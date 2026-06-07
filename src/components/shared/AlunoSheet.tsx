@@ -312,11 +312,15 @@ export function AlunoSheet({
                     <option value="inativo">Inativo</option>
                   </select>
                 ) : (
-                  <StatusBadge status={current.status} />
+                  <div className={viewCls}>
+                    <StatusBadge status={current.status} />
+                  </div>
                 )}
               </Field>
               <Field label="Situação financeira">
-                <StatusBadge status={current.situacao} />
+                <div className={viewCls}>
+                  <StatusBadge status={current.situacao} />
+                </div>
               </Field>
             </div>
           </section>
