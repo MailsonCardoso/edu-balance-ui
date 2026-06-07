@@ -40,7 +40,7 @@ type FormData = z.infer<typeof schema>;
 
 const inputCls =
   "w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors";
-const viewCls = "text-sm py-2.5 text-foreground";
+const viewCls = "w-full min-h-10 px-3 py-2.5 rounded-md bg-muted/30 border border-border text-sm text-foreground flex items-center";
 
 function Field({
   label,
