@@ -103,8 +103,8 @@ function AlunosList() {
                     <td className="px-4 py-3"><StatusBadge status={a.situacao} /></td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => toast.info(`Visualizando ${a.nome}`)} className="p-1.5 rounded hover:bg-accent" title="Visualizar"><Eye className="size-4" /></button>
-                        <button onClick={() => toast.info("Edição em desenvolvimento")} className="p-1.5 rounded hover:bg-accent" title="Editar"><Pencil className="size-4" /></button>
+                        <Link to="/alunos/$id" params={{ id: a.id }} className="p-1.5 rounded hover:bg-accent inline-block" title="Visualizar"><Eye className="size-4" /></Link>
+                        <Link to="/alunos/$id" params={{ id: a.id }} className="p-1.5 rounded hover:bg-accent inline-block" title="Editar"><Pencil className="size-4" /></Link>
                         <button onClick={() => remove(a.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive" title="Excluir"><Trash2 className="size-4" /></button>
                       </div>
                     </td>

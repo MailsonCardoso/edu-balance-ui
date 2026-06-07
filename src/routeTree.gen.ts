@@ -18,6 +18,7 @@ import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
+import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
 
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
@@ -64,6 +65,11 @@ const AlunosNovoRoute = AlunosNovoRouteImport.update({
   path: '/novo',
   getParentRoute: () => AlunosRoute,
 } as any)
+const AlunosIdRoute = AlunosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AlunosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/alunos/': typeof AlunosIndexRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/alunos': typeof AlunosIndexRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/alunos/': typeof AlunosIndexRoute
 }
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/alunos/$id'
     | '/alunos/novo'
     | '/alunos/'
   fileRoutesByTo: FileRoutesByTo
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/alunos/$id'
     | '/alunos/novo'
     | '/alunos'
   id:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/alunos/$id'
     | '/alunos/novo'
     | '/alunos/'
   fileRoutesById: FileRoutesById
@@ -208,15 +220,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlunosNovoRouteImport
       parentRoute: typeof AlunosRoute
     }
+    '/alunos/$id': {
+      id: '/alunos/$id'
+      path: '/$id'
+      fullPath: '/alunos/$id'
+      preLoaderRoute: typeof AlunosIdRouteImport
+      parentRoute: typeof AlunosRoute
+    }
   }
 }
 
 interface AlunosRouteChildren {
+  AlunosIdRoute: typeof AlunosIdRoute
   AlunosNovoRoute: typeof AlunosNovoRoute
   AlunosIndexRoute: typeof AlunosIndexRoute
 }
 
 const AlunosRouteChildren: AlunosRouteChildren = {
+  AlunosIdRoute: AlunosIdRoute,
   AlunosNovoRoute: AlunosNovoRoute,
   AlunosIndexRoute: AlunosIndexRoute,
 }
@@ -236,10 +257,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
