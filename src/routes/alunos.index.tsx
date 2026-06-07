@@ -1,8 +1,18 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
-import { ActionSheet } from "@/components/shared/ActionSheet";
+import { AlunoSheet } from "@/components/shared/AlunoSheet";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
@@ -12,12 +22,13 @@ export const Route = createFileRoute("/alunos/")({
 });
 
 function AlunosList() {
-  const navigate = useNavigate();
   const [data, setData] = useState(mockAlunos);
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("");
   const [status, setStatus] = useState("");
-  const [selectedAluno, setSelectedAluno] = useState<Aluno | null>(null);
+  const [sheetAluno, setSheetAluno] = useState<Aluno | null>(null);
+  const [sheetMode, setSheetMode] = useState<"view" | "edit">("view");
+  const [deleteAluno, setDeleteAluno] = useState<Aluno | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -29,11 +40,6 @@ function AlunosList() {
       ),
     [data, q, turma, status],
   );
-
-  const remove = (id: string) => {
-    setData((d) => d.filter((a) => a.id !== id));
-    toast.success("Aluno removido");
-  };
 
   return (
     <>
@@ -93,7 +99,7 @@ function AlunosList() {
                   <th className="px-4 py-3 font-medium">Telefone</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Situação</th>
-                  <th className="px-4 py-3 w-12"></th>
+                  <th className="px-4 py-3 font-medium text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -106,13 +112,29 @@ function AlunosList() {
                     <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
                     <td className="px-4 py-3"><StatusBadge status={a.situacao} /></td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => setSelectedAluno(a)}
-                        className="p-1.5 rounded hover:bg-accent"
-                        title="Ações"
-                      >
-                        <MoreVertical className="size-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => { setSheetAluno(a); setSheetMode("view"); }}
+                          className="p-1.5 rounded hover:bg-accent"
+                          title="Visualizar"
+                        >
+                          <Eye className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => { setSheetAluno(a); setSheetMode("edit"); }}
+                          className="p-1.5 rounded hover:bg-accent"
+                          title="Editar"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteAluno(a)}
+                          className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                          title="Excluir"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -122,34 +144,45 @@ function AlunosList() {
         </div>
       </div>
 
-      <ActionSheet
-        open={!!selectedAluno}
-        onOpenChange={(open) => { if (!open) setSelectedAluno(null); }}
-        title={selectedAluno?.nome ?? ""}
-        description="Ações disponíveis para este aluno"
-        actions={
-          selectedAluno
-            ? [
-                {
-                  label: "Visualizar",
-                  icon: <Eye className="size-5" />,
-                  onClick: () => navigate({ to: "/alunos/$id", params: { id: selectedAluno.id } }),
-                },
-                {
-                  label: "Editar",
-                  icon: <Pencil className="size-5" />,
-                  onClick: () => navigate({ to: "/alunos/$id", params: { id: selectedAluno.id } }),
-                },
-                {
-                  label: "Excluir",
-                  icon: <Trash2 className="size-5" />,
-                  onClick: () => remove(selectedAluno.id),
-                  destructive: true,
-                },
-              ]
-            : []
-        }
+      <AlunoSheet
+        open={!!sheetAluno}
+        onOpenChange={(open) => { if (!open) setSheetAluno(null); }}
+        aluno={sheetAluno}
+        mode={sheetMode}
+        onSave={(updated) => {
+          setData((d) => d.map((a) => (a.id === updated.id ? updated : a)));
+          setSheetAluno(updated);
+        }}
       />
+
+      <AlertDialog
+        open={!!deleteAluno}
+        onOpenChange={(open) => { if (!open) setDeleteAluno(null); }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir aluno</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir <strong>{deleteAluno?.nome}</strong>? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteAluno) {
+                  setData((d) => d.filter((a) => a.id !== deleteAluno.id));
+                  toast.success("Aluno removido");
+                }
+                setDeleteAluno(null);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

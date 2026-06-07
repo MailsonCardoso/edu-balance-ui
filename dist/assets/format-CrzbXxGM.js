@@ -1,1 +1,0 @@
-const c=e=>e.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}),r=e=>new Date(e).toLocaleDateString("pt-BR"),a=e=>e.replace(/\D/g,"").slice(0,11).replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");export{c as b,r as f,a as m};
