@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
@@ -27,7 +27,7 @@ function AlunosList() {
   const [turma, setTurma] = useState("");
   const [status, setStatus] = useState("");
   const [sheetAluno, setSheetAluno] = useState<Aluno | null>(null);
-  const [sheetMode, setSheetMode] = useState<"view" | "edit">("view");
+  const [sheetMode, setSheetMode] = useState<"view" | "edit" | "create">("view");
   const [deleteAluno, setDeleteAluno] = useState<Aluno | null>(null);
 
   const filtered = useMemo(
@@ -47,12 +47,12 @@ function AlunosList() {
         title="Alunos"
         description={`${filtered.length} aluno(s) encontrado(s)`}
         actions={
-          <Link
-            to="/alunos/novo"
+          <button
+            onClick={() => { setSheetAluno(null); setSheetMode("create"); }}
             className="inline-flex items-center gap-2 h-10 px-4 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
           >
             <Plus className="size-4" /> Novo aluno
-          </Link>
+          </button>
         }
       />
 
@@ -145,13 +145,23 @@ function AlunosList() {
       </div>
 
       <AlunoSheet
-        open={!!sheetAluno}
-        onOpenChange={(open) => { if (!open) setSheetAluno(null); }}
+        open={!!sheetAluno || sheetMode === "create"}
+        onOpenChange={(open) => { if (!open) { setSheetAluno(null); setSheetMode("view"); } }}
         aluno={sheetAluno}
         mode={sheetMode}
         onSave={(updated) => {
-          setData((d) => d.map((a) => (a.id === updated.id ? updated : a)));
-          setSheetAluno(updated);
+          setData((d) => {
+            const exists = d.find((a) => a.id === updated.id);
+            return exists
+              ? d.map((a) => (a.id === updated.id ? updated : a))
+              : [...d, updated];
+          });
+          if (sheetMode === "create") {
+            setSheetAluno(null);
+            setSheetMode("view");
+          } else {
+            setSheetAluno(updated);
+          }
         }}
       />
 
