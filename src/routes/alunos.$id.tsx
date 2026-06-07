@@ -20,7 +20,7 @@ import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/alunos/$id")({
   component: AlunoDetalhe,
@@ -64,7 +64,14 @@ function AlunoDetalhe() {
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
-    values: aluno ? { ...aluno } : undefined,
+    values: aluno
+      ? {
+          ...aluno,
+          dataNascimento: aluno.dataNascimento?.includes("/")
+            ? aluno.dataNascimento
+            : fmtDate(aluno.dataNascimento),
+        }
+      : undefined,
   });
 
   if (!aluno) {
@@ -150,10 +157,10 @@ function AlunoDetalhe() {
               {editing ? <input className={inputCls} {...register("cpf")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpf", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.cpf}</p>}
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
-              {editing ? <input type="date" className={inputCls} {...register("dataNascimento")} /> : <p className="text-sm py-2.5">{aluno.dataNascimento}</p>}
+              {editing ? <input className={inputCls} placeholder="DD/MM/AAAA" {...register("dataNascimento")} onChange={(e) => { const masked = maskDate(e.target.value); e.target.value = masked; setValue("dataNascimento", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.dataNascimento ? fmtDate(aluno.dataNascimento) : ""}</p>}
             </Field>
             <Field label="Telefone" error={errors.telefone?.message}>
-              {editing ? <input className={inputCls} {...register("telefone")} /> : <p className="text-sm py-2.5">{aluno.telefone}</p>}
+              {editing ? <input className={inputCls} placeholder="(11) 99999-9999" {...register("telefone")} onChange={(e) => { const masked = maskPhone(e.target.value); e.target.value = masked; setValue("telefone", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.telefone}</p>}
             </Field>
             <Field label="E-mail" error={errors.email?.message}>
               {editing ? <input type="email" className={inputCls} {...register("email")} /> : <p className="text-sm py-2.5">{aluno.email}</p>}
@@ -174,7 +181,7 @@ function AlunoDetalhe() {
               {editing ? <input className={inputCls} {...register("cpfResponsavel")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpfResponsavel", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.cpfResponsavel}</p>}
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
-              {editing ? <input className={inputCls} {...register("telefoneResponsavel")} /> : <p className="text-sm py-2.5">{aluno.telefoneResponsavel}</p>}
+              {editing ? <input className={inputCls} placeholder="(11) 99999-9999" {...register("telefoneResponsavel")} onChange={(e) => { const masked = maskPhone(e.target.value); e.target.value = masked; setValue("telefoneResponsavel", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.telefoneResponsavel}</p>}
             </Field>
           </div>
         </section>

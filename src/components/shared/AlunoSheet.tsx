@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { StatusBadge } from "@/components/shared/Primitives";
 import type { Aluno } from "@/lib/mock-data";
-import { maskCPF } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -106,7 +106,14 @@ export function AlunoSheet({
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    values: isCreate ? undefined : { ...current },
+    values: isCreate
+      ? undefined
+      : {
+          ...current,
+          dataNascimento: current.dataNascimento?.includes("/")
+            ? current.dataNascimento
+            : fmtDate(current.dataNascimento),
+        },
     defaultValues: isCreate ? { status: "ativo" } : undefined,
   });
 
@@ -187,12 +194,17 @@ export function AlunoSheet({
               <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
                 {editing ? (
                   <input
-                    type="date"
                     className={inputCls}
+                    placeholder="DD/MM/AAAA"
                     {...register("dataNascimento")}
+                    onChange={(e) => {
+                      const masked = maskDate(e.target.value);
+                      e.target.value = masked;
+                      setValue("dataNascimento", masked, { shouldValidate: true });
+                    }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.dataNascimento}</p>
+                  <p className={viewCls}>{current.dataNascimento ? fmtDate(current.dataNascimento) : ""}</p>
                 )}
               </Field>
               <Field label="Telefone" error={errors.telefone?.message}>
@@ -201,6 +213,11 @@ export function AlunoSheet({
                     className={inputCls}
                     placeholder="(11) 99999-9999"
                     {...register("telefone")}
+                    onChange={(e) => {
+                      const masked = maskPhone(e.target.value);
+                      e.target.value = masked;
+                      setValue("telefone", masked, { shouldValidate: true });
+                    }}
                   />
                 ) : (
                   <p className={viewCls}>{current.telefone}</p>
@@ -275,6 +292,11 @@ export function AlunoSheet({
                     className={inputCls}
                     placeholder="(11) 99999-9999"
                     {...register("telefoneResponsavel")}
+                    onChange={(e) => {
+                      const masked = maskPhone(e.target.value);
+                      e.target.value = masked;
+                      setValue("telefoneResponsavel", masked, { shouldValidate: true });
+                    }}
                   />
                 ) : (
                   <p className={viewCls}>{current.telefoneResponsavel}</p>
