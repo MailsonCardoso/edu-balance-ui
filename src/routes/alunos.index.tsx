@@ -1,8 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
+import { ActionSheet } from "@/components/shared/ActionSheet";
 import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
+import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/alunos/")({
@@ -10,10 +12,12 @@ export const Route = createFileRoute("/alunos/")({
 });
 
 function AlunosList() {
+  const navigate = useNavigate();
   const [data, setData] = useState(mockAlunos);
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedAluno, setSelectedAluno] = useState<Aluno | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -89,7 +93,7 @@ function AlunosList() {
                   <th className="px-4 py-3 font-medium">Telefone</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Situação</th>
-                  <th className="px-4 py-3 font-medium text-right">Ações</th>
+                  <th className="px-4 py-3 w-12"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -102,11 +106,13 @@ function AlunosList() {
                     <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
                     <td className="px-4 py-3"><StatusBadge status={a.situacao} /></td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        <Link to="/alunos/$id" params={{ id: a.id }} className="p-1.5 rounded hover:bg-accent inline-block" title="Visualizar"><Eye className="size-4" /></Link>
-                        <Link to="/alunos/$id" params={{ id: a.id }} className="p-1.5 rounded hover:bg-accent inline-block" title="Editar"><Pencil className="size-4" /></Link>
-                        <button onClick={() => remove(a.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive" title="Excluir"><Trash2 className="size-4" /></button>
-                      </div>
+                      <button
+                        onClick={() => setSelectedAluno(a)}
+                        className="p-1.5 rounded hover:bg-accent"
+                        title="Ações"
+                      >
+                        <MoreVertical className="size-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -115,6 +121,35 @@ function AlunosList() {
           )}
         </div>
       </div>
+
+      <ActionSheet
+        open={!!selectedAluno}
+        onOpenChange={(open) => { if (!open) setSelectedAluno(null); }}
+        title={selectedAluno?.nome ?? ""}
+        description="Ações disponíveis para este aluno"
+        actions={
+          selectedAluno
+            ? [
+                {
+                  label: "Visualizar",
+                  icon: <Eye className="size-5" />,
+                  onClick: () => navigate({ to: "/alunos/$id", params: { id: selectedAluno.id } }),
+                },
+                {
+                  label: "Editar",
+                  icon: <Pencil className="size-5" />,
+                  onClick: () => navigate({ to: "/alunos/$id", params: { id: selectedAluno.id } }),
+                },
+                {
+                  label: "Excluir",
+                  icon: <Trash2 className="size-5" />,
+                  onClick: () => remove(selectedAluno.id),
+                  destructive: true,
+                },
+              ]
+            : []
+        }
+      />
     </>
   );
 }

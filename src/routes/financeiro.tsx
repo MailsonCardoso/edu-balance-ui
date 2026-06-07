@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Eye, History, Search } from "lucide-react";
+import { CheckCircle2, Eye, History, MoreVertical, Search } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
+import { ActionSheet } from "@/components/shared/ActionSheet";
 import { mensalidades as mock } from "@/lib/mock-data";
+import type { Mensalidade } from "@/lib/mock-data";
 import { brl, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 
@@ -14,6 +16,7 @@ function Financeiro() {
   const [data, setData] = useState(mock);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedMensalidade, setSelectedMensalidade] = useState<Mensalidade | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -76,7 +79,7 @@ function Financeiro() {
                   <th className="px-4 py-3 font-medium">Vencimento</th>
                   <th className="px-4 py-3 font-medium">Valor</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium text-right">Ações</th>
+                  <th className="px-4 py-3 w-12"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -88,13 +91,13 @@ function Financeiro() {
                     <td className="px-4 py-3 font-medium">{brl(m.valor)}{m.valorPago && m.status === "parcial" ? <span className="text-xs text-info ml-2">({brl(m.valorPago)} pago)</span> : null}</td>
                     <td className="px-4 py-3"><StatusBadge status={m.status} /></td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => toast.info(`Detalhes ${m.competencia}`)} className="p-1.5 rounded hover:bg-accent" title="Detalhes"><Eye className="size-4" /></button>
-                        <button onClick={() => toast.info("Histórico do aluno")} className="p-1.5 rounded hover:bg-accent" title="Histórico"><History className="size-4" /></button>
-                        {m.status !== "pago" && (
-                          <button onClick={() => registrar(m.id)} className="p-1.5 rounded text-success hover:bg-success/10" title="Registrar pagamento"><CheckCircle2 className="size-4" /></button>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => setSelectedMensalidade(m)}
+                        className="p-1.5 rounded hover:bg-accent"
+                        title="Ações"
+                      >
+                        <MoreVertical className="size-4" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -103,6 +106,42 @@ function Financeiro() {
           )}
         </div>
       </div>
+
+      <ActionSheet
+        open={!!selectedMensalidade}
+        onOpenChange={(open) => { if (!open) setSelectedMensalidade(null); }}
+        title={selectedMensalidade ? `${selectedMensalidade.alunoNome} — ${selectedMensalidade.competencia}` : ""}
+        description={
+          selectedMensalidade
+            ? `${brl(selectedMensalidade.valor)} — ${selectedMensalidade.status.replace("_", " ")}`
+            : ""
+        }
+        actions={
+          selectedMensalidade
+            ? [
+                {
+                  label: "Detalhes",
+                  icon: <Eye className="size-5" />,
+                  onClick: () => toast.info(`Detalhes da mensalidade de ${selectedMensalidade.competencia}`),
+                },
+                {
+                  label: "Histórico",
+                  icon: <History className="size-5" />,
+                  onClick: () => toast.info(`Histórico de pagamentos de ${selectedMensalidade.alunoNome}`),
+                },
+                ...(selectedMensalidade.status !== "pago"
+                  ? [
+                      {
+                        label: "Registrar pagamento",
+                        icon: <CheckCircle2 className="size-5" />,
+                        onClick: () => registrar(selectedMensalidade.id),
+                      },
+                    ]
+                  : []),
+              ]
+            : []
+        }
+      />
     </>
   );
 }
