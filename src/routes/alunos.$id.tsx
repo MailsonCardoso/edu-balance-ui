@@ -9,6 +9,7 @@ import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { maskCPF } from "@/lib/format";
 
 export const Route = createFileRoute("/alunos/$id")({
   component: AlunoDetalhe,
@@ -50,7 +51,7 @@ function AlunoDetalhe() {
 
   const [aluno, setAluno] = useState<Aluno | undefined>(() => mockAlunos.find((a) => a.id === id));
 
-  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<FormData>({
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
     values: aluno ? { ...aluno } : undefined,
   });
@@ -117,7 +118,7 @@ function AlunoDetalhe() {
               {editing ? <input className={inputCls} {...register("nome")} /> : <p className="text-sm py-2.5">{aluno.nome}</p>}
             </Field>
             <Field label="CPF" error={errors.cpf?.message}>
-              {editing ? <input className={inputCls} {...register("cpf")} /> : <p className="text-sm py-2.5">{aluno.cpf}</p>}
+              {editing ? <input className={inputCls} {...register("cpf")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpf", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.cpf}</p>}
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
               {editing ? <input type="date" className={inputCls} {...register("dataNascimento")} /> : <p className="text-sm py-2.5">{aluno.dataNascimento}</p>}
@@ -141,7 +142,7 @@ function AlunoDetalhe() {
               {editing ? <input className={inputCls} {...register("responsavel")} /> : <p className="text-sm py-2.5">{aluno.responsavel}</p>}
             </Field>
             <Field label="CPF do responsável" error={errors.cpfResponsavel?.message}>
-              {editing ? <input className={inputCls} {...register("cpfResponsavel")} /> : <p className="text-sm py-2.5">{aluno.cpfResponsavel}</p>}
+              {editing ? <input className={inputCls} {...register("cpfResponsavel")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpfResponsavel", masked, { shouldValidate: true }) }} /> : <p className="text-sm py-2.5">{aluno.cpfResponsavel}</p>}
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
               {editing ? <input className={inputCls} {...register("telefoneResponsavel")} /> : <p className="text-sm py-2.5">{aluno.telefoneResponsavel}</p>}

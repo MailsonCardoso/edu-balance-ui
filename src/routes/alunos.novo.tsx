@@ -8,6 +8,8 @@ import { PageHeader } from "@/components/shared/Primitives";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { maskCPF } from "@/lib/format";
+import type { ChangeEvent } from "react";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -54,7 +56,7 @@ const inputCls =
 
 function NovoAluno() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { status: "ativo" },
   });
@@ -86,7 +88,7 @@ function NovoAluno() {
               <input className={inputCls} {...register("nome")} />
             </Field>
             <Field label="CPF" error={errors.cpf?.message}>
-              <input className={inputCls} placeholder="000.000.000-00" {...register("cpf")} />
+              <input className={inputCls} placeholder="000.000.000-00" {...register("cpf")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpf", masked, { shouldValidate: true }) }} />
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
               <input type="date" className={inputCls} {...register("dataNascimento")} />
@@ -110,7 +112,7 @@ function NovoAluno() {
               <input className={inputCls} {...register("responsavel")} />
             </Field>
             <Field label="CPF do responsável" error={errors.cpfResponsavel?.message}>
-              <input className={inputCls} placeholder="000.000.000-00" {...register("cpfResponsavel")} />
+              <input className={inputCls} placeholder="000.000.000-00" {...register("cpfResponsavel")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpfResponsavel", masked, { shouldValidate: true }) }} />
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
               <input className={inputCls} {...register("telefoneResponsavel")} />
