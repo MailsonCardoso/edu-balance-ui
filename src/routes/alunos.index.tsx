@@ -145,6 +145,7 @@ function AlunosList() {
       </div>
 
       <AlunoSheet
+        key={sheetMode + (sheetAluno?.id ?? "new")}
         open={!!sheetAluno || sheetMode === "create"}
         onOpenChange={(open) => { if (!open) { setSheetAluno(null); setSheetMode("view"); } }}
         aluno={sheetAluno}
