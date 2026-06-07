@@ -3,7 +3,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Eye, EyeOff, Pencil, Save, Trash2, X } from "lucide-react";
+import { ArrowLeft, Pencil, Save, Trash2, X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { PageHeader, StatusBadge } from "@/components/shared/Primitives";
 import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
@@ -101,9 +112,27 @@ function AlunoDetalhe() {
                 <button onClick={() => setEditing(true)} className="h-10 px-4 inline-flex items-center gap-2 rounded-md border border-input hover:bg-accent text-sm">
                   <Pencil className="size-4" /> Editar
                 </button>
-                <button onClick={remover} className="h-10 px-4 inline-flex items-center gap-2 rounded-md border border-destructive/30 hover:bg-destructive/10 text-destructive text-sm">
-                  <Trash2 className="size-4" /> Excluir
-                </button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button className="h-10 px-4 inline-flex items-center gap-2 rounded-md border border-destructive/30 hover:bg-destructive/10 text-destructive text-sm">
+                      <Trash2 className="size-4" /> Excluir
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir aluno</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja excluir <strong>{aluno.nome}</strong>? Esta ação não pode ser desfeita.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={remover} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Sim, excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </>
             )}
           </div>
