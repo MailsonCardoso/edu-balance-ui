@@ -9,38 +9,184 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RelatoriosRouteImport } from './routes/relatorios'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
+import { Route as FinanceiroRouteImport } from './routes/financeiro'
+import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
+import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 
+const RelatoriosRoute = RelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InadimplentesRoute = InadimplentesRouteImport.update({
+  id: '/inadimplentes',
+  path: '/inadimplentes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceiroRoute = FinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlunosRoute = AlunosRouteImport.update({
+  id: '/alunos',
+  path: '/alunos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlunosIndexRoute = AlunosIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AlunosRoute,
+} as any)
+const AlunosNovoRoute = AlunosNovoRouteImport.update({
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => AlunosRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alunos': typeof AlunosRouteWithChildren
+  '/financeiro': typeof FinanceiroRoute
+  '/inadimplentes': typeof InadimplentesRoute
+  '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/alunos/novo': typeof AlunosNovoRoute
+  '/alunos/': typeof AlunosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/financeiro': typeof FinanceiroRoute
+  '/inadimplentes': typeof InadimplentesRoute
+  '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/alunos/novo': typeof AlunosNovoRoute
+  '/alunos': typeof AlunosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alunos': typeof AlunosRouteWithChildren
+  '/financeiro': typeof FinanceiroRoute
+  '/inadimplentes': typeof InadimplentesRoute
+  '/login': typeof LoginRoute
+  '/perfil': typeof PerfilRoute
+  '/relatorios': typeof RelatoriosRoute
+  '/alunos/novo': typeof AlunosNovoRoute
+  '/alunos/': typeof AlunosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/alunos'
+    | '/financeiro'
+    | '/inadimplentes'
+    | '/login'
+    | '/perfil'
+    | '/relatorios'
+    | '/alunos/novo'
+    | '/alunos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/financeiro'
+    | '/inadimplentes'
+    | '/login'
+    | '/perfil'
+    | '/relatorios'
+    | '/alunos/novo'
+    | '/alunos'
+  id:
+    | '__root__'
+    | '/'
+    | '/alunos'
+    | '/financeiro'
+    | '/inadimplentes'
+    | '/login'
+    | '/perfil'
+    | '/relatorios'
+    | '/alunos/novo'
+    | '/alunos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlunosRoute: typeof AlunosRouteWithChildren
+  FinanceiroRoute: typeof FinanceiroRoute
+  InadimplentesRoute: typeof InadimplentesRoute
+  LoginRoute: typeof LoginRoute
+  PerfilRoute: typeof PerfilRoute
+  RelatoriosRoute: typeof RelatoriosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/relatorios': {
+      id: '/relatorios'
+      path: '/relatorios'
+      fullPath: '/relatorios'
+      preLoaderRoute: typeof RelatoriosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inadimplentes': {
+      id: '/inadimplentes'
+      path: '/inadimplentes'
+      fullPath: '/inadimplentes'
+      preLoaderRoute: typeof InadimplentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financeiro': {
+      id: '/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof FinanceiroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alunos': {
+      id: '/alunos'
+      path: '/alunos'
+      fullPath: '/alunos'
+      preLoaderRoute: typeof AlunosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +194,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alunos/': {
+      id: '/alunos/'
+      path: '/'
+      fullPath: '/alunos/'
+      preLoaderRoute: typeof AlunosIndexRouteImport
+      parentRoute: typeof AlunosRoute
+    }
+    '/alunos/novo': {
+      id: '/alunos/novo'
+      path: '/novo'
+      fullPath: '/alunos/novo'
+      preLoaderRoute: typeof AlunosNovoRouteImport
+      parentRoute: typeof AlunosRoute
+    }
   }
 }
 
+interface AlunosRouteChildren {
+  AlunosNovoRoute: typeof AlunosNovoRoute
+  AlunosIndexRoute: typeof AlunosIndexRoute
+}
+
+const AlunosRouteChildren: AlunosRouteChildren = {
+  AlunosNovoRoute: AlunosNovoRoute,
+  AlunosIndexRoute: AlunosIndexRoute,
+}
+
+const AlunosRouteWithChildren =
+  AlunosRoute._addFileChildren(AlunosRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlunosRoute: AlunosRouteWithChildren,
+  FinanceiroRoute: FinanceiroRoute,
+  InadimplentesRoute: InadimplentesRoute,
+  LoginRoute: LoginRoute,
+  PerfilRoute: PerfilRoute,
+  RelatoriosRoute: RelatoriosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
