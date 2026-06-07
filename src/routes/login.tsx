@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "../lib/auth";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -21,13 +22,19 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Data>({
     resolver: zodResolver(schema),
     defaultValues: { email: "admin@escola.com", senha: "admin123", lembrar: true },
   });
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: Data) => {
     await new Promise((r) => setTimeout(r, 700));
+    const ok = login(data.email, data.senha);
+    if (!ok) {
+      toast.error("E-mail ou senha inválidos");
+      return
+    }
     toast.success("Bem-vindo de volta!");
     navigate({ to: "/" });
   };

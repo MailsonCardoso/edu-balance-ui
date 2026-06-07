@@ -1,8 +1,12 @@
-import { Bell, Menu, Moon, Search, Sun } from "lucide-react";
+import { Bell, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
 import { useTheme } from "@/lib/theme";
+import { useAuth } from "@/lib/auth";
+import { useNavigate } from "@tanstack/react-router";
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { theme, toggle } = useTheme();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   return (
     <header className="h-16 bg-card border-b border-border flex items-center px-4 md:px-6 gap-3 sticky top-0 z-20">
       <button
@@ -36,12 +40,20 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
         <div className="flex items-center gap-3 pl-3 ml-2 border-l border-border">
           <div className="hidden sm:flex flex-col items-end leading-tight">
-            <span className="text-sm font-medium">Admin Escola</span>
-            <span className="text-xs text-muted-foreground">admin@escola.com</span>
+            <span className="text-sm font-medium">{user?.nome}</span>
+            <span className="text-xs text-muted-foreground">{user?.email}</span>
           </div>
           <div className="size-9 rounded-full bg-gradient-to-br from-primary to-info grid place-items-center text-primary-foreground font-semibold text-sm">
-            AE
+            {user?.nome.charAt(0).toUpperCase()}
           </div>
+          <button
+            onClick={() => { logout(); navigate({ to: "/login" }) }}
+            className="p-2 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+            aria-label="Sair"
+            title="Sair"
+          >
+            <LogOut className="size-[18px]" />
+          </button>
         </div>
       </div>
     </header>
