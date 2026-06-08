@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -24,6 +24,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           side="left"
           className="p-0 w-[280px] bg-sidebar border-r border-sidebar-border"
         >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de navegação</SheetTitle>
+          </SheetHeader>
           <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
