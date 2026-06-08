@@ -18,7 +18,7 @@ import {
 import { PageHeader, StatusBadge } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
+import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -69,7 +69,7 @@ function AlunoDetalhe() {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
 
-  const [aluno, setAluno] = useState<Aluno | undefined>(() => mockAlunos.find((a) => a.id === id));
+  const [aluno, setAluno] = useState<Aluno | undefined>();
 
   const {
     register,

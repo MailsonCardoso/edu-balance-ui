@@ -15,14 +15,13 @@ import {
   Legend,
 } from "recharts";
 import { PageHeader, StatCard } from "@/components/shared/Primitives";
-import {
-  dashboardStats,
-  receitaMensal,
-  receitaAnual,
-  inadimplenciaPeriodo,
-  evolucaoPagamentos,
-} from "@/lib/mock-data";
 import { brl } from "@/lib/format";
+
+const zerado = { totalRecebido: 0, totalAberto: 0, totalVencido: 0, alunosAtivos: 0, alunosInadimplentes: 0 };
+const vazioGrafico: { mes: string; receita: number; meta?: number }[] = [];
+const vazioAnual: { ano: string; receita: number }[] = [];
+const vazioInadimplencia: { mes: string; percentual: number }[] = [];
+const vazioPagamentos: { dia: string; pagos: number; pendentes: number }[] = [];
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -63,45 +62,45 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
         <StatCard
           label="Recebido no mês"
-          value={brl(dashboardStats.totalRecebido)}
+          value={brl(zerado.totalRecebido)}
           icon={<Wallet className="size-5" />}
           tone="success"
-          trend="+12% vs mês anterior"
+          trend="Nenhum registro"
         />
         <StatCard
           label="Em aberto"
-          value={brl(dashboardStats.totalAberto)}
+          value={brl(zerado.totalAberto)}
           icon={<CalendarClock className="size-5" />}
           tone="warning"
           trend="A receber neste mês"
         />
         <StatCard
           label="Vencido"
-          value={brl(dashboardStats.totalVencido)}
+          value={brl(zerado.totalVencido)}
           icon={<AlertCircle className="size-5" />}
           tone="destructive"
-          trend="23 parcelas em atraso"
+          trend="Nenhum registro"
         />
         <StatCard
           label="Alunos ativos"
-          value={dashboardStats.alunosAtivos}
+          value={zerado.alunosAtivos}
           icon={<Users className="size-5" />}
           tone="info"
           trend="Matriculados"
         />
         <StatCard
           label="Inadimplentes"
-          value={dashboardStats.alunosInadimplentes}
+          value={zerado.alunosInadimplentes}
           icon={<UserX className="size-5" />}
           tone="destructive"
-          trend="12% da base"
+          trend="Nenhum registro"
         />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <ChartCard title="Receita mensal" subtitle="Comparativo com a meta" index={0}>
           <ResponsiveContainer>
-            <AreaChart data={receitaMensal}>
+            <AreaChart data={vazioGrafico}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
@@ -143,7 +142,7 @@ function Dashboard() {
 
         <ChartCard title="Receita anual" subtitle="Evolução nos últimos anos" index={1}>
           <ResponsiveContainer>
-            <BarChart data={receitaAnual}>
+            <BarChart data={vazioAnual}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="ano" tick={axisStyle} stroke="var(--border)" />
               <YAxis
@@ -168,7 +167,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Inadimplência por período" subtitle="Percentual mensal" index={2}>
           <ResponsiveContainer>
-            <LineChart data={inadimplenciaPeriodo}>
+            <LineChart data={vazioInadimplencia}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />
               <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v}%`} />
@@ -193,7 +192,7 @@ function Dashboard() {
 
         <ChartCard title="Evolução de pagamentos" subtitle="Pagos vs pendentes no mês" index={3}>
           <ResponsiveContainer>
-            <AreaChart data={evolucaoPagamentos}>
+            <AreaChart data={vazioPagamentos}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="dia" tick={axisStyle} stroke="var(--border)" />
               <YAxis tick={axisStyle} stroke="var(--border)" />

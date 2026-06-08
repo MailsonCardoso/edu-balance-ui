@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mensalidades, alunos, turmas } from "@/lib/mock-data";
+import { turmas } from "@/lib/mock-data";
 import { brl } from "@/lib/format";
 
 export const Route = createFileRoute("/inadimplentes")({
@@ -21,24 +21,7 @@ function Inadimplentes() {
   const [minValor, setMinValor] = useState(0);
 
   const list = useMemo(() => {
-    const today = new Date();
-    const vencidas = mensalidades.filter((m) => m.status === "vencido");
-    const byAluno = new Map<string, { parcelas: number; total: number; maiorAtraso: number }>();
-    for (const m of vencidas) {
-      const dias = Math.floor((today.getTime() - new Date(m.vencimento).getTime()) / 86_400_000);
-      const cur = byAluno.get(m.alunoId) ?? { parcelas: 0, total: 0, maiorAtraso: 0 };
-      cur.parcelas += 1;
-      cur.total += m.valor;
-      cur.maiorAtraso = Math.max(cur.maiorAtraso, dias);
-      byAluno.set(m.alunoId, cur);
-    }
-    return Array.from(byAluno.entries())
-      .map(([id, info]) => {
-        const a = alunos.find((x) => x.id === id)!;
-        return { ...a, ...info };
-      })
-      .filter((r) => (turma === "all" || r.turma === turma) && r.total >= minValor)
-      .sort((a, b) => b.total - a.total);
+    return [] as Array<Record<string, unknown>>;
   }, [turma, minValor]);
 
   return (

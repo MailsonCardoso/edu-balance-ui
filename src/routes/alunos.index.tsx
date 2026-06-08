@@ -22,7 +22,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { alunos as mockAlunos, turmas } from "@/lib/mock-data";
+import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/alunos/")({
 });
 
 function AlunosList() {
-  const [data, setData] = useState(mockAlunos);
+  const [data, setData] = useState<Aluno[]>([]);
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("all");
   const [status, setStatus] = useState("all");

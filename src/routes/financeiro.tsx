@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mensalidades as mock } from "@/lib/mock-data";
 import type { Mensalidade } from "@/lib/mock-data";
 import { brl, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/financeiro")({
 });
 
 function Financeiro() {
-  const [data, setData] = useState(mock);
+  const [data, setData] = useState<Mensalidade[]>([]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
   const [selectedMensalidade, setSelectedMensalidade] = useState<Mensalidade | null>(null);
