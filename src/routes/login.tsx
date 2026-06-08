@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -128,11 +128,7 @@ function Login() {
           </form>
 
           <p className="text-xs text-muted-foreground text-center mt-6">
-            Use as credenciais pré-preenchidas para um tour rápido —{" "}
-            <Link to="/" className="text-primary hover:underline">
-              ou entre no dashboard
-            </Link>
-            .
+            Use as credenciais pré-definidas para acessar o sistema
           </p>
         </div>
       </div>
