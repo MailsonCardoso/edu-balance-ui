@@ -188,9 +188,13 @@ function AlunosList() {
         aluno={sheetAluno}
         mode={sheetMode}
         onSave={(updated) => {
+          console.log("[DEBUG] onSave called with:", updated);
           setData((d) => {
+            console.log("[DEBUG] setData updater, current length:", d.length);
             const exists = d.find((a) => a.id === updated.id);
-            return exists ? d.map((a) => (a.id === updated.id ? updated : a)) : [...d, updated];
+            const next = exists ? d.map((a) => (a.id === updated.id ? updated : a)) : [...d, updated];
+            console.log("[DEBUG] setData next length:", next.length);
+            return next;
           });
           if (sheetMode === "create") {
             setSheetAluno(null);
