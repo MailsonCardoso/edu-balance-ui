@@ -28,7 +28,8 @@ const senhaSchema = z
   })
   .refine((d) => d.nova === d.confirmar, { path: ["confirmar"], message: "Senhas não coincidem" });
 
-const inputCls = "w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring";
+const inputCls =
+  "w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring";
 
 function Perfil() {
   const [tab, setTab] = useState<Tab>("Perfil");
@@ -66,12 +67,19 @@ function Perfil() {
 }
 
 function PerfilForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(perfilSchema),
     defaultValues: { nome: "Admin Escola", email: "admin@escola.com", cargo: "Administrador" },
   });
   return (
-    <form onSubmit={handleSubmit(() => toast.success("Perfil atualizado"))} className="space-y-4 max-w-xl">
+    <form
+      onSubmit={handleSubmit(() => toast.success("Perfil atualizado"))}
+      className="space-y-4 max-w-xl"
+    >
       <div className="space-y-1.5">
         <label className="text-sm font-medium">Nome</label>
         <input className={inputCls} {...register("nome")} />
@@ -86,26 +94,40 @@ function PerfilForm() {
         <label className="text-sm font-medium">Cargo</label>
         <input className={inputCls} {...register("cargo")} />
       </div>
-      <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90">Salvar</button>
+      <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90">
+        Salvar
+      </button>
     </form>
   );
 }
 
 function SenhaForm() {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({ resolver: zodResolver(senhaSchema) });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({ resolver: zodResolver(senhaSchema) });
   return (
     <form
-      onSubmit={handleSubmit(() => { toast.success("Senha alterada"); reset(); })}
+      onSubmit={handleSubmit(() => {
+        toast.success("Senha alterada");
+        reset();
+      })}
       className="space-y-4 max-w-xl"
     >
       {(["atual", "nova", "confirmar"] as const).map((k) => (
         <div key={k} className="space-y-1.5">
-          <label className="text-sm font-medium capitalize">{k === "atual" ? "Senha atual" : k === "nova" ? "Nova senha" : "Confirmar nova senha"}</label>
+          <label className="text-sm font-medium capitalize">
+            {k === "atual" ? "Senha atual" : k === "nova" ? "Nova senha" : "Confirmar nova senha"}
+          </label>
           <input type="password" className={inputCls} {...register(k)} />
           {errors[k] && <p className="text-xs text-destructive">{errors[k]?.message as string}</p>}
         </div>
       ))}
-      <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90">Alterar senha</button>
+      <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90">
+        Alterar senha
+      </button>
     </form>
   );
 }
@@ -120,9 +142,17 @@ function Toggle({ label, desc }: { label: string; desc: string }) {
       </div>
       <button
         onClick={() => setOn(!on)}
-        className={cn("relative w-11 h-6 rounded-full transition-colors", on ? "bg-primary" : "bg-muted")}
+        className={cn(
+          "relative w-11 h-6 rounded-full transition-colors",
+          on ? "bg-primary" : "bg-muted",
+        )}
       >
-        <span className={cn("absolute top-0.5 size-5 bg-white rounded-full transition-transform shadow", on ? "translate-x-5" : "translate-x-0.5")} />
+        <span
+          className={cn(
+            "absolute top-0.5 size-5 bg-white rounded-full transition-transform shadow",
+            on ? "translate-x-5" : "translate-x-0.5",
+          )}
+        />
       </button>
     </div>
   );

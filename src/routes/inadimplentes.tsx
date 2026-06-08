@@ -1,6 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { mensalidades, alunos, turmas } from "@/lib/mock-data";
 import { brl } from "@/lib/format";
 
@@ -9,7 +17,7 @@ export const Route = createFileRoute("/inadimplentes")({
 });
 
 function Inadimplentes() {
-  const [turma, setTurma] = useState("");
+  const [turma, setTurma] = useState("all");
   const [minValor, setMinValor] = useState(0);
 
   const list = useMemo(() => {
@@ -29,26 +37,38 @@ function Inadimplentes() {
         const a = alunos.find((x) => x.id === id)!;
         return { ...a, ...info };
       })
-      .filter((r) => (!turma || r.turma === turma) && r.total >= minValor)
+      .filter((r) => (turma === "all" || r.turma === turma) && r.total >= minValor)
       .sort((a, b) => b.total - a.total);
   }, [turma, minValor]);
 
   return (
     <>
-      <PageHeader title="Inadimplentes" description={`${list.length} aluno(s) com parcelas em aberto`} />
+      <PageHeader
+        title="Inadimplentes"
+        description={`${list.length} aluno(s) com parcelas em aberto`}
+      />
 
       <div className="bg-card rounded-xl border border-border">
         <div className="p-4 flex flex-col md:flex-row gap-3 border-b border-border">
-          <select value={turma} onChange={(e) => setTurma(e.target.value)} className="h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring">
-            <option value="">Todas as turmas</option>
-            {turmas.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <input
+          <Select value={turma} onValueChange={setTurma}>
+            <SelectTrigger className="w-44 h-10">
+              <SelectValue placeholder="Todas as turmas" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as turmas</SelectItem>
+              {turmas.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
             type="number"
             value={minValor || ""}
             onChange={(e) => setMinValor(Number(e.target.value) || 0)}
             placeholder="Valor mínimo (R$)"
-            className="h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring"
+            className="h-10 max-w-44"
           />
         </div>
 
@@ -71,9 +91,17 @@ function Inadimplentes() {
                   <tr key={r.id} className="hover:bg-muted/30">
                     <td className="px-4 py-3 font-medium">{r.nome}</td>
                     <td className="px-4 py-3">{r.turma}</td>
-                    <td className="px-4 py-3 text-center"><span className="inline-flex items-center justify-center min-w-8 h-7 px-2 rounded-full bg-destructive/15 text-destructive text-xs font-semibold">{r.parcelas}</span></td>
-                    <td className="px-4 py-3 text-center text-destructive font-medium">{r.maiorAtraso}d</td>
-                    <td className="px-4 py-3 text-right font-semibold text-destructive">{brl(r.total)}</td>
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-flex items-center justify-center min-w-8 h-7 px-2 rounded-full bg-destructive/15 text-destructive text-xs font-semibold">
+                        {r.parcelas}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-center text-destructive font-medium">
+                      {r.maiorAtraso}d
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold text-destructive">
+                      {brl(r.total)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

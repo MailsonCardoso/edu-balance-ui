@@ -5,11 +5,12 @@ import { z } from "zod";
 import { ArrowLeft, Save } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/shared/Primitives";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/format";
-import type { ChangeEvent } from "react";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -51,12 +52,15 @@ function Field({
   );
 }
 
-const inputCls =
-  "w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors";
-
 function NovoAluno() {
   const navigate = useNavigate();
-  const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { status: "ativo" },
   });
@@ -74,33 +78,48 @@ function NovoAluno() {
         title="Cadastro de aluno"
         description="Preencha os dados do aluno e do responsável financeiro"
         actions={
-          <Link to="/alunos" className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-input hover:bg-accent text-sm">
+          <Link
+            to="/alunos"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-md border border-input hover:bg-accent text-sm"
+          >
             <ArrowLeft className="size-4" /> Voltar
           </Link>
         }
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-card rounded-xl border border-border p-6 space-y-6">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-card rounded-xl border border-border p-6 space-y-6"
+      >
         <section>
           <h3 className="font-semibold mb-4">Dados do aluno</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Nome completo" error={errors.nome?.message} className="md:col-span-2">
-              <input className={inputCls} {...register("nome")} />
+              <Input className="h-10" {...register("nome")} />
             </Field>
             <Field label="CPF" error={errors.cpf?.message}>
-              <input className={inputCls} placeholder="000.000.000-00" {...register("cpf")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpf", masked, { shouldValidate: true }) }} />
+              <Input
+                className="h-10"
+                placeholder="000.000.000-00"
+                {...register("cpf")}
+                onChange={(e) => {
+                  const masked = maskCPF(e.target.value);
+                  e.target.value = masked;
+                  setValue("cpf", masked, { shouldValidate: true });
+                }}
+              />
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
-              <input type="date" className={inputCls} {...register("dataNascimento")} />
+              <Input type="date" className="h-10" {...register("dataNascimento")} />
             </Field>
             <Field label="Telefone" error={errors.telefone?.message}>
-              <input className={inputCls} placeholder="(00) 00000-0000" {...register("telefone")} />
+              <Input className="h-10" placeholder="(00) 00000-0000" {...register("telefone")} />
             </Field>
             <Field label="E-mail" error={errors.email?.message}>
-              <input type="email" className={inputCls} {...register("email")} />
+              <Input type="email" className="h-10" {...register("email")} />
             </Field>
             <Field label="Endereço" error={errors.endereco?.message} className="md:col-span-2">
-              <input className={inputCls} {...register("endereco")} />
+              <Input className="h-10" {...register("endereco")} />
             </Field>
           </div>
         </section>
@@ -109,13 +128,22 @@ function NovoAluno() {
           <h3 className="font-semibold mb-4">Responsável financeiro</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Nome do responsável" error={errors.responsavel?.message}>
-              <input className={inputCls} {...register("responsavel")} />
+              <Input className="h-10" {...register("responsavel")} />
             </Field>
             <Field label="CPF do responsável" error={errors.cpfResponsavel?.message}>
-              <input className={inputCls} placeholder="000.000.000-00" {...register("cpfResponsavel")} onChange={(e) => { const masked = maskCPF(e.target.value); e.target.value = masked; setValue("cpfResponsavel", masked, { shouldValidate: true }) }} />
+              <Input
+                className="h-10"
+                placeholder="000.000.000-00"
+                {...register("cpfResponsavel")}
+                onChange={(e) => {
+                  const masked = maskCPF(e.target.value);
+                  e.target.value = masked;
+                  setValue("cpfResponsavel", masked, { shouldValidate: true });
+                }}
+              />
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
-              <input className={inputCls} {...register("telefoneResponsavel")} />
+              <Input className="h-10" {...register("telefoneResponsavel")} />
             </Field>
           </div>
         </section>
@@ -124,13 +152,23 @@ function NovoAluno() {
           <h3 className="font-semibold mb-4">Matrícula</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Série / Turma" error={errors.turma?.message}>
-              <select className={inputCls} {...register("turma")}>
+              <select
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
+                {...register("turma")}
+              >
                 <option value="">Selecione...</option>
-                {turmas.map((t) => <option key={t} value={t}>{t}</option>)}
+                {turmas.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="Status" error={errors.status?.message}>
-              <select className={inputCls} {...register("status")}>
+              <select
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
+                {...register("status")}
+              >
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
               </select>
@@ -139,14 +177,12 @@ function NovoAluno() {
         </section>
 
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
-          <Link to="/alunos" className="h-10 px-4 inline-flex items-center rounded-md border border-input hover:bg-accent text-sm">Cancelar</Link>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="h-10 px-5 inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 disabled:opacity-60"
-          >
+          <Link to="/alunos">
+            <Button variant="outline">Cancelar</Button>
+          </Link>
+          <Button type="submit" disabled={isSubmitting}>
             <Save className="size-4" /> {isSubmitting ? "Salvando..." : "Salvar aluno"}
-          </button>
+          </Button>
         </div>
       </form>
     </>

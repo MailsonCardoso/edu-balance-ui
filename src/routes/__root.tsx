@@ -1,5 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, createRootRouteWithContext, useRouterState, useNavigate } from "@tanstack/react-router";
+import {
+  Outlet,
+  createRootRouteWithContext,
+  useRouterState,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import { AppLayout } from "../components/layout/AppLayout";
@@ -12,18 +17,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     if (!user && pathname !== "/login") {
-      navigate({ to: "/login", replace: true })
+      navigate({ to: "/login", replace: true });
     }
-  }, [user, pathname, navigate])
+  }, [user, pathname, navigate]);
 
-  if (!user && pathname !== "/login") return null
-  return <>{children}</>
+  if (!user && pathname !== "/login") return null;
+  return <>{children}</>;
 }
 
 function RootComponent() {
@@ -36,7 +41,13 @@ function RootComponent() {
       <AuthProvider>
         <ThemeProvider>
           <AuthGuard>
-            {isAuthRoute ? <Outlet /> : <AppLayout><Outlet /></AppLayout>}
+            {isAuthRoute ? (
+              <Outlet />
+            ) : (
+              <AppLayout>
+                <Outlet />
+              </AppLayout>
+            )}
           </AuthGuard>
           <Toaster />
         </ThemeProvider>

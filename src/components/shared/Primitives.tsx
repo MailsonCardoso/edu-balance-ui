@@ -42,14 +42,19 @@ export function StatCard({
     info: "bg-info/10 text-info",
   } as const;
   return (
-    <div className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl border border-border p-5 hover:shadow-lg hover:border-primary/20 transition-all duration-300 animate-in">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-muted-foreground">{label}</p>
           <p className="text-2xl font-semibold mt-2 tracking-tight">{value}</p>
           {trend && <p className="text-xs text-muted-foreground mt-1">{trend}</p>}
         </div>
-        <div className={cn("size-10 rounded-lg grid place-items-center", toneMap[tone])}>
+        <div
+          className={cn(
+            "size-10 rounded-lg grid place-items-center transition-transform duration-300 group-hover:scale-110",
+            toneMap[tone],
+          )}
+        >
           {icon}
         </div>
       </div>
@@ -81,16 +86,40 @@ export function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export function EmptyState({ title, description }: { title: string; description?: string }) {
+export function EmptyState({
+  title,
+  description,
+  icon,
+}: {
+  title: string;
+  description?: string;
+  icon?: ReactNode;
+}) {
   return (
-    <div className="text-center py-16 px-4">
-      <div className="mx-auto size-12 rounded-full bg-muted grid place-items-center mb-4">
-        <svg className="size-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+    <div className="text-center py-16 px-4 animate-in">
+      <div className="mx-auto size-14 rounded-2xl bg-muted grid place-items-center mb-4">
+        {icon ? (
+          icon
+        ) : (
+          <svg
+            className="size-6 text-muted-foreground"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        )}
       </div>
       <h3 className="text-sm font-semibold">{title}</h3>
-      {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+      {description && (
+        <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">{description}</p>
+      )}
     </div>
   );
 }

@@ -20,16 +20,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </div>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="p-0 w-[280px] bg-sidebar border-r border-sidebar-border">
+        <SheetContent
+          side="left"
+          className="p-0 w-[280px] bg-sidebar border-r border-sidebar-border"
+        >
           <Sidebar collapsed={false} onToggle={() => setMobileOpen(false)} />
         </SheetContent>
       </Sheet>
 
       <div className="flex-1 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setMobileOpen(true)} />
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+        <main key={pathname} className="flex-1 p-4 md:p-6 lg:p-8 animate-in">
+          {children}
+        </main>
       </div>
     </div>
   );
 }
-

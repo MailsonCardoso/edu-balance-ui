@@ -6,6 +6,10 @@ import { z } from "zod";
 import { Eye, EyeOff, GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../lib/auth";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const schema = z.object({
   email: z.string().email("E-mail inválido"),
@@ -23,7 +27,11 @@ function Login() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<Data>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<Data>({
     resolver: zodResolver(schema),
     defaultValues: { email: "admin@escola.com", senha: "admin123", lembrar: true },
   });
@@ -33,7 +41,7 @@ function Login() {
     const ok = login(data.email, data.senha);
     if (!ok) {
       toast.error("E-mail ou senha inválidos");
-      return
+      return;
     }
     toast.success("Bem-vindo de volta!");
     navigate({ to: "/" });
@@ -54,14 +62,15 @@ function Login() {
             Gestão financeira escolar simplificada
           </h2>
           <p className="mt-4 text-primary-foreground/85 max-w-md">
-            Controle de mensalidades, inadimplência e relatórios em uma plataforma elegante e moderna.
+            Controle de mensalidades, inadimplência e relatórios em uma plataforma elegante e
+            moderna.
           </p>
         </div>
         <p className="relative text-sm text-primary-foreground/70">© 2025 EduFinance</p>
       </div>
 
       <div className="flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm animate-in">
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <div className="size-10 rounded-lg bg-primary grid place-items-center text-primary-foreground">
               <GraduationCap className="size-6" />
@@ -72,27 +81,25 @@ function Login() {
           <p className="text-sm text-muted-foreground mt-1">Entre com seu e-mail e senha</p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">E-mail</label>
-              <input
-                type="email"
-                className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring"
-                {...register("email")}
-              />
+            <div className="space-y-2">
+              <Label htmlFor="email">E-mail</Label>
+              <Input id="email" type="email" className="h-11" {...register("email")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Senha</label>
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
               <div className="relative">
-                <input
+                <Input
+                  id="senha"
                   type={show ? "text" : "password"}
-                  className="w-full h-11 px-3 pr-10 rounded-md border border-input bg-background text-sm outline-none focus:border-ring"
+                  className="h-11 pr-10"
                   {...register("senha")}
                 />
                 <button
                   type="button"
                   onClick={() => setShow((s) => !s)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground"
+                  tabIndex={-1}
                 >
                   {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
@@ -100,27 +107,32 @@ function Login() {
               {errors.senha && <p className="text-xs text-destructive">{errors.senha.message}</p>}
             </div>
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded accent-primary" {...register("lembrar")} />
-                <span>Lembrar acesso</span>
-              </label>
-              <button type="button" onClick={() => toast.info("E-mail de recuperação enviado")} className="text-primary hover:underline">
+              <div className="flex items-center gap-2">
+                <Checkbox id="lembrar" {...register("lembrar")} />
+                <Label htmlFor="lembrar" className="cursor-pointer">
+                  Lembrar acesso
+                </Label>
+              </div>
+              <button
+                type="button"
+                onClick={() => toast.info("E-mail de recuperação enviado")}
+                className="text-primary hover:underline text-sm"
+              >
                 Esqueci minha senha
               </button>
             </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full h-11 rounded-md bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 disabled:opacity-60 inline-flex items-center justify-center gap-2"
-            >
+            <Button type="submit" disabled={isSubmitting} className="w-full h-11 text-base">
               {isSubmitting && <Loader2 className="size-4 animate-spin" />}
               {isSubmitting ? "Entrando..." : "Entrar"}
-            </button>
+            </Button>
           </form>
 
           <p className="text-xs text-muted-foreground text-center mt-6">
             Use as credenciais pré-preenchidas para um tour rápido —{" "}
-            <Link to="/" className="text-primary hover:underline">ou entre no dashboard</Link>.
+            <Link to="/" className="text-primary hover:underline">
+              ou entre no dashboard
+            </Link>
+            .
           </p>
         </div>
       </div>

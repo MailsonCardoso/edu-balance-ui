@@ -2,6 +2,7 @@ import { Bell, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
+import { Input } from "@/components/ui/input";
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { theme, toggle } = useTheme();
@@ -18,11 +19,11 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       </button>
 
       <div className="relative flex-1 max-w-md">
-        <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <input
+        <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
+        <Input
           type="search"
           placeholder="Buscar alunos, mensalidades..."
-          className="w-full h-10 pl-9 pr-3 rounded-md bg-muted/50 border border-transparent focus:border-ring focus:bg-background outline-none text-sm transition-colors"
+          className="pl-9 h-10 bg-muted/50 border-transparent focus:bg-background"
         />
       </div>
 
@@ -43,11 +44,14 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             <span className="text-sm font-medium">{user?.nome}</span>
             <span className="text-xs text-muted-foreground">{user?.email}</span>
           </div>
-          <div className="size-9 rounded-full bg-gradient-to-br from-primary to-info grid place-items-center text-primary-foreground font-semibold text-sm">
+          <div className="size-9 rounded-full bg-gradient-to-br from-primary to-warning grid place-items-center text-primary-foreground font-semibold text-sm">
             {user?.nome.charAt(0).toUpperCase()}
           </div>
           <button
-            onClick={() => { logout(); navigate({ to: "/login" }) }}
+            onClick={() => {
+              logout();
+              navigate({ to: "/login" });
+            }}
             className="p-2 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
             aria-label="Sair"
             title="Sair"
