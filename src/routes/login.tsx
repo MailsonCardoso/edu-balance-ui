@@ -59,14 +59,14 @@ function Login() {
         </div>
         <div className="relative">
           <h2 className="text-4xl font-semibold leading-tight">
-            Gestão financeira escolar simplificada
+            Gestão financeira escolar
           </h2>
           <p className="mt-4 text-primary-foreground/85 max-w-md">
             Controle de mensalidades, inadimplência e relatórios em uma plataforma elegante e
             moderna.
           </p>
         </div>
-        <p className="relative text-sm text-primary-foreground/70">© 2025 EduFinance</p>
+        <p className="relative text-sm text-primary-foreground/70">© 2026 EduFinance</p>
       </div>
 
       <div className="flex items-center justify-center p-6 md:p-12">
