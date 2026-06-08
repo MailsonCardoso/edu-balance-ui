@@ -145,7 +145,7 @@ export function AlunoSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-lg overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
         <SheetHeader className="pr-8">
           <SheetTitle>
             {isCreate ? "Novo aluno" : editing ? "Editando aluno" : current.nome}
@@ -165,8 +165,8 @@ export function AlunoSheet({
               <span className="size-1.5 rounded-full bg-primary inline-block" />
               Dados do aluno
             </h4>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Nome completo" error={errors.nome?.message} className="col-span-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Nome completo" error={errors.nome?.message} className="sm:col-span-2">
                 {editing ? (
                   <Input
                     className="h-10"
@@ -239,7 +239,7 @@ export function AlunoSheet({
                   <p className={viewCls}>{current.email}</p>
                 )}
               </Field>
-              <Field label="Endereço" error={errors.endereco?.message} className="col-span-2">
+              <Field label="Endereço" error={errors.endereco?.message} className="sm:col-span-2">
                 {editing ? (
                   <Input
                     className="h-10"
@@ -258,11 +258,11 @@ export function AlunoSheet({
               <span className="size-1.5 rounded-full bg-primary inline-block" />
               Responsável financeiro
             </h4>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field
                 label="Nome do responsável"
                 error={errors.responsavel?.message}
-                className="col-span-2"
+                className="sm:col-span-2"
               >
                 {editing ? (
                   <Input
@@ -314,7 +314,7 @@ export function AlunoSheet({
               <span className="size-1.5 rounded-full bg-primary inline-block" />
               Matrícula
             </h4>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Field label="Série / Turma" error={errors.turma?.message}>
                 {editing ? (
                   <Controller
