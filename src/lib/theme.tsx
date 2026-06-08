@@ -23,11 +23,19 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 function applyPresetVars(preset: ThemePreset, theme: Theme) {
-  const root = document.documentElement;
-  const vars = theme === "dark" ? preset.dark : preset.light;
-  Object.entries(vars).forEach(([key, val]) => {
-    root.style.setProperty(key, val);
-  });
+  let styleEl = document.getElementById("theme-preset-vars");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "theme-preset-vars";
+    document.head.appendChild(styleEl);
+  }
+  const lightVars = Object.entries(preset.light)
+    .map(([k, v]) => `${k}: ${v};`)
+    .join("\n");
+  const darkVars = Object.entries(preset.dark)
+    .map(([k, v]) => `${k}: ${v};`)
+    .join("\n");
+  styleEl.textContent = `:root {\n${lightVars}\n}\n:root.dark {\n${darkVars}\n}`;
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

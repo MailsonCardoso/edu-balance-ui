@@ -33,7 +33,7 @@ function Login() {
     formState: { errors, isSubmitting },
   } = useForm<Data>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "admin@escola.com", senha: "admin123", lembrar: true },
+    defaultValues: { email: "admin@escola.com", senha: "", lembrar: true },
   });
 
   const onSubmit = async (data: Data) => {
