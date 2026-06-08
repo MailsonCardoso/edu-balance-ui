@@ -1,9 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Pencil, Save, Trash2, X } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Save, Trash2, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -23,6 +23,7 @@ import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
+import { fetchAluno, updateAluno, deleteAluno } from "@/lib/api/alunos";
 
 export const Route = createFileRoute("/alunos/$id")({
   component: AlunoDetalhe,
@@ -68,8 +69,15 @@ function AlunoDetalhe() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [aluno, setAluno] = useState<Aluno | undefined>();
+
+  useEffect(() => {
+    fetchAluno(id)
+      .then(setAluno)
+      .catch(() => toast.error("Erro ao carregar aluno"))
+      .finally(() => setLoading(false));
+  }, [id]);
 
   const {
     register,
@@ -89,6 +97,14 @@ function AlunoDetalhe() {
       : undefined,
   });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   if (!aluno) {
     return (
       <div className="text-center py-20 text-muted-foreground">
@@ -101,15 +117,24 @@ function AlunoDetalhe() {
   }
 
   const onSubmit = async (data: FormData) => {
-    await new Promise((r) => setTimeout(r, 600));
-    setAluno({ ...aluno, ...data });
-    setEditing(false);
-    toast.success("Aluno atualizado com sucesso!");
+    try {
+      const updated = await updateAluno(aluno.id, data);
+      setAluno(updated);
+      setEditing(false);
+      toast.success("Aluno atualizado com sucesso!");
+    } catch {
+      toast.error("Erro ao atualizar aluno");
+    }
   };
 
-  const remover = () => {
-    toast.success("Aluno removido");
-    navigate({ to: "/alunos" });
+  const remover = async () => {
+    try {
+      await deleteAluno(aluno.id);
+      toast.success("Aluno removido");
+      navigate({ to: "/alunos" });
+    } catch {
+      toast.error("Erro ao excluir aluno");
+    }
   };
 
   return (

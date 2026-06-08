@@ -11,6 +11,7 @@ import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/format";
+import { createAluno } from "@/lib/api/alunos";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -24,6 +25,7 @@ const schema = z.object({
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
+  situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -62,14 +64,17 @@ function NovoAluno() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "ativo" },
+    defaultValues: { status: "ativo", situacao: "em_dia" },
   });
 
   const onSubmit = async (data: FormData) => {
-    await new Promise((r) => setTimeout(r, 600));
-    console.log("Novo aluno:", data);
-    toast.success("Aluno cadastrado com sucesso!");
-    navigate({ to: "/alunos" });
+    try {
+      await createAluno(data);
+      toast.success("Aluno cadastrado com sucesso!");
+      navigate({ to: "/alunos" });
+    } catch {
+      toast.error("Erro ao cadastrar aluno");
+    }
   };
 
   return (
@@ -171,6 +176,16 @@ function NovoAluno() {
               >
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
+              </select>
+            </Field>
+            <Field label="Situação financeira" error={errors.situacao?.message}>
+              <select
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
+                {...register("situacao")}
+              >
+                <option value="em_dia">Em dia</option>
+                <option value="em_atraso">Em atraso</option>
+                <option value="inadimplente">Inadimplente</option>
               </select>
             </Field>
           </div>

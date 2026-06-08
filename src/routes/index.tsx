@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Wallet, AlertCircle, CalendarClock, Users, UserX } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Wallet, CalendarClock, Users, UserX } from "lucide-react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -16,9 +17,10 @@ import {
 } from "recharts";
 import { PageHeader, StatCard } from "@/components/shared/Primitives";
 import { brl } from "@/lib/format";
+import { fetchAlunos } from "@/lib/api/alunos";
+import { fetchMensalidades } from "@/lib/api/mensalidades";
 
-const zerado = { totalRecebido: 0, totalAberto: 0, totalVencido: 0, alunosAtivos: 0, alunosInadimplentes: 0 };
-const vazioGrafico: { mes: string; receita: number; meta?: number }[] = [];
+const vazioGrafico: { mes: string; receita: number }[] = [];
 const vazioAnual: { ano: string; receita: number }[] = [];
 const vazioInadimplencia: { mes: string; percentual: number }[] = [];
 const vazioPagamentos: { dia: string; pagos: number; pendentes: number }[] = [];
@@ -55,6 +57,52 @@ function ChartCard({
 const axisStyle = { fontSize: 12, fill: "var(--muted-foreground)" };
 
 function Dashboard() {
+  const [loading, setLoading] = useState(true);
+
+  const [stats, setStats] = useState({
+    totalRecebido: 0,
+    totalAberto: 0,
+    totalVencido: 0,
+    alunosAtivos: 0,
+    alunosInadimplentes: 0,
+  });
+
+  useEffect(() => {
+    Promise.all([fetchAlunos(), fetchMensalidades()])
+      .then(([alunos, mensalidades]) => {
+        const ativos = alunos.filter((a) => a.status === "ativo");
+        const inadimplentes = alunos.filter((a) => a.situacao === "inadimplente");
+
+        const recebido = mensalidades
+          .filter((m) => m.status === "pago")
+          .reduce((s, m) => s + m.valor, 0);
+
+        const aberto = mensalidades
+          .filter((m) => m.status === "pendente")
+          .reduce((s, m) => s + m.valor, 0);
+
+        const vencido = mensalidades
+          .filter((m) => m.status === "atrasado")
+          .reduce((s, m) => s + m.valor, 0);
+
+        setStats({ totalRecebido: recebido, totalAberto: aberto, totalVencido: vencido, alunosAtivos: ativos.length, alunosInadimplentes: inadimplentes.length });
+      })
+      .catch(() => setStats({ totalRecebido: 0, totalAberto: 0, totalVencido: 0, alunosAtivos: 0, alunosInadimplentes: 0 }))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const trendRecebido = stats.totalRecebido > 0 ? `R$ ${stats.totalRecebido.toFixed(2)} recebidos` : "Nenhum registro";
+  const trendAberto = stats.totalAberto > 0 ? `R$ ${stats.totalAberto.toFixed(2)} a receber` : "Nenhum registro";
+  const trendVencido = stats.totalVencido > 0 ? `R$ ${stats.totalVencido.toFixed(2)} vencidos` : "Nenhum registro";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <>
       <PageHeader title="Dashboard" description="Visão geral das finanças da escola" />
@@ -62,38 +110,38 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 mb-6">
         <StatCard
           label="Recebido no mês"
-          value={brl(zerado.totalRecebido)}
+          value={brl(stats.totalRecebido)}
           icon={<Wallet className="size-5" />}
           tone="success"
-          trend="Nenhum registro"
+          trend={trendRecebido}
         />
         <StatCard
           label="Em aberto"
-          value={brl(zerado.totalAberto)}
+          value={brl(stats.totalAberto)}
           icon={<CalendarClock className="size-5" />}
           tone="warning"
-          trend="A receber neste mês"
+          trend={trendAberto}
         />
         <StatCard
           label="Vencido"
-          value={brl(zerado.totalVencido)}
-          icon={<AlertCircle className="size-5" />}
+          value={brl(stats.totalVencido)}
+          icon={<Wallet className="size-5" />}
           tone="destructive"
-          trend="Nenhum registro"
+          trend={trendVencido}
         />
         <StatCard
           label="Alunos ativos"
-          value={zerado.alunosAtivos}
+          value={stats.alunosAtivos}
           icon={<Users className="size-5" />}
           tone="info"
           trend="Matriculados"
         />
         <StatCard
           label="Inadimplentes"
-          value={zerado.alunosInadimplentes}
+          value={stats.alunosInadimplentes}
           icon={<UserX className="size-5" />}
           tone="destructive"
-          trend="Nenhum registro"
+          trend="Com situação irregular"
         />
       </div>
 
@@ -109,53 +157,24 @@ function Dashboard() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />
-              <YAxis
-                tick={axisStyle}
-                stroke="var(--border)"
-                tickFormatter={(v) => `${v / 1000}k`}
-              />
+              <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v / 1000}k`} />
               <Tooltip
-                contentStyle={{
-                  background: "var(--popover)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                }}
+                contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
                 formatter={(v) => brl(Number(v))}
               />
-              <Area
-                type="monotone"
-                dataKey="receita"
-                stroke="var(--primary)"
-                fill="url(#grad1)"
-                strokeWidth={2}
-              />
-              <Line
-                type="monotone"
-                dataKey="meta"
-                stroke="var(--chart-3)"
-                strokeDasharray="4 4"
-                strokeWidth={2}
-              />
+              <Area type="monotone" dataKey="receita" stroke="var(--primary)" fill="url(#grad1)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Receita anual" subtitle="Evolução nos últimos anos" index={1}>
+        <ChartCard title="Receita anual" subtitle="Evolução" index={1}>
           <ResponsiveContainer>
             <BarChart data={vazioAnual}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="ano" tick={axisStyle} stroke="var(--border)" />
-              <YAxis
-                tick={axisStyle}
-                stroke="var(--border)"
-                tickFormatter={(v) => `${v / 1000}k`}
-              />
+              <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v / 1000}k`} />
               <Tooltip
-                contentStyle={{
-                  background: "var(--popover)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                }}
+                contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
                 formatter={(v) => brl(Number(v))}
               />
               <Bar dataKey="receita" fill="var(--chart-1)" radius={[6, 6, 0, 0]} />
@@ -172,20 +191,10 @@ function Dashboard() {
               <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />
               <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v}%`} />
               <Tooltip
-                contentStyle={{
-                  background: "var(--popover)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                }}
+                contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
                 formatter={(v) => `${v}%`}
               />
-              <Line
-                type="monotone"
-                dataKey="percentual"
-                stroke="var(--destructive)"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
+              <Line type="monotone" dataKey="percentual" stroke="var(--destructive)" strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -196,32 +205,10 @@ function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="dia" tick={axisStyle} stroke="var(--border)" />
               <YAxis tick={axisStyle} stroke="var(--border)" />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--popover)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                }}
-              />
+              <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Area
-                type="monotone"
-                dataKey="pagos"
-                stackId="1"
-                stroke="var(--success)"
-                fill="var(--success)"
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
-              <Area
-                type="monotone"
-                dataKey="pendentes"
-                stackId="1"
-                stroke="var(--chart-3)"
-                fill="var(--chart-3)"
-                fillOpacity={0.3}
-                strokeWidth={2}
-              />
+              <Area type="monotone" dataKey="pagos" stackId="1" stroke="var(--success)" fill="var(--success)" fillOpacity={0.3} strokeWidth={2} />
+              <Area type="monotone" dataKey="pendentes" stackId="1" stroke="var(--chart-3)" fill="var(--chart-3)" fillOpacity={0.3} strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>

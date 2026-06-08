@@ -31,6 +31,11 @@ function alunoToApi(aluno: Record<string, unknown>): Record<string, unknown> {
   return mapKeys(clean, toSnake);
 }
 
+export async function fetchAluno(id: string): Promise<Aluno> {
+  const { data } = await api.get(`/alunos/${id}`);
+  return alunoFromApi(data as Record<string, unknown>);
+}
+
 export async function fetchAlunos(): Promise<Aluno[]> {
   const { data } = await api.get("/alunos");
   return (data as unknown[]).map((a) => alunoFromApi(a as Record<string, unknown>));
