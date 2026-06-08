@@ -116,7 +116,7 @@ function AlunoDetalhe() {
     <>
       <PageHeader
         title={aluno.nome}
-        description={`${aluno.turma} · ${aluno.situacao === "em_dia" ? "Em dia" : aluno.situacao === "pendente" ? "Pendente" : "Inadimplente"}`}
+        description={`${aluno.turma} · ${aluno.situacao === "em_dia" ? "Em dia" : aluno.situacao === "em_atraso" ? "Em atraso" : "Inadimplente"}`}
         actions={
           <div className="flex items-center gap-2">
             <Link to="/alunos">

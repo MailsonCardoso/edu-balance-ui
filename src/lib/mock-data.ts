@@ -1,5 +1,5 @@
 export type AlunoStatus = "ativo" | "inativo";
-export type SituacaoFinanceira = "em_dia" | "pendente" | "inadimplente";
+export type SituacaoFinanceira = "em_dia" | "em_atraso" | "inadimplente";
 export type MensalidadeStatus = "pago" | "pendente" | "vencido" | "parcial";
 
 export interface Aluno {

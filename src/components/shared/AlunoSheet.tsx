@@ -43,6 +43,7 @@ const schema = z.object({
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
+  situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -123,7 +124,7 @@ export function AlunoSheet({
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
         },
-    defaultValues: isCreate ? { status: "ativo" } : undefined,
+    defaultValues: isCreate ? { status: "ativo", situacao: "em_dia" } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -134,7 +135,6 @@ export function AlunoSheet({
         ...data,
         cpf: data.cpf || "",
         cpfResponsavel: data.cpfResponsavel || "",
-        situacao: "em_dia",
       };
       onSave(novo);
       toast.success("Aluno cadastrado com sucesso!");
@@ -374,9 +374,28 @@ export function AlunoSheet({
                 )}
               </Field>
               <Field label="Situação financeira">
-                <div className={viewCls}>
-                  <StatusBadge status={current.situacao} />
-                </div>
+                {editing ? (
+                  <Controller
+                    name="situacao"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value || "em_dia"} onValueChange={field.onChange}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="em_dia">Em dia</SelectItem>
+                          <SelectItem value="em_atraso">Em atraso</SelectItem>
+                          <SelectItem value="inadimplente">Inadimplente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                ) : (
+                  <div className={viewCls}>
+                    <StatusBadge status={current.situacao} />
+                  </div>
+                )}
               </Field>
             </div>
           </section>

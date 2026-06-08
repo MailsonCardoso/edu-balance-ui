@@ -66,6 +66,7 @@ export function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     pago: "bg-success/15 text-success border-success/30",
     pendente: "bg-warning/15 text-warning border-warning/30",
+    em_atraso: "bg-warning/15 text-warning border-warning/30",
     vencido: "bg-destructive/15 text-destructive border-destructive/30",
     parcial: "bg-info/15 text-info border-info/30",
     ativo: "bg-success/15 text-success border-success/30",
