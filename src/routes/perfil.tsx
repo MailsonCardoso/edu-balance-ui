@@ -6,8 +6,6 @@ import { z } from "zod";
 import { PageHeader } from "@/components/shared/Primitives";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/lib/theme";
-import { themePresets } from "@/lib/theme-presets";
 
 export const Route = createFileRoute("/perfil")({
   component: Perfil,
@@ -170,70 +168,9 @@ function Configuracoes() {
   );
 }
 
-function Swatch({ color, label }: { color: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div
-        className="size-6 rounded-full border border-border shrink-0"
-        style={{ backgroundColor: color }}
-        title={label}
-      />
-      <span className="text-[10px] text-muted-foreground leading-tight text-center">{label}</span>
-    </div>
-  );
-}
-
 function Preferencias() {
-  const { presetName, setPreset } = useTheme();
-
   return (
-    <div className="max-w-xl space-y-6">
-      <div className="space-y-3">
-        <div>
-          <label className="text-sm font-medium">Tema de cores</label>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Escolha uma paleta de cores para a interface
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {themePresets.map((p) => (
-            <button
-              key={p.name}
-              onClick={() => setPreset(p.name)}
-              className={cn(
-                "flex items-center gap-4 p-3 rounded-lg border text-left transition-all",
-                presetName === p.name
-                  ? "border-primary ring-1 ring-primary bg-primary/5"
-                  : "border-border hover:border-ring/50",
-              )}
-            >
-              <div className="flex items-center gap-1.5 shrink-0">
-                <Swatch color={p.colors.primary} label="P" />
-                <Swatch color={p.colors.secondary} label="S" />
-                <Swatch color={p.colors.accent} label="A" />
-                <Swatch color={p.colors.background} label="Bg" />
-                <Swatch color={p.colors.sidebar} label="Sb" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate">{p.label}</p>
-                <div className="flex gap-1 mt-1">
-                  <span
-                    className="size-3 rounded-sm border border-border"
-                    style={{ backgroundColor: p.colors.primary }}
-                  />
-                  <span
-                    className="size-3 rounded-sm border border-border"
-                    style={{ backgroundColor: p.colors.sidebar }}
-                  />
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <hr className="border-border" />
-
+    <div className="max-w-xl space-y-4">
       <div className="space-y-1.5">
         <label className="text-sm font-medium">Idioma</label>
         <select className={inputCls} defaultValue="pt-BR">
