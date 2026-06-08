@@ -44,7 +44,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             <span className="text-sm font-medium">{user?.nome}</span>
             <span className="text-xs text-muted-foreground">{user?.email}</span>
           </div>
-          <div className="size-9 rounded-full bg-gradient-to-br from-primary to-warning grid place-items-center text-primary-foreground font-semibold text-sm">
+          <div className="size-9 rounded-full bg-gradient-to-br from-primary to-info grid place-items-center text-primary-foreground font-semibold text-sm">
             {user?.nome.charAt(0).toUpperCase()}
           </div>
           <button
