@@ -33,7 +33,7 @@ function Login() {
     formState: { errors, isSubmitting },
   } = useForm<Data>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "admin@escola.com", senha: "", lembrar: true },
+    defaultValues: { email: "", senha: "", lembrar: true },
   });
 
   const onSubmit = async (data: Data) => {
@@ -127,9 +127,7 @@ function Login() {
             </Button>
           </form>
 
-          <p className="text-xs text-muted-foreground text-center mt-6">
-            Use as credenciais pré-definidas para acessar o sistema
-          </p>
+
         </div>
       </div>
     </div>
