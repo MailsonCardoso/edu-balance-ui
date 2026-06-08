@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Eye, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Eye, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { AlunoSheet } from "@/components/shared/AlunoSheet";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ import {
 import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
+import { fetchAlunos, createAluno, updateAluno, deleteAluno } from "@/lib/api/alunos";
 
 export const Route = createFileRoute("/alunos/")({
   component: AlunosList,
@@ -32,12 +33,20 @@ export const Route = createFileRoute("/alunos/")({
 
 function AlunosList() {
   const [data, setData] = useState<Aluno[]>([]);
+  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [sheetAluno, setSheetAluno] = useState<Aluno | null>(null);
   const [sheetMode, setSheetMode] = useState<"view" | "edit" | "create">("view");
   const [deleteAluno, setDeleteAluno] = useState<Aluno | null>(null);
+
+  useEffect(() => {
+    fetchAlunos()
+      .then(setData)
+      .catch(() => toast.error("Erro ao carregar alunos"))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(
     () =>
@@ -47,10 +56,41 @@ function AlunosList() {
             a.nome.toLowerCase().includes(q.toLowerCase()) ||
             a.responsavel.toLowerCase().includes(q.toLowerCase())) &&
           (turma === "all" || a.turma === turma) &&
-          (status === "all" || a.status === status),
+          (statusFilter === "all" || a.status === statusFilter),
       ),
-    [data, q, turma, status],
+    [data, q, turma, statusFilter],
   );
+
+  const handleSave = async (aluno: Aluno) => {
+    try {
+      if (sheetMode === "create") {
+        const created = await createAluno(aluno);
+        setData((d) => [...d, created]);
+        toast.success("Aluno cadastrado com sucesso!");
+        setSheetAluno(null);
+        setSheetMode("view");
+      } else {
+        const updated = await updateAluno(aluno.id, aluno);
+        setData((d) => d.map((a) => (a.id === updated.id ? updated : a)));
+        toast.success("Aluno atualizado com sucesso!");
+        setSheetAluno(updated);
+      }
+    } catch {
+      toast.error("Erro ao salvar aluno");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteAluno) return;
+    try {
+      await deleteAluno(deleteAluno.id);
+      setData((d) => d.filter((a) => a.id !== deleteAluno.id));
+      toast.success("Aluno removido");
+      setDeleteAluno(null);
+    } catch {
+      toast.error("Erro ao excluir aluno");
+    }
+  };
 
   return (
     <>
@@ -93,7 +133,7 @@ function AlunosList() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Todos os status" />
             </SelectTrigger>
@@ -106,7 +146,11 @@ function AlunosList() {
         </div>
 
         <div className="overflow-x-auto">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : filtered.length === 0 ? (
             <EmptyState
               title="Nenhum aluno encontrado"
               description="Ajuste os filtros ou cadastre um novo aluno."
@@ -187,22 +231,7 @@ function AlunosList() {
         }}
         aluno={sheetAluno}
         mode={sheetMode}
-        onSave={(updated) => {
-          console.log("[DEBUG] onSave called with:", updated);
-          setData((d) => {
-            console.log("[DEBUG] setData updater, current length:", d.length);
-            const exists = d.find((a) => a.id === updated.id);
-            const next = exists ? d.map((a) => (a.id === updated.id ? updated : a)) : [...d, updated];
-            console.log("[DEBUG] setData next length:", next.length);
-            return next;
-          });
-          if (sheetMode === "create") {
-            setSheetAluno(null);
-            setSheetMode("view");
-          } else {
-            setSheetAluno(updated);
-          }
-        }}
+        onSave={handleSave}
       />
 
       <AlertDialog
@@ -221,16 +250,7 @@ function AlunosList() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (deleteAluno) {
-                  setData((d) => d.filter((a) => a.id !== deleteAluno.id));
-                  toast.success("Aluno removido");
-                }
-                setDeleteAluno(null);
-              }}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Sim, excluir
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { CheckCircle2, Eye, History, MoreVertical, Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Eye, History, Loader2, MoreVertical, Search } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 import type { Mensalidade } from "@/lib/mock-data";
 import { brl, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
+import { fetchMensalidades, updateMensalidade } from "@/lib/api/mensalidades";
 
 export const Route = createFileRoute("/financeiro")({
   component: Financeiro,
@@ -21,36 +22,49 @@ export const Route = createFileRoute("/financeiro")({
 
 function Financeiro() {
   const [data, setData] = useState<Mensalidade[]>([]);
+  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedMensalidade, setSelectedMensalidade] = useState<Mensalidade | null>(null);
+
+  useEffect(() => {
+    fetchMensalidades()
+      .then(setData)
+      .catch(() => toast.error("Erro ao carregar mensalidades"))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(
     () =>
       data.filter(
         (m) =>
           (!q ||
-            m.alunoNome.toLowerCase().includes(q.toLowerCase()) ||
-            m.competencia.includes(q)) &&
-          (status === "all" || m.status === status),
+            (m.alunoNome || "").toLowerCase().includes(q.toLowerCase()) ||
+            m.mesReferencia.includes(q)) &&
+          (statusFilter === "all" || m.status === statusFilter),
       ),
-    [data, q, status],
+    [data, q, statusFilter],
   );
 
-  const registrar = (id: string) => {
-    setData((d) =>
-      d.map((m) => (m.id === id ? { ...m, status: "pago" as const, valorPago: m.valor } : m)),
-    );
-    toast.success("Pagamento registrado");
+  const registrar = async (id: string) => {
+    try {
+      await updateMensalidade(id, { status: "pago", dataPagamento: new Date().toISOString().split("T")[0] });
+      const updated = await fetchMensalidades();
+      setData(updated);
+      toast.success("Pagamento registrado");
+      setSelectedMensalidade(null);
+    } catch {
+      toast.error("Erro ao registrar pagamento");
+    }
   };
 
   const totals = useMemo(
     () => ({
-      pago: filtered.filter((m) => m.status === "pago").reduce((s, m) => s + (m.valorPago ?? 0), 0),
+      pago: filtered.filter((m) => m.status === "pago").reduce((s, m) => s + m.valor, 0),
       pendente: filtered
-        .filter((m) => m.status === "pendente" || m.status === "parcial")
-        .reduce((s, m) => s + (m.valor - (m.valorPago ?? 0)), 0),
-      vencido: filtered.filter((m) => m.status === "vencido").reduce((s, m) => s + m.valor, 0),
+        .filter((m) => m.status === "pendente" || m.status === "atrasado")
+        .reduce((s, m) => s + m.valor, 0),
+      vencido: filtered.filter((m) => m.status === "atrasado").reduce((s, m) => s + m.valor, 0),
     }),
     [filtered],
   );
@@ -81,11 +95,11 @@ function Financeiro() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar aluno ou competência..."
+              placeholder="Buscar aluno ou mês..."
               className="pl-9 h-10"
             />
           </div>
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40 h-10">
               <SelectValue placeholder="Todos os status" />
             </SelectTrigger>
@@ -93,21 +107,24 @@ function Financeiro() {
               <SelectItem value="all">Todos os status</SelectItem>
               <SelectItem value="pago">Pago</SelectItem>
               <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="vencido">Vencido</SelectItem>
-              <SelectItem value="parcial">Parcial</SelectItem>
+              <SelectItem value="atrasado">Atrasado</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="overflow-x-auto">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : filtered.length === 0 ? (
             <EmptyState title="Sem mensalidades" />
           ) : (
             <table className="w-full text-sm">
               <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3 font-medium">Aluno</th>
-                  <th className="px-4 py-3 font-medium">Competência</th>
+                  <th className="px-4 py-3 font-medium">Mês</th>
                   <th className="px-4 py-3 font-medium">Vencimento</th>
                   <th className="px-4 py-3 font-medium">Valor</th>
                   <th className="px-4 py-3 font-medium">Status</th>
@@ -117,15 +134,10 @@ function Financeiro() {
               <tbody className="divide-y divide-border">
                 {filtered.map((m) => (
                   <tr key={m.id} className="hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">{m.alunoNome}</td>
-                    <td className="px-4 py-3">{m.competencia}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{fmtDate(m.vencimento)}</td>
-                    <td className="px-4 py-3 font-medium">
-                      {brl(m.valor)}
-                      {m.valorPago && m.status === "parcial" ? (
-                        <span className="text-xs text-info ml-2">({brl(m.valorPago)} pago)</span>
-                      ) : null}
-                    </td>
+                    <td className="px-4 py-3 font-medium">{m.alunoNome || "—"}</td>
+                    <td className="px-4 py-3">{m.mesReferencia}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{fmtDate(m.dataVencimento)}</td>
+                    <td className="px-4 py-3 font-medium">{brl(m.valor)}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={m.status} />
                     </td>
@@ -153,7 +165,7 @@ function Financeiro() {
         }}
         title={
           selectedMensalidade
-            ? `${selectedMensalidade.alunoNome} — ${selectedMensalidade.competencia}`
+            ? `${selectedMensalidade.alunoNome || "—"} — ${selectedMensalidade.mesReferencia}`
             : ""
         }
         description={
@@ -168,13 +180,13 @@ function Financeiro() {
                   label: "Detalhes",
                   icon: <Eye className="size-5" />,
                   onClick: () =>
-                    toast.info(`Detalhes da mensalidade de ${selectedMensalidade.competencia}`),
+                    toast.info(`Detalhes da mensalidade de ${selectedMensalidade.mesReferencia}`),
                 },
                 {
                   label: "Histórico",
                   icon: <History className="size-5" />,
                   onClick: () =>
-                    toast.info(`Histórico de pagamentos de ${selectedMensalidade.alunoNome}`),
+                    toast.info(`Histórico de pagamentos de ${selectedMensalidade.alunoNome || "aluno"}`),
                 },
                 ...(selectedMensalidade.status !== "pago"
                   ? [

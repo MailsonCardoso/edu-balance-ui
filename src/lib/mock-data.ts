@@ -1,6 +1,6 @@
 export type AlunoStatus = "ativo" | "inativo";
 export type SituacaoFinanceira = "em_dia" | "em_atraso" | "inadimplente";
-export type MensalidadeStatus = "pago" | "pendente" | "vencido" | "parcial";
+export type MensalidadeStatus = "pendente" | "pago" | "atrasado";
 
 export interface Aluno {
   id: string;
@@ -21,12 +21,12 @@ export interface Aluno {
 export interface Mensalidade {
   id: string;
   alunoId: string;
-  alunoNome: string;
-  competencia: string;
-  vencimento: string;
+  mesReferencia: string;
   valor: number;
-  valorPago?: number;
+  dataVencimento: string;
+  dataPagamento: string | null;
   status: MensalidadeStatus;
+  alunoNome?: string;
 }
 
 export const turmas = [

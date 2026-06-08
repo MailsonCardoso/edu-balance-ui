@@ -100,7 +100,7 @@ export function AlunoSheet({
   onOpenChange: (open: boolean) => void;
   aluno: Aluno | null;
   mode: "view" | "edit" | "create";
-  onSave: (data: Aluno) => void;
+  onSave: (data: Aluno) => void | Promise<void>;
 }) {
   const isCreate = mode === "create";
   const [editing, setEditing] = useState(mode === "edit" || isCreate);
@@ -128,7 +128,6 @@ export function AlunoSheet({
   });
 
   const onSubmit = async (data: FormData) => {
-    await new Promise((r) => setTimeout(r, 600));
     if (isCreate) {
       const novo: Aluno = {
         id: String(Date.now()),
@@ -136,13 +135,11 @@ export function AlunoSheet({
         cpf: data.cpf || "",
         cpfResponsavel: data.cpfResponsavel || "",
       };
-      onSave(novo);
-      toast.success("Aluno cadastrado com sucesso!");
+      await onSave(novo);
       onOpenChange(false);
     } else {
-      onSave({ ...current, ...data });
+      await onSave({ ...current, ...data });
       setEditing(false);
-      toast.success("Aluno atualizado com sucesso!");
     }
   };
 
