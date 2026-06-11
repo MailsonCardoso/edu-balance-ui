@@ -34,7 +34,11 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     if (!user) {
-      navigate({ to: "/login", replace: true });
+      if (pathname === "/") {
+        navigate({ to: "/site", replace: true });
+      } else {
+        navigate({ to: "/login", replace: true });
+      }
     }
   }, [user, pathname, isPublicRoute, isResponsavelRoute, hasResponsavelData, navigate]);
 
