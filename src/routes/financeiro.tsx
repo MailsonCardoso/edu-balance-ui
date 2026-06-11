@@ -61,7 +61,7 @@ function Financeiro() {
     mesReferencia: "",
     valor: 0,
     dataVencimento: "",
-    formaPagamento: "",
+    formaPagamento: "nenhuma",
   });
 
   const [pagamentoOpen, setPagamentoOpen] = useState(false);
@@ -121,10 +121,10 @@ function Financeiro() {
         mesReferencia: mensalidade.mesReferencia,
         valor: mensalidade.valor,
         dataVencimento: mensalidade.dataVencimento,
-        formaPagamento: mensalidade.formaPagamento ?? "",
+        formaPagamento: mensalidade.formaPagamento ?? "nenhuma",
       });
     } else {
-      setFormData({ alunoId: "", mesReferencia: mesCorrente(), valor: 0, dataVencimento: "", formaPagamento: "" });
+      setFormData({ alunoId: "", mesReferencia: mesCorrente(), valor: 0, dataVencimento: "", formaPagamento: "nenhuma" });
     }
     setFormOpen(true);
   };
@@ -152,6 +152,7 @@ function Financeiro() {
   const salvarForm = async () => {
     try {
       const dataVencimento = toIsoDate(formData.dataVencimento);
+      const formaPg = formData.formaPagamento === "nenhuma" ? null : formData.formaPagamento;
       if (formMode === "create") {
         await createMensalidade({
           alunoId: formData.alunoId,
@@ -159,7 +160,7 @@ function Financeiro() {
           valor: formData.valor,
           dataVencimento,
           status: "pendente",
-          formaPagamento: (formData.formaPagamento || null) as FormaPagamento | null,
+          formaPagamento: formaPg as FormaPagamento | null,
         });
         toast.success("Mensalidade criada!");
       } else {
@@ -168,7 +169,7 @@ function Financeiro() {
           mesReferencia: formData.mesReferencia,
           valor: formData.valor,
           dataVencimento,
-          formaPagamento: (formData.formaPagamento || null) as FormaPagamento | null,
+          formaPagamento: formaPg as FormaPagamento | null,
         });
         toast.success("Mensalidade atualizada!");
       }
@@ -439,7 +440,7 @@ function Financeiro() {
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sem forma</SelectItem>
+                  <SelectItem value="nenhuma">Sem forma</SelectItem>
                   <SelectItem value="pix">Pix</SelectItem>
                   <SelectItem value="debito">Débito</SelectItem>
                   <SelectItem value="credito">Crédito</SelectItem>
