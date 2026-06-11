@@ -9,6 +9,7 @@ import {
   GraduationCap,
   ChevronLeft,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ const nav = [
   { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/perfil", label: "Perfil", icon: UserCircle },
+  { to: "/ouvidoria", label: "Ouvidoria", icon: MessageCircle },
 ] as const;
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
