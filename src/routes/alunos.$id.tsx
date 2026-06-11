@@ -298,13 +298,6 @@ function AlunoDetalhe() {
                 <p className="text-sm py-2.5">{aluno.telefone}</p>
               )}
             </Field>
-            <Field label="E-mail" error={errors.email?.message}>
-              {editing ? (
-                <Input type="email" className="h-10" {...register("email")} />
-              ) : (
-                <p className="text-sm py-2.5">{aluno.email}</p>
-              )}
-            </Field>
             <Field label="Endereço" error={errors.endereco?.message} className="md:col-span-2">
               {editing ? (
                 <Input className="h-10" {...register("endereco")} />
@@ -354,6 +347,13 @@ function AlunoDetalhe() {
                 />
               ) : (
                 <p className="text-sm py-2.5">{aluno.telefoneResponsavel}</p>
+              )}
+            </Field>
+            <Field label="E-mail do responsável" error={errors.email?.message}>
+              {editing ? (
+                <Input type="email" className="h-10" placeholder="usado para login no portal" {...register("email")} />
+              ) : (
+                <p className="text-sm py-2.5">{aluno.email}</p>
               )}
             </Field>
           </div>

@@ -263,18 +263,6 @@ export function AlunoSheet({
                   <p className={viewCls}>{current.telefone}</p>
                 )}
               </Field>
-              <Field label="E-mail" error={errors.email?.message}>
-                {editing ? (
-                  <Input
-                    type="email"
-                    className="h-10"
-                    placeholder="aluno@email.com"
-                    {...register("email")}
-                  />
-                ) : (
-                  <p className={viewCls}>{current.email}</p>
-                )}
-              </Field>
               <Field label="Endereço" error={errors.endereco?.message} className="sm:col-span-2">
                 {editing ? (
                   <Input
@@ -340,6 +328,18 @@ export function AlunoSheet({
                   />
                 ) : (
                   <p className={viewCls}>{current.telefoneResponsavel}</p>
+                )}
+              </Field>
+              <Field label="E-mail do responsável" error={errors.email?.message}>
+                {editing ? (
+                  <Input
+                    type="email"
+                    className="h-10"
+                    placeholder="usado para login no portal"
+                    {...register("email")}
+                  />
+                ) : (
+                  <p className={viewCls}>{current.email}</p>
                 )}
               </Field>
             </div>

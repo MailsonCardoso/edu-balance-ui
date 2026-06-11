@@ -165,9 +165,6 @@ function NovoAluno() {
             <Field label="Telefone" error={errors.telefone?.message}>
               <Input className="h-10" placeholder="(00) 00000-0000" {...register("telefone")} />
             </Field>
-            <Field label="E-mail" error={errors.email?.message}>
-              <Input type="email" className="h-10" {...register("email")} />
-            </Field>
             <Field label="Endereço" error={errors.endereco?.message} className="md:col-span-2">
               <Input className="h-10" {...register("endereco")} />
             </Field>
@@ -194,6 +191,9 @@ function NovoAluno() {
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
               <Input className="h-10" {...register("telefoneResponsavel")} />
+            </Field>
+            <Field label="E-mail do responsável" error={errors.email?.message}>
+              <Input type="email" className="h-10" placeholder="usado para login no portal" {...register("email")} />
             </Field>
           </div>
         </section>
