@@ -215,7 +215,7 @@ function Institucional() {
           <p className="mt-3 text-white/70 max-w-xl mx-auto">
             Faça o download do estatuto social da APA CMCB XII para consultar nossas normas e regulamentos.
           </p>
-          <button className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors mt-8">
+          <button className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium hover:bg-white/90 transition-colors mt-8">
             <Download className="size-4" /> Baixar Estatuto (PDF)
           </button>
         </div>

@@ -102,19 +102,19 @@ function SiteHome() {
             <div className="flex flex-wrap gap-3 mt-8">
               <Link
                 to="/transparencia"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600 transition-colors"
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
               >
                 Portal da Transparência <ArrowRight className="size-4" />
               </Link>
               <Link
                 to="/transparencia"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
               >
                 Seja Sócio
               </Link>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
               >
                 Dashboard
               </Link>
@@ -212,7 +212,7 @@ function SiteHome() {
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             <Link
               to="/transparencia"
-              className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors"
+              className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium hover:bg-white/90 transition-colors"
             >
               Quero ser Sócio <ArrowRight className="size-4" />
             </Link>

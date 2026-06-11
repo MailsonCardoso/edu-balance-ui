@@ -114,7 +114,7 @@ function Ouvidoria() {
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors"
+                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-[#D62828] font-medium text-sm hover:bg-[#D62828]/5 transition-colors"
                   >
                     <Send className="size-4" /> Enviar Manifestação
                   </button>
