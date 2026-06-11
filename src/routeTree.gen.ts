@@ -17,6 +17,7 @@ import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ResponsavelIndexRouteImport } from './routes/responsavel.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
@@ -62,6 +63,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResponsavelIndexRoute = ResponsavelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ResponsavelRoute,
+} as any)
 const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -104,11 +111,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
-  '/responsavel': typeof ResponsavelRouteWithChildren
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos': typeof AlunosIndexRoute
+  '/responsavel': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +131,7 @@ export interface FileRoutesById {
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,6 +148,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/responsavel/dashboard'
     | '/alunos/'
+    | '/responsavel/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -148,11 +157,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
-    | '/responsavel'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/responsavel/dashboard'
     | '/alunos'
+    | '/responsavel'
   id:
     | '__root__'
     | '/'
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/responsavel/dashboard'
     | '/alunos/'
+    | '/responsavel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -238,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/responsavel/': {
+      id: '/responsavel/'
+      path: '/'
+      fullPath: '/responsavel/'
+      preLoaderRoute: typeof ResponsavelIndexRouteImport
+      parentRoute: typeof ResponsavelRoute
+    }
     '/alunos/': {
       id: '/alunos/'
       path: '/'
@@ -286,10 +303,12 @@ const AlunosRouteWithChildren =
 
 interface ResponsavelRouteChildren {
   ResponsavelDashboardRoute: typeof ResponsavelDashboardRoute
+  ResponsavelIndexRoute: typeof ResponsavelIndexRoute
 }
 
 const ResponsavelRouteChildren: ResponsavelRouteChildren = {
   ResponsavelDashboardRoute: ResponsavelDashboardRoute,
+  ResponsavelIndexRoute: ResponsavelIndexRoute,
 }
 
 const ResponsavelRouteWithChildren = ResponsavelRoute._addFileChildren(
