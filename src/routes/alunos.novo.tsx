@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/format";
 import { createAluno } from "@/lib/api/alunos";
+import { createMensalidade } from "@/lib/api/mensalidades";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -26,6 +27,8 @@ const schema = z.object({
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
   situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
+  valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
+  diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -64,12 +67,26 @@ function NovoAluno() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "ativo", situacao: "em_dia" },
+    defaultValues: { status: "ativo", situacao: "em_dia", valorMensalidade: 0, diaVencimento: 10 },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
-      await createAluno(data);
+      const created = await createAluno(data);
+      if (data.valorMensalidade > 0) {
+        const hoje = new Date();
+        const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
+        const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
+        const dia = String(data.diaVencimento || 10).padStart(2, "0");
+        const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
+        await createMensalidade({
+          alunoId: created.id,
+          mesReferencia: mesRef,
+          valor: data.valorMensalidade,
+          dataVencimento: `${dia}/${mesNum}/${hoje.getFullYear()}`,
+          status: "pendente",
+        });
+      }
       toast.success("Aluno cadastrado com sucesso!");
       navigate({ to: "/alunos" });
     } catch {
@@ -187,6 +204,26 @@ function NovoAluno() {
                 <option value="em_atraso">Em atraso</option>
                 <option value="inadimplente">Inadimplente</option>
               </select>
+            </Field>
+            <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                className="h-10"
+                placeholder="0,00"
+                {...register("valorMensalidade", { valueAsNumber: true })}
+              />
+            </Field>
+            <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
+              <Input
+                type="number"
+                min="1"
+                max="31"
+                className="h-10"
+                placeholder="10"
+                {...register("diaVencimento", { valueAsNumber: true })}
+              />
             </Field>
           </div>
         </section>

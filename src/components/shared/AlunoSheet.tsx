@@ -44,6 +44,8 @@ const schema = z.object({
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
   situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
+  valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
+  diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -87,6 +89,8 @@ const emptyAluno: Aluno = {
   turma: "",
   status: "ativo",
   situacao: "em_dia",
+  valorMensalidade: 0,
+  diaVencimento: 10,
 };
 
 export function AlunoSheet({
@@ -124,7 +128,7 @@ export function AlunoSheet({
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
         },
-    defaultValues: isCreate ? { status: "ativo", situacao: "em_dia" } : undefined,
+    defaultValues: isCreate ? { status: "ativo", situacao: "em_dia", valorMensalidade: 0, diaVencimento: 10 } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -392,6 +396,38 @@ export function AlunoSheet({
                   <div className={viewCls}>
                     <StatusBadge status={current.situacao} />
                   </div>
+                )}
+              </Field>
+              <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
+                {editing ? (
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="h-10"
+                    placeholder="0,00"
+                    {...register("valorMensalidade", { valueAsNumber: true })}
+                  />
+                ) : (
+                  <p className={viewCls}>
+                    {current.valorMensalidade
+                      ? current.valorMensalidade.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+                      : "—"}
+                  </p>
+                )}
+              </Field>
+              <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
+                {editing ? (
+                  <Input
+                    type="number"
+                    min="1"
+                    max="31"
+                    className="h-10"
+                    placeholder="10"
+                    {...register("diaVencimento", { valueAsNumber: true })}
+                  />
+                ) : (
+                  <p className={viewCls}>Dia {current.diaVencimento}</p>
                 )}
               </Field>
             </div>

@@ -26,6 +26,7 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { fetchAlunos, createAluno, updateAluno, deleteAluno } from "@/lib/api/alunos";
+import { createMensalidade } from "@/lib/api/mensalidades";
 
 export const Route = createFileRoute("/alunos/")({
   component: AlunosList,
@@ -66,6 +67,20 @@ function AlunosList() {
       if (sheetMode === "create") {
         const created = await createAluno(aluno);
         setData((d) => [...d, created]);
+        if (aluno.valorMensalidade > 0) {
+          const hoje = new Date();
+          const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
+          const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
+          const dia = String(aluno.diaVencimento || 10).padStart(2, "0");
+          const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
+          await createMensalidade({
+            alunoId: created.id,
+            mesReferencia: mesRef,
+            valor: aluno.valorMensalidade,
+            dataVencimento: `${dia}/${mesNum}/${hoje.getFullYear()}`,
+            status: "pendente",
+          });
+        }
         toast.success("Aluno cadastrado com sucesso!");
         setSheetAluno(null);
         setSheetMode("view");
