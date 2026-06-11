@@ -50,7 +50,7 @@ function Transparencia() {
 
   return (
     <>
-      <section className="relative bg-[#0B2B4F] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -82,7 +82,7 @@ function Transparencia() {
           {[
             { icon: TrendingUp, label: "Receitas do Mês", value: "R$ 24.580", color: "text-emerald-600" },
             { icon: TrendingDown, label: "Despesas do Mês", value: "R$ 18.320", color: "text-red-600" },
-            { icon: DollarSign, label: "Saldo Atual", value: "R$ 42.890", color: "text-[#0B2B4F]" },
+            { icon: DollarSign, label: "Saldo Atual", value: "R$ 42.890", color: "text-[#D62828]" },
           ].map((item) => (
             <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
               <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ function Transparencia() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-2xl font-bold text-[#0B2B4F] mb-6">Auditoria e Regularização</h2>
+              <h2 className="text-2xl font-bold text-[#D62828] mb-6">Auditoria e Regularização</h2>
               <p className="text-sm text-gray-500 mb-8">
                 Acompanhe o status do processo de auditoria e regularização institucional.
               </p>
@@ -127,7 +127,7 @@ function Transparencia() {
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold text-[#0B2B4F] mb-6">Documentos</h2>
+              <h2 className="text-2xl font-bold text-[#D62828] mb-6">Documentos</h2>
               <p className="text-sm text-gray-500 mb-8">
                 Documentos institucionais disponíveis para consulta e download.
               </p>
@@ -141,7 +141,7 @@ function Transparencia() {
                         <p className="text-xs text-gray-400">Atualizado em {doc.updated}</p>
                       </div>
                     </div>
-                    <button className="shrink-0 size-8 rounded-lg bg-gray-50 grid place-items-center text-gray-400 hover:text-[#0B2B4F] hover:bg-[#0B2B4F]/5 transition-colors opacity-0 group-hover:opacity-100">
+                    <button className="shrink-0 size-8 rounded-lg bg-gray-50 grid place-items-center text-gray-400 hover:text-[#D62828] hover:bg-[#D62828]/5 transition-colors opacity-0 group-hover:opacity-100">
                       <Download className="size-4" />
                     </button>
                   </div>
@@ -155,18 +155,18 @@ function Transparencia() {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Gestão Atual</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Gestão Atual</h2>
             <p className="text-gray-500 mt-1">Diretoria Provisória — Mandato de 90 dias para regularização</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {management.map((person) => (
               <div key={person.name} className="bg-white rounded-xl border border-gray-100 p-6 text-center hover:shadow-md transition-shadow">
-                <div className="size-16 rounded-full bg-gradient-to-br from-[#0B2B4F]/10 to-gray-100 mx-auto grid place-items-center">
-                  <User className="size-7 text-[#0B2B4F]/40" />
+                <div className="size-16 rounded-full bg-gradient-to-br from-[#D62828]/10 to-gray-100 mx-auto grid place-items-center">
+                  <User className="size-7 text-[#D62828]/40" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900">{person.name}</h3>
-                <p className="text-xs font-medium text-[#0B2B4F] uppercase tracking-wider mt-0.5">{person.role}</p>
+                <p className="text-xs font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
                 <p className="text-xs text-gray-500 mt-2">{person.desc}</p>
               </div>
             ))}
@@ -183,7 +183,7 @@ function Transparencia() {
       <section className="py-16 lg:py-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Perguntas Frequentes</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Perguntas Frequentes</h2>
           </div>
           <div className="space-y-2">
             {faq.map((item, i) => (

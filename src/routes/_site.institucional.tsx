@@ -32,7 +32,7 @@ const management = [
 function Institucional() {
   return (
     <>
-      <section className="relative bg-[#0B2B4F] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -48,7 +48,7 @@ function Institucional() {
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Nossa História</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossa História</h2>
             <p className="mt-4 text-gray-600 leading-relaxed">
               A APA CMCB XII nasceu da união de pais e responsáveis comprometidos com a excelência na educação de seus filhos. 
               Ao longo dos anos, enfrentamos desafios e celebramos conquistas, sempre movidos pelo objetivo comum de oferecer 
@@ -67,7 +67,7 @@ function Institucional() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F] mb-8">Um Novo Capítulo</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828] mb-8">Um Novo Capítulo</h2>
               <div className="bg-white rounded-xl border border-emerald-100 p-6 sm:p-8">
                 <div className="grid sm:grid-cols-2 gap-6">
                   {[
@@ -91,7 +91,7 @@ function Institucional() {
 
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-gray-100 p-6">
-                <Target className="size-6 text-[#0B2B4F] mb-3" />
+                <Target className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Missão</h3>
                 <p className="text-sm text-gray-600 mt-2 leading-relaxed">
                   Promover a integração entre escola, pais e comunidade, apoiando o desenvolvimento educacional, 
@@ -99,7 +99,7 @@ function Institucional() {
                 </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 p-6">
-                <Eye className="size-6 text-[#0B2B4F] mb-3" />
+                <Eye className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Visão</h3>
                 <p className="text-sm text-gray-600 mt-2 leading-relaxed">
                   Ser referência em gestão participativa e transparência entre as associações de pais do Brasil, 
@@ -114,13 +114,13 @@ function Institucional() {
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Nossos Valores</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossos Valores</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {valores.map((v) => (
               <div key={v.title} className="text-center p-6 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow">
-                <div className="size-11 rounded-full bg-[#0B2B4F]/5 mx-auto grid place-items-center">
-                  <v.icon className="size-5 text-[#0B2B4F]" />
+                <div className="size-11 rounded-full bg-[#D62828]/5 mx-auto grid place-items-center">
+                  <v.icon className="size-5 text-[#D62828]" />
                 </div>
                 <h3 className="mt-3 text-sm font-semibold text-gray-900">{v.title}</h3>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">{v.desc}</p>
@@ -133,13 +133,13 @@ function Institucional() {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">O que fazemos</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">O que fazemos</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {atividades.map((a) => (
               <div key={a.title} className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-sm transition-shadow">
-                <div className="size-10 rounded-lg bg-[#0B2B4F]/5 grid place-items-center">
-                  <a.icon className="size-5 text-[#0B2B4F]" />
+                <div className="size-10 rounded-lg bg-[#D62828]/5 grid place-items-center">
+                  <a.icon className="size-5 text-[#D62828]" />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-gray-900">{a.title}</h3>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">{a.desc}</p>
@@ -152,17 +152,17 @@ function Institucional() {
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Diretoria Provisória</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Diretoria Provisória</h2>
             <p className="text-gray-500 mt-1">Mandato de 90 dias para regularização e eleições diretas</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {management.map((person) => (
               <div key={person.name} className="bg-white rounded-xl border border-gray-100 p-6 text-center hover:shadow-md transition-shadow">
-                <div className="size-16 rounded-full bg-gradient-to-br from-[#0B2B4F]/10 to-gray-100 mx-auto grid place-items-center">
-                  <User className="size-7 text-[#0B2B4F]/40" />
+                <div className="size-16 rounded-full bg-gradient-to-br from-[#D62828]/10 to-gray-100 mx-auto grid place-items-center">
+                  <User className="size-7 text-[#D62828]/40" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900">{person.name}</h3>
-                <p className="text-xs font-medium text-[#0B2B4F] uppercase tracking-wider mt-0.5">{person.role}</p>
+                <p className="text-xs font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
                 <p className="text-xs text-gray-500 mt-2">{person.desc}</p>
               </div>
             ))}
@@ -178,7 +178,7 @@ function Institucional() {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Conselho Fiscal</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Conselho Fiscal</h2>
           </div>
           <div className="max-w-lg mx-auto space-y-2">
             {["Roberto Almeida (Presidente)", "Fernanda Lima", "Pedro Rocha"].map((name) => (
@@ -196,7 +196,7 @@ function Institucional() {
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0B2B4F]">Parceiros</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Parceiros</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -208,7 +208,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-[#0B2B4F] text-white">
+      <section className="py-16 lg:py-24 bg-[#D62828] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FileTextIcon />
           <h2 className="text-2xl lg:text-3xl font-bold mt-6">Estatuto Social</h2>

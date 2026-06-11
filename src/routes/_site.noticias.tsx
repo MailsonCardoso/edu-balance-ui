@@ -41,7 +41,7 @@ function Noticias() {
 
   return (
     <>
-      <section className="relative bg-[#0B2B4F] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -63,7 +63,7 @@ function Noticias() {
                   key={cat}
                   onClick={() => { setActiveCategory(cat); setPage(1); }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    activeCategory === cat ? "bg-[#0B2B4F] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    activeCategory === cat ? "bg-[#D62828] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
                   {cat}
@@ -77,7 +77,7 @@ function Noticias() {
                 placeholder="Buscar notícias..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="w-full h-10 pl-9 pr-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#0B2B4F] transition-colors"
+                className="w-full h-10 pl-9 pr-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
               />
             </div>
           </div>
@@ -91,17 +91,17 @@ function Noticias() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginated.map((item) => (
                 <div key={item.title} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-40 bg-gradient-to-br from-[#0B2B4F]/5 to-gray-100 flex items-center justify-center">
-                    <FileText className="size-10 text-[#0B2B4F]/20" />
+                  <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center">
+                    <FileText className="size-10 text-[#D62828]/20" />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-medium uppercase tracking-wider text-[#0B2B4F] bg-[#0B2B4F]/5 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
                         {item.category}
                       </span>
                       <span className="text-xs text-gray-400">{item.date}</span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#0B2B4F] transition-colors">
+                    <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                       {item.title}
                     </h3>
                     <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
@@ -125,7 +125,7 @@ function Noticias() {
                   key={p}
                   onClick={() => setPage(p)}
                   className={`size-9 rounded-lg text-sm font-medium transition-colors ${
-                    p === page ? "bg-[#0B2B4F] text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    p === page ? "bg-[#D62828] text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   {p}

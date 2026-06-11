@@ -24,11 +24,11 @@ function SiteLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center gap-3 shrink-0">
-              <div className="size-9 rounded-lg bg-[#0B2B4F] grid place-items-center text-white font-bold text-sm">
+              <div className="size-9 rounded-lg bg-[#D62828] grid place-items-center text-white font-bold text-sm">
                 APA
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-semibold text-[#0B2B4F] leading-tight">APA CMCB XII</p>
+                <p className="text-sm font-semibold text-[#D62828] leading-tight">APA CMCB XII</p>
                 <p className="text-[10px] text-gray-500 leading-tight">Associação de Pais e Amigos</p>
               </div>
             </Link>
@@ -41,7 +41,7 @@ function SiteLayout() {
                     key={link.to}
                     to={link.to}
                     className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      isActive ? "text-[#0B2B4F] bg-gray-50" : "text-gray-600 hover:text-[#0B2B4F] hover:bg-gray-50"
+                      isActive ? "text-[#D62828] bg-gray-50" : "text-gray-600 hover:text-[#D62828] hover:bg-gray-50"
                     }`}
                   >
                     {link.label}
@@ -51,33 +51,33 @@ function SiteLayout() {
             </nav>
 
             <div className="flex items-center gap-3">
-              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#0B2B4F] transition-colors">
+              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#D62828] transition-colors">
                 <Instagram className="size-5" />
               </a>
-              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#0B2B4F] transition-colors">
+              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#D62828] transition-colors">
                 <Facebook className="size-5" />
               </a>
-              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#0B2B4F] transition-colors">
+              <a href="#" className="hidden sm:block text-gray-400 hover:text-[#D62828] transition-colors">
                 <Youtube className="size-5" />
               </a>
 
               <Link
                 to="/transparencia"
-                className="hidden md:inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#0B2B4F] text-white text-sm font-medium hover:bg-[#0B2B4F]/90 transition-colors"
+                className="hidden md:inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#D62828] text-white text-sm font-medium hover:bg-[#D62828]/90 transition-colors"
               >
                 Seja Sócio
               </Link>
 
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-[#0B2B4F] text-[#0B2B4F] text-sm font-medium hover:bg-[#0B2B4F]/5 transition-colors"
+                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-[#D62828] text-[#D62828] text-sm font-medium hover:bg-[#D62828]/5 transition-colors"
               >
                 Dashboard
               </Link>
 
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="lg:hidden p-2 text-gray-600 hover:text-[#0B2B4F]"
+                className="lg:hidden p-2 text-gray-600 hover:text-[#D62828]"
               >
                 {menuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
               </button>
@@ -96,7 +96,7 @@ function SiteLayout() {
                     to={link.to}
                     onClick={() => setMenuOpen(false)}
                     className={`block px-3 py-2.5 text-sm font-medium rounded-md ${
-                      isActive ? "text-[#0B2B4F] bg-gray-50" : "text-gray-600 hover:text-[#0B2B4F] hover:bg-gray-50"
+                      isActive ? "text-[#D62828] bg-gray-50" : "text-gray-600 hover:text-[#D62828] hover:bg-gray-50"
                     }`}
                   >
                     {link.label}
@@ -107,15 +107,15 @@ function SiteLayout() {
                 <Link
                   to="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-2.5 px-3 rounded-lg bg-[#0B2B4F] text-white text-sm font-medium"
+                  className="block w-full text-center py-2.5 px-3 rounded-lg bg-[#D62828] text-white text-sm font-medium"
                 >
                   Dashboard
                 </Link>
               </div>
               <div className="pt-3 flex items-center gap-4 px-3">
-                <a href="#" className="text-gray-400 hover:text-[#0B2B4F]"><Instagram className="size-5" /></a>
-                <a href="#" className="text-gray-400 hover:text-[#0B2B4F]"><Facebook className="size-5" /></a>
-                <a href="#" className="text-gray-400 hover:text-[#0B2B4F]"><Youtube className="size-5" /></a>
+                <a href="#" className="text-gray-400 hover:text-[#D62828]"><Instagram className="size-5" /></a>
+                <a href="#" className="text-gray-400 hover:text-[#D62828]"><Facebook className="size-5" /></a>
+                <a href="#" className="text-gray-400 hover:text-[#D62828]"><Youtube className="size-5" /></a>
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ function SiteLayout() {
         <Outlet />
       </main>
 
-      <footer className="bg-[#0B2B4F] text-white">
+      <footer className="bg-[#D62828] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <div className="sm:col-span-2 lg:col-span-1">

@@ -24,7 +24,7 @@ function Ouvidoria() {
           <div className="size-16 rounded-full bg-emerald-50 mx-auto grid place-items-center">
             <Shield className="size-8 text-emerald-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#0B2B4F] mt-6">Manifestação enviada</h2>
+          <h2 className="text-2xl font-bold text-[#D62828] mt-6">Manifestação enviada</h2>
           <p className="text-gray-500 mt-2">
             Sua manifestação foi registrada com sucesso. {anonymous ? "Por ser anônima, não será possível acompanhar individualmente." : "Você receberá uma resposta no e-mail informado."}
           </p>
@@ -35,7 +35,7 @@ function Ouvidoria() {
 
   return (
     <>
-      <section className="relative bg-[#0B2B4F] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -53,7 +53,7 @@ function Ouvidoria() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-lg font-semibold text-[#0B2B4F] mb-6">Envie sua manifestação</h2>
+                <h2 className="text-lg font-semibold text-[#D62828] mb-6">Envie sua manifestação</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -61,7 +61,7 @@ function Ouvidoria() {
                       <label className="text-sm font-medium text-gray-700">Nome</label>
                       <input
                         type="text"
-                        className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#0B2B4F] transition-colors"
+                        className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
                         disabled={anonymous}
                         placeholder={anonymous ? "Anônimo" : "Seu nome"}
                       />
@@ -70,7 +70,7 @@ function Ouvidoria() {
                       <label className="text-sm font-medium text-gray-700">E-mail</label>
                       <input
                         type="email"
-                        className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#0B2B4F] transition-colors"
+                        className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
                         disabled={anonymous}
                         placeholder={anonymous ? "Anônimo" : "seu@email.com"}
                       />
@@ -79,7 +79,7 @@ function Ouvidoria() {
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-gray-700">Tipo</label>
-                    <select className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#0B2B4F] transition-colors bg-white">
+                    <select className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors bg-white">
                       <option value="">Selecione...</option>
                       <option value="sugestao">Sugestão</option>
                       <option value="reclamacao">Reclamação</option>
@@ -93,7 +93,7 @@ function Ouvidoria() {
                     <label className="text-sm font-medium text-gray-700">Mensagem</label>
                     <textarea
                       rows={5}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#0B2B4F] transition-colors resize-none"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors resize-none"
                       placeholder="Descreva sua manifestação em detalhes..."
                       required
                     />
@@ -104,7 +104,7 @@ function Ouvidoria() {
                       type="checkbox"
                       checked={anonymous}
                       onChange={(e) => setAnonymous(e.target.checked)}
-                      className="size-4 rounded border-gray-300 text-[#0B2B4F] focus:ring-[#0B2B4F]"
+                      className="size-4 rounded border-gray-300 text-[#D62828] focus:ring-[#D62828]"
                     />
                     <div>
                       <span className="text-sm font-medium text-gray-700">Desejo manter anonimato</span>
@@ -114,7 +114,7 @@ function Ouvidoria() {
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#0B2B4F] text-white font-medium text-sm hover:bg-[#0B2B4F]/90 transition-colors"
+                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors"
                   >
                     <Send className="size-4" /> Enviar Manifestação
                   </button>
@@ -124,17 +124,17 @@ function Ouvidoria() {
 
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
-                <Lock className="size-6 text-[#0B2B4F] mb-3" />
+                <Lock className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Sigilo Garantido</h3>
                 <p className="text-xs text-gray-500 mt-1">Suas informações são protegidas e tratadas com absoluto sigilo.</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
-                <MessageSquare className="size-6 text-[#0B2B4F] mb-3" />
+                <MessageSquare className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Canal Direto</h3>
                 <p className="text-xs text-gray-500 mt-1">Sua manifestação chega diretamente à ouvidoria da associação.</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
-                <Shield className="size-6 text-[#0B2B4F] mb-3" />
+                <Shield className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Denúncia Anônima</h3>
                 <p className="text-xs text-gray-500 mt-1">Caso prefira, marque a opção anônima e seus dados não serão identificados.</p>
               </div>
