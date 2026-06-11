@@ -17,11 +17,23 @@ function mapKeys<T>(obj: Record<string, unknown>, fn: (k: string) => string): T 
   return result as T;
 }
 
+function toDDMMYYYY(dateStr: string): string {
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString("pt-BR");
+}
+
 function mensalidadeFromApi(raw: Record<string, unknown>): Mensalidade {
   const mapped = mapKeys<Record<string, unknown>>(raw, toCamel);
   mapped.id = String(mapped.id);
   mapped.alunoId = String(mapped.alunoId);
   mapped.valor = Number(mapped.valor) || 0;
+  if (mapped.dataVencimento && typeof mapped.dataVencimento === "string") {
+    mapped.dataVencimento = toDDMMYYYY(mapped.dataVencimento);
+  }
+  if (mapped.dataPagamento && typeof mapped.dataPagamento === "string") {
+    mapped.dataPagamento = toDDMMYYYY(mapped.dataPagamento);
+  }
   if (raw.aluno && typeof raw.aluno === "object") {
     const a = raw.aluno as Record<string, unknown>;
     mapped.alunoNome = String(a.nome || "");
