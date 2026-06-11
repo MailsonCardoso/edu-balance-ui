@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Eye, FileText, History, Loader2, MoreVertical, Plus, Pencil, Search, Trash2, X } from "lucide-react";
+import { CheckCircle2, FileText, History, Loader2, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -213,6 +213,57 @@ function Financeiro() {
     }
   };
 
+  const gerarPdf = (m: Mensalidade) => {
+    const janela = window.open("", "_blank");
+    if (!janela) return;
+    janela.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Recibo - ${m.alunoNome}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: Arial, sans-serif; padding: 60px; color: #111; }
+          .header { text-align: center; border-bottom: 2px solid #222; padding-bottom: 20px; margin-bottom: 30px; }
+          .header h1 { font-size: 24px; margin-bottom: 4px; }
+          .header p { font-size: 14px; color: #555; }
+          .info { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+          .row { display: flex; justify-content: space-between; align-items: baseline; }
+          .row .label { color: #555; font-size: 14px; }
+          .row .value { font-size: 14px; font-weight: 600; text-align: right; max-width: 55%; }
+          .highlight { background: #e6f7e6; border: 1px solid #b7e6b7; border-radius: 8px; padding: 20px; text-align: center; margin-top: 20px; }
+          .highlight p { font-size: 14px; color: #2e7d32; font-weight: 600; }
+          .highlight small { font-size: 12px; color: #666; }
+          .footer { text-align: center; margin-top: 50px; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 16px; }
+          @media print { body { padding: 40px; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Bombeiro Paranã</h1>
+          <p>Colegio Militar 2 de Julho Unidade XII - Paranã</p>
+        </div>
+        <div class="info">
+          <div class="row"><span class="label">Aluno:</span><span class="value">${m.alunoNome || "—"}</span></div>
+          <div class="row"><span class="label">Responsável:</span><span class="value">${m.alunoResponsavel || "—"}</span></div>
+          <div class="row"><span class="label">Mês referente:</span><span class="value">${m.mesReferencia}</span></div>
+          <div class="row"><span class="label">Valor:</span><span class="value">${brl(m.valor)}</span></div>
+          <div class="row"><span class="label">Data pagamento:</span><span class="value">${m.dataPagamento ? fmtDate(m.dataPagamento) : "—"}</span></div>
+          <div class="row"><span class="label">Forma de pagamento:</span><span class="value">${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}</span></div>
+        </div>
+        <div class="highlight">
+          <p>Pagamento recebido com sucesso!</p>
+          <small>O responsável foi informado sobre o recebimento.</small>
+        </div>
+        <div class="footer">Documento gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
+        <script>window.print();window.close();<\/script>
+      </body>
+      </html>
+    `);
+    janela.document.close();
+  };
+
   return (
     <>
       <PageHeader
@@ -336,11 +387,6 @@ function Financeiro() {
         actions={
           selectedMensalidade
             ? [
-                {
-                  label: "Detalhes",
-                  icon: <Eye className="size-5" />,
-                  onClick: () => setReciboMensalidade(selectedMensalidade),
-                },
                 {
                   label: "Editar",
                   icon: <Pencil className="size-5" />,
@@ -578,10 +624,15 @@ function Financeiro() {
               </p>
             </div>
           </div>
-          <AlertDialogFooter className="sm:justify-center">
-            <AlertDialogAction onClick={() => setReciboMensalidade(null)}>
+          <AlertDialogFooter className="sm:justify-center gap-2">
+            <Button variant="outline" onClick={() => setReciboMensalidade(null)}>
               Fechar
-            </AlertDialogAction>
+            </Button>
+            {reciboMensalidade && (
+              <Button onClick={() => gerarPdf(reciboMensalidade)}>
+                <Printer className="size-4" /> Baixar PDF
+              </Button>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
