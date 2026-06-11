@@ -377,22 +377,22 @@ export function AlunoSheet({
               </Field>
               <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
                 {editing ? (
-                  <Controller
-                    name="valorMensalidade"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        className="h-10"
-                        placeholder="0,00"
-                        value={field.value ? maskCurrency(String(field.value)) : ""}
-                        onChange={(e) => {
-                          const masked = maskCurrency(e.target.value);
-                          e.target.value = masked;
-                          field.onChange(parseCurrency(masked));
-                        }}
-                      />
-                    )}
-                  />
+                    <Controller
+                      name="valorMensalidade"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          className="h-10"
+                          placeholder="0,00"
+                          value={field.value !== null && field.value !== undefined && !isNaN(field.value) ? maskCurrency(String(field.value)) : ""}
+                          onChange={(e) => {
+                            const masked = maskCurrency(e.target.value);
+                            e.target.value = masked;
+                            field.onChange(masked ? parseCurrency(masked) : 0);
+                          }}
+                        />
+                      )}
+                    />
                 ) : (
                   <p className={viewCls}>
                     {current.valorMensalidade

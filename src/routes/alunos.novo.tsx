@@ -203,11 +203,11 @@ function NovoAluno() {
                   <Input
                     className="h-10"
                     placeholder="0,00"
-                    value={field.value ? maskCurrency(String(field.value)) : ""}
+                    value={field.value !== null && field.value !== undefined && !isNaN(field.value) ? maskCurrency(String(field.value)) : ""}
                     onChange={(e) => {
                       const masked = maskCurrency(e.target.value);
                       e.target.value = masked;
-                      field.onChange(parseCurrency(masked));
+                      field.onChange(masked ? parseCurrency(masked) : 0);
                     }}
                   />
                 )}
