@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/Primitives";
 import type { Aluno } from "@/lib/mock-data";
-import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, maskCurrency, parseCurrency, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -122,6 +122,8 @@ export function AlunoSheet({
       ? undefined
       : {
           ...current,
+          valorMensalidade: current.valorMensalidade ?? 0,
+          diaVencimento: current.diaVencimento ?? 10,
           dataNascimento: current.dataNascimento?.includes("/")
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
@@ -375,13 +377,21 @@ export function AlunoSheet({
               </Field>
               <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
                 {editing ? (
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    className="h-10"
-                    placeholder="0,00"
-                    {...register("valorMensalidade", { valueAsNumber: true })}
+                  <Controller
+                    name="valorMensalidade"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        className="h-10"
+                        placeholder="0,00"
+                        value={field.value ? maskCurrency(String(field.value)) : ""}
+                        onChange={(e) => {
+                          const masked = maskCurrency(e.target.value);
+                          e.target.value = masked;
+                          field.onChange(parseCurrency(masked));
+                        }}
+                      />
+                    )}
                   />
                 ) : (
                   <p className={viewCls}>
@@ -393,13 +403,20 @@ export function AlunoSheet({
               </Field>
               <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
                 {editing ? (
-                  <Input
-                    type="number"
-                    min="1"
-                    max="31"
-                    className="h-10"
-                    placeholder="10"
-                    {...register("diaVencimento", { valueAsNumber: true })}
+                  <Controller
+                    name="diaVencimento"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type="number"
+                        min="1"
+                        max="31"
+                        className="h-10"
+                        placeholder="10"
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(Number(e.target.value) || 10)}
+                      />
+                    )}
                   />
                 ) : (
                   <p className={viewCls}>Dia {current.diaVencimento}</p>

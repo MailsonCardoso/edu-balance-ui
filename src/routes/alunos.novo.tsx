@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Save } from "lucide-react";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF } from "@/lib/format";
+import { maskCPF, maskCurrency, parseCurrency } from "@/lib/format";
 import { createAluno } from "@/lib/api/alunos";
 import { createMensalidade } from "@/lib/api/mensalidades";
 
@@ -196,23 +196,38 @@ function NovoAluno() {
             </Field>
 
             <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                className="h-10"
-                placeholder="0,00"
-                {...register("valorMensalidade", { valueAsNumber: true })}
+              <Controller
+                name="valorMensalidade"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    className="h-10"
+                    placeholder="0,00"
+                    value={field.value ? maskCurrency(String(field.value)) : ""}
+                    onChange={(e) => {
+                      const masked = maskCurrency(e.target.value);
+                      e.target.value = masked;
+                      field.onChange(parseCurrency(masked));
+                    }}
+                  />
+                )}
               />
             </Field>
             <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
-              <Input
-                type="number"
-                min="1"
-                max="31"
-                className="h-10"
-                placeholder="10"
-                {...register("diaVencimento", { valueAsNumber: true })}
+              <Controller
+                name="diaVencimento"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="number"
+                    min="1"
+                    max="31"
+                    className="h-10"
+                    placeholder="10"
+                    value={field.value || ""}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 10)}
+                  />
+                )}
               />
             </Field>
           </div>

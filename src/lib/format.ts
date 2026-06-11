@@ -29,3 +29,15 @@ export const maskPhone = (value: string) => {
     .replace(/(\d{5})(\d)/, "$1-$2")
     .replace(/(\d{4})\d*$/, "$1");
 };
+
+export const maskCurrency = (value: string): string => {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (!digits) return "";
+  const v = parseInt(digits, 10) / 100;
+  return v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+export const parseCurrency = (masked: string): number => {
+  const cleaned = masked.replace(/\D/g, "");
+  return parseFloat(cleaned || "0") / 100;
+};
