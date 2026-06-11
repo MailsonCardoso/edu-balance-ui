@@ -26,7 +26,6 @@ const schema = z.object({
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
-  situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
   valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
   diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
 });
@@ -67,12 +66,12 @@ function NovoAluno() {
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "ativo", situacao: "em_dia", valorMensalidade: 0, diaVencimento: 10 },
+    defaultValues: { status: "ativo", valorMensalidade: 0, diaVencimento: 10 },
   });
 
   const onSubmit = async (data: FormData) => {
     try {
-      const created = await createAluno(data);
+      const created = await createAluno({ ...data, situacao: "em_dia" });
       if (data.valorMensalidade > 0) {
         const hoje = new Date();
         const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
@@ -195,16 +194,7 @@ function NovoAluno() {
                 <option value="inativo">Inativo</option>
               </select>
             </Field>
-            <Field label="Situação financeira" error={errors.situacao?.message}>
-              <select
-                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
-                {...register("situacao")}
-              >
-                <option value="em_dia">Em dia</option>
-                <option value="em_atraso">Em atraso</option>
-                <option value="inadimplente">Inadimplente</option>
-              </select>
-            </Field>
+
             <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
               <Input
                 type="number"

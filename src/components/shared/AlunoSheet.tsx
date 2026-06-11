@@ -43,7 +43,6 @@ const schema = z.object({
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
-  situacao: z.enum(["em_dia", "em_atraso", "inadimplente"]),
   valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
   diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
 });
@@ -88,7 +87,6 @@ const emptyAluno: Aluno = {
   telefoneResponsavel: "",
   turma: "",
   status: "ativo",
-  situacao: "em_dia",
   valorMensalidade: 0,
   diaVencimento: 10,
 };
@@ -128,7 +126,7 @@ export function AlunoSheet({
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
         },
-    defaultValues: isCreate ? { status: "ativo", situacao: "em_dia", valorMensalidade: 0, diaVencimento: 10 } : undefined,
+    defaultValues: isCreate ? { status: "ativo", valorMensalidade: 0, diaVencimento: 10 } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -136,6 +134,7 @@ export function AlunoSheet({
       const novo: Aluno = {
         id: String(Date.now()),
         ...data,
+        situacao: "em_dia",
         cpf: data.cpf || "",
         cpfResponsavel: data.cpfResponsavel || "",
       };
@@ -374,30 +373,13 @@ export function AlunoSheet({
                   </div>
                 )}
               </Field>
-              <Field label="Situação financeira">
-                {editing ? (
-                  <Controller
-                    name="situacao"
-                    control={control}
-                    render={({ field }) => (
-                      <Select value={field.value || "em_dia"} onValueChange={field.onChange}>
-                        <SelectTrigger className="h-10">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="em_dia">Em dia</SelectItem>
-                          <SelectItem value="em_atraso">Em atraso</SelectItem>
-                          <SelectItem value="inadimplente">Inadimplente</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                ) : (
+              {!editing && (
+                <Field label="Situação financeira">
                   <div className={viewCls}>
                     <StatusBadge status={current.situacao} />
                   </div>
-                )}
-              </Field>
+                </Field>
+              )}
               <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
                 {editing ? (
                   <Input
