@@ -29,7 +29,7 @@ function Associado() {
 
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -83,8 +83,8 @@ function Associado() {
                     <div className="size-10 rounded-full bg-[#D62828]/10 mx-auto grid place-items-center">
                       <item.icon className="size-5 text-[#D62828]" />
                     </div>
-                    <h3 className="mt-3 font-semibold text-gray-900 text-sm">{item.title}</h3>
-                    <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                    <h3 className="mt-3 font-semibold text-gray-900 text-base">{item.title}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
                   </div>
                 ))}
               </div>

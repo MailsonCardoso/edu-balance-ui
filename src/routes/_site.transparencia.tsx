@@ -61,7 +61,7 @@ function Transparencia() {
 
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -82,8 +82,8 @@ function Transparencia() {
                 <TrendingUp className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">{data ? fmt(data.financeiro.receitas_mes) : "—"}</p>
-                <p className="text-xs text-gray-500">Arrecadação do Mês</p>
+                <p className="text-xl font-bold text-gray-900">{data ? fmt(data.financeiro.receitas_mes) : "—"}</p>
+                <p className="text-sm text-gray-500">Arrecadação do Mês</p>
               </div>
             </div>
           </div>
@@ -93,8 +93,8 @@ function Transparencia() {
                 <Users className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">{data ? String(data.total_associados) : "—"}</p>
-                <p className="text-xs text-gray-500">Total de Associados</p>
+                <p className="text-xl font-bold text-gray-900">{data ? String(data.total_associados) : "—"}</p>
+                <p className="text-sm text-gray-500">Total de Associados</p>
               </div>
             </div>
           </div>
@@ -104,8 +104,8 @@ function Transparencia() {
                 <Clock className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">2</p>
-                <p className="text-xs text-gray-500">Projetos em Andamento</p>
+                <p className="text-xl font-bold text-gray-900">2</p>
+                <p className="text-sm text-gray-500">Projetos em Andamento</p>
               </div>
             </div>
           </div>
@@ -115,39 +115,39 @@ function Transparencia() {
                 <FileText className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">2024/2025</p>
-                <p className="text-xs text-gray-500">Prestação de Contas</p>
+                <p className="text-xl font-bold text-gray-900">2024/2025</p>
+                <p className="text-sm text-gray-500">Prestação de Contas</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
               <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.total_pago) : "—"}</p>
-              <p className="text-xs text-gray-500 mt-1">Total Arrecadado (histórico)</p>
+              <p className="text-sm text-gray-500 mt-1">Total Arrecadado (histórico)</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
               <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.receitas_ano) : "—"}</p>
-              <p className="text-xs text-gray-500 mt-1">Receitas do Ano</p>
+              <p className="text-sm text-gray-500 mt-1">Receitas do Ano</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
               <p className="text-2xl font-bold text-emerald-600">{data ? String(data.mensalidades.pagas) + "/" + String(data.mensalidades.total) : "—"}</p>
-              <p className="text-xs text-gray-500 mt-1">Mensalidades Pagas</p>
+              <p className="text-sm text-gray-500 mt-1">Mensalidades Pagas</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
               <p className="text-2xl font-bold text-amber-600">{data ? String(data.alunos.em_dia) + "/" + String(data.alunos.ativos) : "—"}</p>
-              <p className="text-xs text-gray-500 mt-1">Alunos em Dia</p>
+              <p className="text-sm text-gray-500 mt-1">Alunos em Dia</p>
             </div>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-bold text-[#D62828] mb-6">Auditoria e Regularização</h2>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-base text-gray-500 mb-6">
                 Acompanhe o status do processo de auditoria e regularização institucional.
               </p>
               <div className="space-y-3">
@@ -171,7 +171,7 @@ function Transparencia() {
 
             <div>
               <h2 className="text-2xl font-bold text-[#D62828] mb-6">Documentos</h2>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-base text-gray-500 mb-6">
                 Documentos institucionais disponíveis para consulta e download.
               </p>
               <div className="space-y-2">
@@ -195,7 +195,7 @@ function Transparencia() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Gestão Atual</h2>
@@ -209,8 +209,8 @@ function Transparencia() {
                   <User className="size-7 text-[#D62828]/40" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900">{person.name}</h3>
-                <p className="text-xs font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
-                <p className="text-xs text-gray-500 mt-2">{person.desc}</p>
+                <p className="text-sm font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
+                <p className="text-sm text-gray-500 mt-2">{person.desc}</p>
               </div>
             ))}
           </div>
@@ -223,7 +223,7 @@ function Transparencia() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Perguntas Frequentes</h2>

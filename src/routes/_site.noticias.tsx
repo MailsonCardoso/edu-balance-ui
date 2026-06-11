@@ -41,7 +41,7 @@ function Noticias() {
 
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -54,7 +54,7 @@ function Noticias() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-2 flex-wrap">
@@ -99,12 +99,12 @@ function Noticias() {
                       <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
                         {item.category}
                       </span>
-                      <span className="text-xs text-gray-400">{item.date}</span>
-                    </div>
-                    <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
+                    <span className="text-sm text-gray-400">{item.date}</span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
                   </div>
                 </div>
               ))}

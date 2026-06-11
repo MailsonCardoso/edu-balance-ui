@@ -18,7 +18,7 @@ function Contato() {
 
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -31,7 +31,7 @@ function Contato() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -77,8 +77,8 @@ function Contato() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-5">
                 <MapPin className="size-5 text-[#D62828] mb-2" />
-                <h3 className="text-sm font-semibold text-gray-900">Endereço</h3>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                <h3 className="text-base font-semibold text-gray-900">Endereço</h3>
+                <p className="text-sm text-gray-500 mt-1 leading-relaxed">
                   Colégio Militar 2 de Julho – Unidade XII<br />
                   Rua Exemplo, 123 – Bairro<br />
                   Salvador – BA, CEP 40000-000
@@ -86,18 +86,18 @@ function Contato() {
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-5">
                 <Phone className="size-5 text-[#D62828] mb-2" />
-                <h3 className="text-sm font-semibold text-gray-900">Telefone</h3>
-                <p className="text-xs text-gray-500 mt-1">(71) 99999-9999</p>
+                <h3 className="text-base font-semibold text-gray-900">Telefone</h3>
+                <p className="text-sm text-gray-500 mt-1">(71) 99999-9999</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-5">
                 <Mail className="size-5 text-[#D62828] mb-2" />
-                <h3 className="text-sm font-semibold text-gray-900">E-mail</h3>
-                <p className="text-xs text-gray-500 mt-1">contato@apacmcbxii.org.br</p>
+                <h3 className="text-base font-semibold text-gray-900">E-mail</h3>
+                <p className="text-sm text-gray-500 mt-1">contato@apacmcbxii.org.br</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-5">
                 <Clock className="size-5 text-[#D62828] mb-2" />
-                <h3 className="text-sm font-semibold text-gray-900">Horário de Atendimento</h3>
-                <p className="text-xs text-gray-500 mt-1">Segunda a Sexta: 8h às 17h</p>
+                <h3 className="text-base font-semibold text-gray-900">Horário de Atendimento</h3>
+                <p className="text-sm text-gray-500 mt-1">Segunda a Sexta: 8h às 17h</p>
               </div>
               <a
                 href="#"

@@ -32,7 +32,7 @@ const management = [
 function Institucional() {
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -45,7 +45,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossa História</h2>
@@ -63,7 +63,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -80,8 +80,8 @@ function Institucional() {
                     <div key={item.label} className="flex items-start gap-3">
                       <div className="size-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                        <p className="text-base font-semibold text-gray-900">{item.label}</p>
+                        <p className="text-sm text-gray-500 mt-0.5">{item.desc}</p>
                       </div>
                     </div>
                   ))}
@@ -92,16 +92,16 @@ function Institucional() {
             <div className="space-y-6">
               <div className="bg-white rounded-xl border border-gray-100 p-6">
                 <Target className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900">Missão</h3>
-                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                <h3 className="text-base font-semibold text-gray-900">Missão</h3>
+                <p className="text-base text-gray-600 mt-2 leading-relaxed">
                   Promover a integração entre escola, pais e comunidade, apoiando o desenvolvimento educacional, 
                   social e cultural dos alunos do CMCB XII com transparência, ética e responsabilidade.
                 </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 p-6">
                 <Eye className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900">Visão</h3>
-                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                <h3 className="text-base font-semibold text-gray-900">Visão</h3>
+                <p className="text-base text-gray-600 mt-2 leading-relaxed">
                   Ser referência em gestão participativa e transparência entre as associações de pais do Brasil, 
                   contribuindo ativamente para a excelência da educação pública.
                 </p>
@@ -111,7 +111,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossos Valores</h2>
@@ -122,15 +122,15 @@ function Institucional() {
                 <div className="size-11 rounded-full bg-[#D62828]/5 mx-auto grid place-items-center">
                   <v.icon className="size-5 text-[#D62828]" />
                 </div>
-                <h3 className="mt-3 text-sm font-semibold text-gray-900">{v.title}</h3>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{v.desc}</p>
+                <h3 className="mt-3 text-base font-semibold text-gray-900">{v.title}</h3>
+                <p className="text-sm text-gray-500 mt-1 leading-relaxed">{v.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">O que fazemos</h2>
@@ -141,15 +141,15 @@ function Institucional() {
                 <div className="size-10 rounded-lg bg-[#D62828]/5 grid place-items-center">
                   <a.icon className="size-5 text-[#D62828]" />
                 </div>
-                <h3 className="mt-4 text-sm font-semibold text-gray-900">{a.title}</h3>
-                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{a.desc}</p>
+                <h3 className="mt-4 text-base font-semibold text-gray-900">{a.title}</h3>
+                <p className="text-sm text-gray-500 mt-1 leading-relaxed">{a.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Diretoria Provisória</h2>
@@ -162,8 +162,8 @@ function Institucional() {
                   <User className="size-7 text-[#D62828]/40" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900">{person.name}</h3>
-                <p className="text-xs font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
-                <p className="text-xs text-gray-500 mt-2">{person.desc}</p>
+                <p className="text-sm font-medium text-[#D62828] uppercase tracking-wider mt-0.5">{person.role}</p>
+                <p className="text-sm text-gray-500 mt-2">{person.desc}</p>
               </div>
             ))}
           </div>
@@ -175,7 +175,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Conselho Fiscal</h2>
@@ -186,14 +186,14 @@ function Institucional() {
                 <div className="size-8 rounded-full bg-gray-50 grid place-items-center">
                   <User className="size-4 text-gray-400" />
                 </div>
-                <span className="text-sm text-gray-700">{name}</span>
+                <span className="text-base text-gray-700">{name}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Parceiros</h2>
@@ -208,7 +208,7 @@ function Institucional() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-[#D62828] text-white">
+      <section className="py-12 lg:py-16 bg-[#D62828] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <FileTextIcon />
           <h2 className="text-2xl lg:text-3xl font-bold mt-6">Estatuto Social</h2>

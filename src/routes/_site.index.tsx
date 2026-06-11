@@ -115,7 +115,7 @@ function SiteHome() {
       </section>
 
       <section className="relative -mt-10 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {indicators.map((item) => (
             <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
               <div className="flex items-center gap-3">
@@ -123,8 +123,8 @@ function SiteHome() {
                   <item.icon className="size-5" />
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-gray-900">{item.value}</p>
-                  <p className="text-xs text-gray-500">{item.label}</p>
+                  <p className="text-xl font-bold text-gray-900">{item.value}</p>
+                  <p className="text-sm text-gray-500">{item.label}</p>
                 </div>
               </div>
             </div>
@@ -132,7 +132,7 @@ function SiteHome() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <div>
@@ -158,12 +158,12 @@ function SiteHome() {
                     <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
                       {item.category}
                     </span>
-                    <span className="text-xs text-gray-400">{item.date}</span>
+                    <span className="text-sm text-gray-400">{item.date}</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
+                  <h3 className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
                 </div>
               </div>
             ))}
@@ -180,7 +180,7 @@ function SiteHome() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-[#D62828] to-[#D62828]/95 text-white">
+      <section className="py-12 lg:py-16 bg-gradient-to-br from-[#D62828] to-[#D62828]/95 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl lg:text-3xl font-bold">
             Ainda não é sócio?

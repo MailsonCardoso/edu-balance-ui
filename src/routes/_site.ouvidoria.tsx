@@ -60,7 +60,7 @@ function Ouvidoria() {
           </p>
 
           <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
-            <p className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">
+              <p className="text-sm text-gray-500 uppercase tracking-wider font-medium mb-2">
               Protocolo
             </p>
             <div className="flex items-center justify-center gap-3">
@@ -74,7 +74,7 @@ function Ouvidoria() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="text-sm text-gray-400 mt-4">
             Guarde este protocolo para acompanhar sua manifestação.
           </p>
         </div>
@@ -84,7 +84,7 @@ function Ouvidoria() {
 
   return (
     <>
-      <section className="relative bg-[#D62828] py-16 lg:py-24 overflow-hidden">
+      <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
@@ -97,7 +97,7 @@ function Ouvidoria() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -188,18 +188,18 @@ function Ouvidoria() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <Lock className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900">Sigilo Garantido</h3>
-                <p className="text-xs text-gray-500 mt-1">Suas informações são protegidas e tratadas com absoluto sigilo.</p>
+                <h3 className="text-base font-semibold text-gray-900">Sigilo Garantido</h3>
+                <p className="text-sm text-gray-500 mt-1">Suas informações são protegidas e tratadas com absoluto sigilo.</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <MessageSquare className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900">Canal Direto</h3>
-                <p className="text-xs text-gray-500 mt-1">Sua manifestação chega diretamente à ouvidoria da associação.</p>
+                <h3 className="text-base font-semibold text-gray-900">Canal Direto</h3>
+                <p className="text-sm text-gray-500 mt-1">Sua manifestação chega diretamente à ouvidoria da associação.</p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <Shield className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-sm font-semibold text-gray-900">Denúncia Anônima</h3>
-                <p className="text-xs text-gray-500 mt-1">Caso prefira, marque a opção anônima e seus dados não serão identificados.</p>
+                <h3 className="text-base font-semibold text-gray-900">Denúncia Anônima</h3>
+                <p className="text-sm text-gray-500 mt-1">Caso prefira, marque a opção anônima e seus dados não serão identificados.</p>
               </div>
             </div>
           </div>
