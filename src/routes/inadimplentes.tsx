@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Clock, DollarSign, Loader2, Search } from "lucide-react";
+import { AlertTriangle, Clock, DollarSign, Loader2, MessageCircle, Search } from "lucide-react";
 import { PageHeader, StatusBadge, StatCard, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
 import {
@@ -166,6 +166,7 @@ function Inadimplentes() {
                   <th className="px-4 py-3 font-medium text-center">Parcelas em atraso</th>
                   <th className="px-4 py-3 font-medium text-center">Dias em atraso</th>
                   <th className="px-4 py-3 font-medium text-right">Valor devido</th>
+                  <th className="px-4 py-3 w-12"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -193,6 +194,22 @@ function Inadimplentes() {
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-destructive">
                         {det ? brl(det.total) : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => {
+                            const phone = a.telefoneResponsavel?.replace(/\D/g, "") || a.telefone?.replace(/\D/g, "");
+                            if (!phone) { toast.error("Telefone não encontrado"); return; }
+                            const msg = encodeURIComponent(
+                              `Bombeiro Paranã - Cobrança de Mensalidade\n\nOlá ${a.responsavel || "Responsável"}, o(a) aluno(a) ${a.nome} está com ${det?.parcelas || 0} mensalidade(s) em atraso no valor total de ${det ? brl(det.total) : "—"}.\n\nPor favor, regularize o pagamento o quanto antes.\n\nAtenciosamente,\nColégio Militar 2 de Julho – Unidade XII – Paranã`,
+                            );
+                            window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
+                          }}
+                          className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                          title="Cobrar via WhatsApp"
+                        >
+                          <MessageCircle className="size-4" />
+                        </button>
                       </td>
                     </tr>
                   );

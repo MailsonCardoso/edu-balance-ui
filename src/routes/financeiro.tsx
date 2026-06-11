@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, FileText, History, Loader2, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X } from "lucide-react";
+import { CheckCircle2, FileText, History, Loader2, MessageCircle, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -213,6 +213,16 @@ function Financeiro() {
     }
   };
 
+  const whatsAppUrl = (m: Mensalidade) => {
+    const a = alunos.find((x) => x.id === m.alunoId);
+    const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
+    if (!phone) return null;
+    const msg = encodeURIComponent(
+      `Bombeiro Paranã - Cobrança de Mensalidade\n\nOlá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, a mensalidade do(a) aluno(a) ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} com vencimento em ${fmtDate(m.dataVencimento)} encontra-se ${m.status === "atrasado" ? "VENCIDA" : "PENDENTE"}.\n\nPor favor, regularize o pagamento o quanto antes.\n\nAtenciosamente,\nColégio Militar 2 de Julho – Unidade XII – Paranã`,
+    );
+    return `https://wa.me/55${phone}?text=${msg}`;
+  };
+
   const gerarPdf = (m: Mensalidade) => {
     const janela = window.open("", "_blank");
     if (!janela) return;
@@ -420,6 +430,19 @@ function Financeiro() {
                         label: "Recibo",
                         icon: <FileText className="size-5" />,
                         onClick: () => setReciboMensalidade(selectedMensalidade),
+                      },
+                    ]
+                  : []),
+                ...(selectedMensalidade.status !== "pago"
+                  ? [
+                      {
+                        label: "Cobrar WhatsApp",
+                        icon: <MessageCircle className="size-5" />,
+                        onClick: () => {
+                          const url = whatsAppUrl(selectedMensalidade);
+                          if (url) window.open(url, "_blank");
+                          else toast.error("Telefone não encontrado para este aluno");
+                        },
                       },
                     ]
                   : []),
