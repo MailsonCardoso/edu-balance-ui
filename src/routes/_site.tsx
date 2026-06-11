@@ -69,8 +69,15 @@ function SiteLayout() {
               </Link>
 
               <Link
-                to="/login"
+                to="/responsavel"
                 className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-[#D62828] text-[#D62828] text-sm font-medium hover:bg-[#D62828]/5 transition-colors"
+              >
+                Responsável
+              </Link>
+
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#D62828] text-white text-sm font-medium hover:bg-[#D62828]/90 transition-colors"
               >
                 Dashboard
               </Link>
@@ -105,9 +112,16 @@ function SiteLayout() {
               })}
               <div className="pt-3 flex items-center gap-4 px-3">
                 <Link
-                  to="/login"
+                  to="/responsavel"
                   onClick={() => setMenuOpen(false)}
                   className="block w-full text-center py-2.5 px-3 rounded-lg bg-white text-[#D62828] border border-[#D62828] text-sm font-medium"
+                >
+                  Responsável
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="block w-full text-center py-2.5 px-3 rounded-lg bg-[#D62828] text-white text-sm font-medium"
                 >
                   Dashboard
                 </Link>
