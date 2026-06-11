@@ -40,7 +40,7 @@ function AlunosList() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sheetAluno, setSheetAluno] = useState<Aluno | null>(null);
   const [sheetMode, setSheetMode] = useState<"view" | "edit" | "create">("view");
-  const [deleteAluno, setDeleteAluno] = useState<Aluno | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Aluno | null>(null);
 
   useEffect(() => {
     fetchAlunos()
@@ -96,12 +96,12 @@ function AlunosList() {
   };
 
   const handleDelete = async () => {
-    if (!deleteAluno) return;
+    if (!deleteTarget) return;
     try {
-      await deleteAluno(deleteAluno.id);
-      setData((d) => d.filter((a) => a.id !== deleteAluno.id));
+      await deleteAluno(deleteTarget.id);
+      setData((d) => d.filter((a) => a.id !== deleteTarget.id));
       toast.success("Aluno removido");
-      setDeleteAluno(null);
+      setDeleteTarget(null);
     } catch {
       toast.error("Erro ao excluir aluno");
     }
@@ -215,7 +215,7 @@ function AlunosList() {
                           <Pencil className="size-4" />
                         </button>
                         <button
-                          onClick={() => setDeleteAluno(a)}
+                          onClick={() => setDeleteTarget(a)}
                           className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
                           title="Excluir"
                         >
@@ -246,16 +246,16 @@ function AlunosList() {
       />
 
       <AlertDialog
-        open={!!deleteAluno}
+        open={!!deleteTarget}
         onOpenChange={(open) => {
-          if (!open) setDeleteAluno(null);
+          if (!open) setDeleteTarget(null);
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir aluno</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir <strong>{deleteAluno?.nome}</strong>? Esta ação não
+              Tem certeza que deseja excluir <strong>{deleteTarget?.nome}</strong>? Esta ação não
               pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
