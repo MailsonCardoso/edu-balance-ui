@@ -44,7 +44,7 @@ function Login() {
       return;
     }
     toast.success("Bem-vindo de volta!");
-    navigate({ to: "/" });
+    navigate({ to: "/dashboard" });
   };
 
   return (
