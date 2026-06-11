@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
+  sexo: z.enum(["masculino", "feminino"], { message: "Selecione o sexo" }),
   cpf: z
     .string()
     .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido (000.000.000-00)")
@@ -78,6 +79,7 @@ function Field({
 const emptyAluno: Aluno = {
   id: "",
   nome: "",
+  sexo: "",
   cpf: "",
   dataNascimento: "",
   telefone: "",
@@ -131,7 +133,7 @@ export function AlunoSheet({
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
         },
-    defaultValues: isCreate ? { status: "ativo", valorMensalidade: 0, diaVencimento: 10 } : undefined,
+    defaultValues: isCreate ? { status: "ativo", sexo: "masculino", valorMensalidade: 0, diaVencimento: 10 } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
@@ -183,6 +185,21 @@ export function AlunoSheet({
                   />
                 ) : (
                   <p className={viewCls}>{current.nome}</p>
+                )}
+              </Field>
+              <Field label="Sexo" error={errors.sexo?.message}>
+                {editing ? (
+                  <select
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
+                    {...register("sexo")}
+                  >
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                  </select>
+                ) : (
+                  <p className={viewCls}>
+                    {current.sexo === "feminino" ? "Feminino" : current.sexo === "masculino" ? "Masculino" : "—"}
+                  </p>
                 )}
               </Field>
               <Field label="CPF" error={errors.cpf?.message}>

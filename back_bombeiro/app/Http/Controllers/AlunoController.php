@@ -26,6 +26,7 @@ class AlunoController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'required|string|max:120',
+            'sexo' => 'required|in:masculino,feminino',
             'cpf' => 'nullable|string|max:14|unique:alunos,cpf',
             'data_nascimento' => 'required|string|max:10',
             'telefone' => 'nullable|string|max:20',
@@ -53,6 +54,7 @@ class AlunoController extends Controller
     {
         $validated = $request->validate([
             'nome' => 'sometimes|string|max:120',
+            'sexo' => 'sometimes|in:masculino,feminino',
             'cpf' => 'nullable|string|max:14|unique:alunos,cpf,' . $aluno->id,
             'data_nascimento' => 'sometimes|string|max:10',
             'telefone' => 'nullable|string|max:20',

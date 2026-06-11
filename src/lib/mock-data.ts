@@ -6,6 +6,7 @@ export type FormaPagamento = "pix" | "debito" | "credito";
 export interface Aluno {
   id: string;
   nome: string;
+  sexo: string;
   cpf: string;
   dataNascimento: string;
   telefone: string;
@@ -32,6 +33,7 @@ export interface Mensalidade {
   formaPagamento: FormaPagamento | null;
   alunoNome?: string;
   alunoResponsavel?: string;
+  alunoSexo?: string;
 }
 
 export const turmas = [

@@ -219,6 +219,7 @@ function Financeiro() {
     const dataPg = m.dataPagamento ? fmtDateFull(m.dataPagamento) : "—";
     const dataPgDm = m.dataPagamento ? fmtDate(m.dataPagamento) : "—";
     const valorExtenso = numeroExtenso(m.valor);
+    const rotuloAluno = m.alunoSexo === "feminino" ? "Aluna" : "Aluno";
     janela.document.write(`
       <!DOCTYPE html>
       <html>
@@ -247,7 +248,7 @@ function Financeiro() {
           Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:
         </p>
         <div class="info">
-          <p><strong>Aluno:</strong> ${m.alunoNome || "—"}</p>
+          <p><strong>${rotuloAluno}:</strong> ${m.alunoNome || "—"}</p>
           <p><strong>Responsável:</strong> ${m.alunoResponsavel || "—"}</p>
           <p><strong>Mês de Referência:</strong> ${m.mesReferencia}</p>
           <p><strong>Valor Pago:</strong> ${brl(m.valor)} (${valorExtenso})</p>
@@ -604,7 +605,7 @@ function Financeiro() {
             </p>
             <div className="space-y-2 bg-muted/30 rounded-lg p-4">
               <div className="grid grid-cols-[140px_1fr] gap-x-2">
-                <span className="text-muted-foreground">Aluno:</span>
+                <span className="text-muted-foreground">{reciboMensalidade?.alunoSexo === "feminino" ? "Aluna:" : "Aluno:"}</span>
                 <span className="font-medium">{reciboMensalidade?.alunoNome || "—"}</span>
                 <span className="text-muted-foreground">Responsável:</span>
                 <span className="font-medium">{reciboMensalidade?.alunoResponsavel || "—"}</span>

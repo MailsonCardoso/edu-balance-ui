@@ -16,6 +16,7 @@ import { createMensalidade } from "@/lib/api/mensalidades";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
+  sexo: z.enum(["masculino", "feminino"], { message: "Selecione o sexo" }),
   cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido (000.000.000-00)"),
   dataNascimento: z.string().min(1, "Obrigatório"),
   telefone: z.string().min(10, "Telefone inválido").max(20),
@@ -68,7 +69,7 @@ function NovoAluno() {
     clearErrors,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "ativo", valorMensalidade: 0, diaVencimento: 10 },
+    defaultValues: { status: "ativo", sexo: "masculino", valorMensalidade: 0, diaVencimento: 10 },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -125,6 +126,15 @@ function NovoAluno() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field label="Nome completo" error={errors.nome?.message} className="md:col-span-2">
               <Input className="h-10" {...register("nome")} />
+            </Field>
+            <Field label="Sexo" error={errors.sexo?.message}>
+              <select
+                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm outline-none focus:border-ring transition-colors"
+                {...register("sexo")}
+              >
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+              </select>
             </Field>
             <Field label="CPF" error={errors.cpf?.message}>
               <Input
