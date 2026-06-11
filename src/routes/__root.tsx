@@ -23,7 +23,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
   const isSiteRoute = sitePaths.includes(pathname);
-  const isPublicRoute = ["/login", "/responsavel"].includes(pathname) || isSiteRoute;
+  const isAssociadoRoute = pathname.startsWith("/associado");
+  const isPublicRoute = ["/login", "/responsavel"].includes(pathname) || isSiteRoute || isAssociadoRoute;
   const isResponsavelRoute = pathname.startsWith("/responsavel");
   const hasResponsavelData = localStorage.getItem("responsavel_data");
 
@@ -51,7 +52,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
   const isSiteRoute = sitePaths.includes(pathname);
-  const isAuthRoute = pathname === "/login" || pathname.startsWith("/responsavel") || isSiteRoute;
+  const isAuthRoute = pathname === "/login" || pathname.startsWith("/responsavel") || pathname.startsWith("/associado") || isSiteRoute;
 
   return (
     <QueryClientProvider client={queryClient}>

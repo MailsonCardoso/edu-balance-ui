@@ -62,7 +62,7 @@ function SiteLayout() {
               </a>
 
               <Link
-                to="/transparencia"
+                to="/associado"
                 className="hidden md:inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-white text-[#D62828] border border-[#D62828] text-sm font-medium hover:bg-[#D62828]/5 transition-colors"
               >
                 Seja Sócio
@@ -128,7 +128,7 @@ function SiteLayout() {
               </div>
               <div className="pt-3 flex items-center gap-4 px-3">
                 <Link
-                  to="/transparencia"
+                  to="/associado"
                   onClick={() => setMenuOpen(false)}
                   className="block w-full text-center py-2.5 px-3 rounded-lg bg-white text-[#D62828] border border-[#D62828] text-sm font-medium"
                 >

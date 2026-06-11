@@ -23,6 +23,7 @@ import { Route as ResponsavelIndexRouteImport } from './routes/responsavel.index
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
+import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
 import { Route as SiteTransparenciaRouteImport } from './routes/_site.transparencia'
@@ -30,6 +31,7 @@ import { Route as SiteOuvidoriaRouteImport } from './routes/_site.ouvidoria'
 import { Route as SiteNoticiasRouteImport } from './routes/_site.noticias'
 import { Route as SiteInstitucionalRouteImport } from './routes/_site.institucional'
 import { Route as SiteContatoRouteImport } from './routes/_site.contato'
+import { Route as SiteAssociadoRouteImport } from './routes/_site.associado'
 
 const ResponsavelRoute = ResponsavelRouteImport.update({
   id: '/responsavel',
@@ -100,6 +102,11 @@ const ResponsavelDashboardRoute = ResponsavelDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ResponsavelRoute,
 } as any)
+const AssociadoPainelRoute = AssociadoPainelRouteImport.update({
+  id: '/associado/painel',
+  path: '/associado/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AlunosNovoRoute = AlunosNovoRouteImport.update({
   id: '/novo',
   path: '/novo',
@@ -135,6 +142,11 @@ const SiteContatoRoute = SiteContatoRouteImport.update({
   path: '/contato',
   getParentRoute: () => SiteRoute,
 } as any)
+const SiteAssociadoRoute = SiteAssociadoRouteImport.update({
+  id: '/associado',
+  path: '/associado',
+  getParentRoute: () => SiteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
@@ -147,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
   '/responsavel': typeof ResponsavelRouteWithChildren
+  '/associado': typeof SiteAssociadoRoute
   '/contato': typeof SiteContatoRoute
   '/institucional': typeof SiteInstitucionalRoute
   '/noticias': typeof SiteNoticiasRoute
@@ -154,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/transparencia': typeof SiteTransparenciaRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/associado/painel': typeof AssociadoPainelRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
@@ -166,6 +180,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/associado': typeof SiteAssociadoRoute
   '/contato': typeof SiteContatoRoute
   '/institucional': typeof SiteInstitucionalRoute
   '/noticias': typeof SiteNoticiasRoute
@@ -173,6 +188,7 @@ export interface FileRoutesByTo {
   '/transparencia': typeof SiteTransparenciaRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/associado/painel': typeof AssociadoPainelRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosIndexRoute
@@ -190,6 +206,7 @@ export interface FileRoutesById {
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
   '/responsavel': typeof ResponsavelRouteWithChildren
+  '/_site/associado': typeof SiteAssociadoRoute
   '/_site/contato': typeof SiteContatoRoute
   '/_site/institucional': typeof SiteInstitucionalRoute
   '/_site/noticias': typeof SiteNoticiasRoute
@@ -197,6 +214,7 @@ export interface FileRoutesById {
   '/_site/transparencia': typeof SiteTransparenciaRoute
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
+  '/associado/painel': typeof AssociadoPainelRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/_site/': typeof SiteIndexRoute
   '/alunos/': typeof AlunosIndexRoute
@@ -215,6 +233,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/responsavel'
+    | '/associado'
     | '/contato'
     | '/institucional'
     | '/noticias'
@@ -222,6 +241,7 @@ export interface FileRouteTypes {
     | '/transparencia'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/associado/painel'
     | '/responsavel/dashboard'
     | '/alunos/'
     | '/responsavel/'
@@ -234,6 +254,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/associado'
     | '/contato'
     | '/institucional'
     | '/noticias'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/transparencia'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/associado/painel'
     | '/responsavel/dashboard'
     | '/'
     | '/alunos'
@@ -257,6 +279,7 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/responsavel'
+    | '/_site/associado'
     | '/_site/contato'
     | '/_site/institucional'
     | '/_site/noticias'
@@ -264,6 +287,7 @@ export interface FileRouteTypes {
     | '/_site/transparencia'
     | '/alunos/$id'
     | '/alunos/novo'
+    | '/associado/painel'
     | '/responsavel/dashboard'
     | '/_site/'
     | '/alunos/'
@@ -281,6 +305,7 @@ export interface RootRouteChildren {
   PerfilRoute: typeof PerfilRoute
   RelatoriosRoute: typeof RelatoriosRoute
   ResponsavelRoute: typeof ResponsavelRouteWithChildren
+  AssociadoPainelRoute: typeof AssociadoPainelRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -383,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResponsavelDashboardRouteImport
       parentRoute: typeof ResponsavelRoute
     }
+    '/associado/painel': {
+      id: '/associado/painel'
+      path: '/associado/painel'
+      fullPath: '/associado/painel'
+      preLoaderRoute: typeof AssociadoPainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/alunos/novo': {
       id: '/alunos/novo'
       path: '/novo'
@@ -432,10 +464,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteContatoRouteImport
       parentRoute: typeof SiteRoute
     }
+    '/_site/associado': {
+      id: '/_site/associado'
+      path: '/associado'
+      fullPath: '/associado'
+      preLoaderRoute: typeof SiteAssociadoRouteImport
+      parentRoute: typeof SiteRoute
+    }
   }
 }
 
 interface SiteRouteChildren {
+  SiteAssociadoRoute: typeof SiteAssociadoRoute
   SiteContatoRoute: typeof SiteContatoRoute
   SiteInstitucionalRoute: typeof SiteInstitucionalRoute
   SiteNoticiasRoute: typeof SiteNoticiasRoute
@@ -445,6 +485,7 @@ interface SiteRouteChildren {
 }
 
 const SiteRouteChildren: SiteRouteChildren = {
+  SiteAssociadoRoute: SiteAssociadoRoute,
   SiteContatoRoute: SiteContatoRoute,
   SiteInstitucionalRoute: SiteInstitucionalRoute,
   SiteNoticiasRoute: SiteNoticiasRoute,
@@ -495,6 +536,7 @@ const rootRouteChildren: RootRouteChildren = {
   PerfilRoute: PerfilRoute,
   RelatoriosRoute: RelatoriosRoute,
   ResponsavelRoute: ResponsavelRouteWithChildren,
+  AssociadoPainelRoute: AssociadoPainelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
