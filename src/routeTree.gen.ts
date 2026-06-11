@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SiteRouteImport } from './routes/site'
 import { Route as ResponsavelRouteImport } from './routes/responsavel'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as PerfilRouteImport } from './routes/perfil'
@@ -17,12 +18,20 @@ import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SiteIndexRouteImport } from './routes/site.index'
 import { Route as ResponsavelIndexRouteImport } from './routes/responsavel.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
+import { Route as SiteTransparenciaRouteImport } from './routes/site.transparencia'
+import { Route as SiteOuvidoriaRouteImport } from './routes/site.ouvidoria'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
 
+const SiteRoute = SiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResponsavelRoute = ResponsavelRouteImport.update({
   id: '/responsavel',
   path: '/responsavel',
@@ -63,6 +72,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SiteIndexRoute = SiteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SiteRoute,
+} as any)
 const ResponsavelIndexRoute = ResponsavelIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -72,6 +86,16 @@ const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AlunosRoute,
+} as any)
+const SiteTransparenciaRoute = SiteTransparenciaRouteImport.update({
+  id: '/transparencia',
+  path: '/transparencia',
+  getParentRoute: () => SiteRoute,
+} as any)
+const SiteOuvidoriaRoute = SiteOuvidoriaRouteImport.update({
+  id: '/ouvidoria',
+  path: '/ouvidoria',
+  getParentRoute: () => SiteRoute,
 } as any)
 const ResponsavelDashboardRoute = ResponsavelDashboardRouteImport.update({
   id: '/dashboard',
@@ -98,11 +122,15 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
   '/responsavel': typeof ResponsavelRouteWithChildren
+  '/site': typeof SiteRouteWithChildren
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
+  '/site/ouvidoria': typeof SiteOuvidoriaRoute
+  '/site/transparencia': typeof SiteTransparenciaRoute
   '/alunos/': typeof AlunosIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
+  '/site/': typeof SiteIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,8 +142,11 @@ export interface FileRoutesByTo {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
+  '/site/ouvidoria': typeof SiteOuvidoriaRoute
+  '/site/transparencia': typeof SiteTransparenciaRoute
   '/alunos': typeof AlunosIndexRoute
   '/responsavel': typeof ResponsavelIndexRoute
+  '/site': typeof SiteIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,11 +158,15 @@ export interface FileRoutesById {
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
   '/responsavel': typeof ResponsavelRouteWithChildren
+  '/site': typeof SiteRouteWithChildren
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
+  '/site/ouvidoria': typeof SiteOuvidoriaRoute
+  '/site/transparencia': typeof SiteTransparenciaRoute
   '/alunos/': typeof AlunosIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
+  '/site/': typeof SiteIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -144,11 +179,15 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/responsavel'
+    | '/site'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/responsavel/dashboard'
+    | '/site/ouvidoria'
+    | '/site/transparencia'
     | '/alunos/'
     | '/responsavel/'
+    | '/site/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -160,8 +199,11 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/responsavel/dashboard'
+    | '/site/ouvidoria'
+    | '/site/transparencia'
     | '/alunos'
     | '/responsavel'
+    | '/site'
   id:
     | '__root__'
     | '/'
@@ -172,11 +214,15 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/relatorios'
     | '/responsavel'
+    | '/site'
     | '/alunos/$id'
     | '/alunos/novo'
     | '/responsavel/dashboard'
+    | '/site/ouvidoria'
+    | '/site/transparencia'
     | '/alunos/'
     | '/responsavel/'
+    | '/site/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -188,10 +234,18 @@ export interface RootRouteChildren {
   PerfilRoute: typeof PerfilRoute
   RelatoriosRoute: typeof RelatoriosRoute
   ResponsavelRoute: typeof ResponsavelRouteWithChildren
+  SiteRoute: typeof SiteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/site': {
+      id: '/site'
+      path: '/site'
+      fullPath: '/site'
+      preLoaderRoute: typeof SiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/responsavel': {
       id: '/responsavel'
       path: '/responsavel'
@@ -248,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/site/': {
+      id: '/site/'
+      path: '/'
+      fullPath: '/site/'
+      preLoaderRoute: typeof SiteIndexRouteImport
+      parentRoute: typeof SiteRoute
+    }
     '/responsavel/': {
       id: '/responsavel/'
       path: '/'
@@ -261,6 +322,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/alunos/'
       preLoaderRoute: typeof AlunosIndexRouteImport
       parentRoute: typeof AlunosRoute
+    }
+    '/site/transparencia': {
+      id: '/site/transparencia'
+      path: '/transparencia'
+      fullPath: '/site/transparencia'
+      preLoaderRoute: typeof SiteTransparenciaRouteImport
+      parentRoute: typeof SiteRoute
+    }
+    '/site/ouvidoria': {
+      id: '/site/ouvidoria'
+      path: '/ouvidoria'
+      fullPath: '/site/ouvidoria'
+      preLoaderRoute: typeof SiteOuvidoriaRouteImport
+      parentRoute: typeof SiteRoute
     }
     '/responsavel/dashboard': {
       id: '/responsavel/dashboard'
@@ -315,6 +390,20 @@ const ResponsavelRouteWithChildren = ResponsavelRoute._addFileChildren(
   ResponsavelRouteChildren,
 )
 
+interface SiteRouteChildren {
+  SiteOuvidoriaRoute: typeof SiteOuvidoriaRoute
+  SiteTransparenciaRoute: typeof SiteTransparenciaRoute
+  SiteIndexRoute: typeof SiteIndexRoute
+}
+
+const SiteRouteChildren: SiteRouteChildren = {
+  SiteOuvidoriaRoute: SiteOuvidoriaRoute,
+  SiteTransparenciaRoute: SiteTransparenciaRoute,
+  SiteIndexRoute: SiteIndexRoute,
+}
+
+const SiteRouteWithChildren = SiteRoute._addFileChildren(SiteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlunosRoute: AlunosRouteWithChildren,
@@ -324,6 +413,7 @@ const rootRouteChildren: RootRouteChildren = {
   PerfilRoute: PerfilRoute,
   RelatoriosRoute: RelatoriosRoute,
   ResponsavelRoute: ResponsavelRouteWithChildren,
+  SiteRoute: SiteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

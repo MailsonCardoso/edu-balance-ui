@@ -21,7 +21,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const isPublicRoute = ["/login", "/responsavel"].includes(pathname);
+  const isPublicRoute = ["/login", "/responsavel"].includes(pathname) || pathname.startsWith("/site");
   const isResponsavelRoute = pathname.startsWith("/responsavel");
   const hasResponsavelData = localStorage.getItem("responsavel_data");
 
@@ -47,7 +47,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isAuthRoute = pathname === "/login" || pathname.startsWith("/responsavel");
+  const isAuthRoute = pathname === "/login" || pathname.startsWith("/responsavel") || pathname.startsWith("/site");
 
   return (
     <QueryClientProvider client={queryClient}>
