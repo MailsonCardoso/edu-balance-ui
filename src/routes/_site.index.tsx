@@ -99,27 +99,6 @@ function SiteHome() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3 mt-8">
-              <Link
-                to="/transparencia"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
-              >
-                Portal da Transparência <ArrowRight className="size-4" />
-              </Link>
-              <Link
-                to="/transparencia"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
-              >
-                Seja Sócio
-              </Link>
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
-              >
-                Dashboard
-              </Link>
-            </div>
-
             <div className="flex items-center gap-2 mt-8">
               {slides.map((_, i) => (
                 <button
@@ -211,7 +190,7 @@ function SiteHome() {
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             <Link
-              to="/transparencia"
+              to="/associado"
               className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium hover:bg-white/90 transition-colors"
             >
               Quero ser Sócio <ArrowRight className="size-4" />
