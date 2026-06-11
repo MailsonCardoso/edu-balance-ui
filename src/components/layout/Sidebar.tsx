@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/alunos", label: "Alunos", icon: Users },
   { to: "/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
@@ -52,7 +52,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
 
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {nav.map((item) => {
-          const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
+          const active = pathname.startsWith(item.to);
           const Icon = item.icon;
           return (
             <Link
