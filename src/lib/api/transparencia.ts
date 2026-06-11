@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 
 export interface TransparenciaData {
+  total_associados: number;
   alunos: {
     total: number;
     ativos: number;

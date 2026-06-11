@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Associado;
 use App\Models\Mensalidade;
 use Illuminate\Http\JsonResponse;
 
@@ -35,10 +36,12 @@ class TransparenciaController extends Controller
         $mensalidadesPendentes = Mensalidade::where('status', 'pendente')->count();
         $mensalidadesAtrasadas = Mensalidade::where('status', 'atrasado')->count();
 
+        $totalAssociados = Associado::count();
         $totalMensalidadesPrevistas = Aluno::where('status', 'ativo')->sum('valor_mensalidade');
 
         return response()->json([
             'data' => [
+                'total_associados' => $totalAssociados,
                 'alunos' => [
                     'total' => $totalAlunos,
                     'ativos' => $alunosAtivos,

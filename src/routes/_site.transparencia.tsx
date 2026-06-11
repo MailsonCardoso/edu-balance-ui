@@ -97,18 +97,7 @@ function Transparencia() {
               </div>
               <div>
                 <p className="text-lg font-bold text-gray-900">{data ? fmt(data.financeiro.receitas_mes) : "—"}</p>
-                <p className="text-xs text-gray-500">Receitas do Mês</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="size-11 rounded-lg bg-amber-50 grid place-items-center text-amber-600">
-                <DollarSign className="size-5" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-gray-900">{data ? fmt(data.financeiro.a_receber) : "—"}</p>
-                <p className="text-xs text-gray-500">A Receber</p>
+                <p className="text-xs text-gray-500">Arrecadação do Mês</p>
               </div>
             </div>
           </div>
@@ -118,19 +107,30 @@ function Transparencia() {
                 <Users className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">{data ? String(data.alunos.ativos) : "—"}</p>
-                <p className="text-xs text-gray-500">Alunos Ativos</p>
+                <p className="text-lg font-bold text-gray-900">{data ? String(data.total_associados) : "—"}</p>
+                <p className="text-xs text-gray-500">Total de Associados</p>
               </div>
             </div>
           </div>
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="size-11 rounded-lg bg-red-50 grid place-items-center text-red-600">
-                <AlertTriangle className="size-5" />
+              <div className="size-11 rounded-lg bg-amber-50 grid place-items-center text-amber-600">
+                <Clock className="size-5" />
               </div>
               <div>
-                <p className="text-lg font-bold text-gray-900">{data ? String(data.alunos.inadimplentes) : "—"}</p>
-                <p className="text-xs text-gray-500">Inadimplentes</p>
+                <p className="text-lg font-bold text-gray-900">2</p>
+                <p className="text-xs text-gray-500">Projetos em Andamento</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-purple-50 grid place-items-center text-purple-600">
+                <FileText className="size-5" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">2024/2025</p>
+                <p className="text-xs text-gray-500">Prestação de Contas</p>
               </div>
             </div>
           </div>
