@@ -177,9 +177,8 @@ function AlunosList() {
                   <th className="px-4 py-3 font-medium">Nome</th>
                   <th className="px-4 py-3 font-medium">Responsável</th>
                   <th className="px-4 py-3 font-medium">Turma</th>
-                  <th className="px-4 py-3 font-medium">Telefone</th>
+                  <th className="px-4 py-3 font-medium">Telefone do responsável</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Situação</th>
                   <th className="px-4 py-3 font-medium text-right">Ações</th>
                 </tr>
               </thead>
@@ -189,12 +188,9 @@ function AlunosList() {
                     <td className="px-4 py-3 font-medium">{a.nome}</td>
                     <td className="px-4 py-3 text-muted-foreground">{a.responsavel}</td>
                     <td className="px-4 py-3">{a.turma}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.telefone}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{a.telefoneResponsavel}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={a.status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={a.situacao} />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">

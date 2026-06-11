@@ -373,13 +373,6 @@ export function AlunoSheet({
                   </div>
                 )}
               </Field>
-              {!editing && (
-                <Field label="Situação financeira">
-                  <div className={viewCls}>
-                    <StatusBadge status={current.situacao} />
-                  </div>
-                </Field>
-              )}
               <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
                 {editing ? (
                   <Input
