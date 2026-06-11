@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Clock, DollarSign, Eye, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { AlertTriangle, Clock, DollarSign, Loader2, Search } from "lucide-react";
 import { PageHeader, StatusBadge, StatCard, EmptyState } from "@/components/shared/Primitives";
-import { AlunoSheet } from "@/components/shared/AlunoSheet";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -12,21 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
 import { turmas } from "@/lib/mock-data";
 import type { Aluno, Mensalidade } from "@/lib/mock-data";
 import { brl } from "@/lib/format";
 import { toast } from "sonner";
-import { fetchAlunos, createAluno, updateAluno, deleteAluno as deleteAlunoApi } from "@/lib/api/alunos";
+import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades } from "@/lib/api/mensalidades";
 
 export const Route = createFileRoute("/inadimplentes")({
@@ -39,9 +27,6 @@ function Inadimplentes() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("all");
-  const [sheetAluno, setSheetAluno] = useState<Aluno | null>(null);
-  const [sheetMode, setSheetMode] = useState<"view" | "edit" | "create">("view");
-  const [deleteTarget, setDeleteTarget] = useState<Aluno | null>(null);
 
   useEffect(() => {
     Promise.all([fetchAlunos(), fetchMensalidades()])
@@ -95,52 +80,11 @@ function Inadimplentes() {
     [inadimplentes, agregado],
   );
 
-  const handleSave = async (aluno: Aluno) => {
-    try {
-      if (sheetMode === "create") {
-        const created = await createAluno(aluno);
-        setAlunos((d) => [...d, created]);
-        toast.success("Aluno cadastrado com sucesso!");
-        setSheetAluno(null);
-        setSheetMode("view");
-      } else {
-        const updated = await updateAluno(aluno.id, aluno);
-        setAlunos((d) => d.map((a) => (a.id === updated.id ? updated : a)));
-        toast.success("Aluno atualizado com sucesso!");
-        setSheetAluno(updated);
-      }
-    } catch {
-      toast.error("Erro ao salvar aluno");
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    try {
-      await deleteAlunoApi(deleteTarget.id);
-      setAlunos((d) => d.filter((a) => a.id !== deleteTarget.id));
-      toast.success("Aluno removido");
-      setDeleteTarget(null);
-    } catch {
-      toast.error("Erro ao excluir aluno");
-    }
-  };
-
   return (
     <>
       <PageHeader
         title="Inadimplentes"
         description={`${inadimplentes.length} aluno(s) com situação inadimplente`}
-        actions={
-          <Button
-            onClick={() => {
-              setSheetAluno(null);
-              setSheetMode("create");
-            }}
-          >
-            <Plus className="size-4" /> Novo aluno
-          </Button>
-        }
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -212,7 +156,6 @@ function Inadimplentes() {
                   <th className="px-4 py-3 font-medium text-center">Parcelas em atraso</th>
                   <th className="px-4 py-3 font-medium text-center">Dias em atraso</th>
                   <th className="px-4 py-3 font-medium text-right">Valor devido</th>
-                  <th className="px-4 py-3 font-medium text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -242,37 +185,6 @@ function Inadimplentes() {
                       <td className="px-4 py-3 text-right font-semibold text-destructive">
                         {det ? brl(det.total) : "—"}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => {
-                              setSheetAluno(a);
-                              setSheetMode("view");
-                            }}
-                            className="p-1.5 rounded hover:bg-accent"
-                            title="Visualizar"
-                          >
-                            <Eye className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSheetAluno(a);
-                              setSheetMode("edit");
-                            }}
-                            className="p-1.5 rounded hover:bg-accent"
-                            title="Editar"
-                          >
-                            <Pencil className="size-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteTarget(a)}
-                            className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
-                            title="Excluir"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </td>
                     </tr>
                   );
                 })}
@@ -282,42 +194,6 @@ function Inadimplentes() {
         </div>
       </div>
 
-      <AlunoSheet
-        key={sheetMode + (sheetAluno?.id ?? "new")}
-        open={!!sheetAluno || sheetMode === "create"}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSheetAluno(null);
-            setSheetMode("view");
-          }
-        }}
-        aluno={sheetAluno}
-        mode={sheetMode}
-        onSave={handleSave}
-      />
-
-      <AlertDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir aluno</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir <strong>{deleteTarget?.nome}</strong>? Esta ação não
-              pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Sim, excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
