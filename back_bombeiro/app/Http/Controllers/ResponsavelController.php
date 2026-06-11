@@ -16,10 +16,14 @@ class ResponsavelController extends Controller
         ]);
 
         $cpfLimpo = preg_replace('/\D/', '', $validated['senha']);
+        $cpfMascarado = substr($cpfLimpo, 0, 3) . '.' . substr($cpfLimpo, 3, 3) . '.' . substr($cpfLimpo, 6, 3) . '-' . substr($cpfLimpo, 9, 2);
 
         $alunos = Aluno::with('mensalidades')
             ->where('email', $validated['email'])
-            ->where('cpf_responsavel', $cpfLimpo)
+            ->where(function ($q) use ($cpfLimpo, $cpfMascarado) {
+                $q->where('cpf_responsavel', $cpfLimpo)
+                  ->orWhere('cpf_responsavel', $cpfMascarado);
+            })
             ->get();
 
         if ($alunos->isEmpty()) {
