@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_site/associado")({
 function Associado() {
   const navigate = useNavigate();
   const token = localStorage.getItem("associado_token");
-  const [aba, setAba] = useState<"cadastro" | "login">("cadastro");
+  const [aba, setAba] = useState<"cadastro" | "login">("login");
 
   if (token) {
     navigate({ to: "/associado/painel", replace: true });
@@ -42,17 +42,9 @@ function Associado() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-24">
+      <section className="py-12 lg:py-16">
         <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex rounded-lg border border-gray-200 p-1 mb-8">
-            <button
-              onClick={() => setAba("cadastro")}
-              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Quero ser Sócio
-            </button>
             <button
               onClick={() => setAba("login")}
               className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
@@ -61,8 +53,16 @@ function Associado() {
             >
               Entrar
             </button>
+            <button
+              onClick={() => setAba("cadastro")}
+              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
+                aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Cadastrar
+            </button>
           </div>
-          {aba === "cadastro" ? <AssociadoCadastro /> : <AssociadoLogin />}
+          {aba === "login" ? <AssociadoLogin /> : <AssociadoCadastro />}
         </div>
       </section>
 
@@ -80,6 +80,7 @@ function Associado() {
               { icon: UserPlus, title: "Dados cadastrais", desc: "Mantenha suas informações atualizadas." },
               { icon: Shield, title: "Benefícios", desc: "Parceiros e vantagens exclusivas." },
               { icon: LogIn, title: "Comunidade", desc: "Participe das discussões." },
+              { icon: Shield, title: "Segurança", desc: "Dados protegidos pela LGPD." },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-gray-100 p-6 text-center hover:shadow-md transition-shadow">
                 <div className="size-12 rounded-full bg-[#D62828]/10 mx-auto grid place-items-center">
@@ -133,7 +134,7 @@ function AssociadoCadastro() {
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
-      <h2 className="text-lg font-semibold text-[#D62828] mb-6">Quero ser Sócio</h2>
+      <h2 className="text-lg font-semibold text-[#D62828] mb-6">Cadastrar</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700">Nome completo</label>
@@ -230,16 +231,16 @@ function AssociadoLogin() {
       <h2 className="text-lg font-semibold text-[#D62828] mb-6">Entrar</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Email</label>
+          <label className="text-sm font-medium text-gray-700">Email ou CPF</label>
           <input
             name="email"
-            type="email"
+            type="text"
             required
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Senha (CPF)</label>
+          <label className="text-sm font-medium text-gray-700">Senha</label>
           <input
             name="password"
             type="password"
@@ -250,14 +251,17 @@ function AssociadoLogin() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg border border-[#D62828] text-[#D62828] font-medium text-sm hover:bg-[#D62828]/5 transition-colors disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors disabled:opacity-50"
         >
           {loading ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
+      <div className="mt-4 text-center">
+        <a href="#" className="text-sm text-[#D62828] hover:underline">Esqueceu a senha? Recuperar acesso</a>
+      </div>
       <div className="mt-6 pt-6 border-t border-gray-100">
-        <p className="text-xs text-gray-400 leading-relaxed">
+        <p className="text-xs text-gray-400 leading-relaxed text-center">
           <Shield className="size-3 inline mr-1" />
           Dados protegidos pela LGPD.
         </p>
