@@ -76,13 +76,6 @@ function SiteLayout() {
                 Responsável
               </Link>
 
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg bg-[#D62828] text-white text-sm font-medium hover:bg-[#D62828]/90 transition-colors"
-              >
-                Dashboard
-              </Link>
-
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="lg:hidden p-2 text-gray-600 hover:text-[#D62828]"
@@ -118,13 +111,6 @@ function SiteLayout() {
                   className="block w-full text-center py-2.5 px-3 rounded-lg bg-white text-[#D62828] border border-[#D62828] text-sm font-medium"
                 >
                   Responsável
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-2.5 px-3 rounded-lg bg-[#D62828] text-white text-sm font-medium"
-                >
-                  Dashboard
                 </Link>
               </div>
               <div className="pt-3 flex items-center gap-4 px-3">
