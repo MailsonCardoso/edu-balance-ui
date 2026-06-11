@@ -101,7 +101,7 @@ function Financeiro() {
     () => ({
       pago: filtered.filter((m) => m.status === "pago").reduce((s, m) => s + m.valor, 0),
       pendente: filtered
-        .filter((m) => m.status === "pendente" || m.status === "atrasado")
+        .filter((m) => m.status === "pendente")
         .reduce((s, m) => s + m.valor, 0),
       vencido: filtered.filter((m) => m.status === "atrasado").reduce((s, m) => s + m.valor, 0),
     }),
