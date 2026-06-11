@@ -14,6 +14,7 @@ import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
+import { Route as GestaoOuvidoriaRouteImport } from './routes/gestao-ouvidoria'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlunosRouteImport } from './routes/alunos'
@@ -53,6 +54,11 @@ const LoginRoute = LoginRouteImport.update({
 const InadimplentesRoute = InadimplentesRouteImport.update({
   id: '/inadimplentes',
   path: '/inadimplentes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoOuvidoriaRoute = GestaoOuvidoriaRouteImport.update({
+  id: '/gestao-ouvidoria',
+  path: '/gestao-ouvidoria',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceiroRoute = FinanceiroRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-ouvidoria'
     | '/inadimplentes'
     | '/login'
     | '/perfil'
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
   to:
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-ouvidoria'
     | '/inadimplentes'
     | '/login'
     | '/perfil'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-ouvidoria'
     | '/inadimplentes'
     | '/login'
     | '/perfil'
@@ -263,6 +275,7 @@ export interface RootRouteChildren {
   AlunosRoute: typeof AlunosRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   FinanceiroRoute: typeof FinanceiroRoute
+  GestaoOuvidoriaRoute: typeof GestaoOuvidoriaRoute
   InadimplentesRoute: typeof InadimplentesRoute
   LoginRoute: typeof LoginRoute
   PerfilRoute: typeof PerfilRoute
@@ -305,6 +318,13 @@ declare module '@tanstack/react-router' {
       path: '/inadimplentes'
       fullPath: '/inadimplentes'
       preLoaderRoute: typeof InadimplentesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-ouvidoria': {
+      id: '/gestao-ouvidoria'
+      path: '/gestao-ouvidoria'
+      fullPath: '/gestao-ouvidoria'
+      preLoaderRoute: typeof GestaoOuvidoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financeiro': {
@@ -469,6 +489,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlunosRoute: AlunosRouteWithChildren,
   DashboardRoute: DashboardRoute,
   FinanceiroRoute: FinanceiroRoute,
+  GestaoOuvidoriaRoute: GestaoOuvidoriaRoute,
   InadimplentesRoute: InadimplentesRoute,
   LoginRoute: LoginRoute,
   PerfilRoute: PerfilRoute,
