@@ -201,7 +201,7 @@ function Inadimplentes() {
                             const phone = a.telefoneResponsavel?.replace(/\D/g, "") || a.telefone?.replace(/\D/g, "");
                             if (!phone) { toast.error("Telefone não encontrado"); return; }
                             const msg = encodeURIComponent(
-                              `Bombeiro Paranã - Cobrança de Mensalidade\n\nOlá ${a.responsavel || "Responsável"}, o(a) aluno(a) ${a.nome} está com ${det?.parcelas || 0} mensalidade(s) em atraso no valor total de ${det ? brl(det.total) : "—"}.\n\nPor favor, regularize o pagamento o quanto antes.\n\nAtenciosamente,\nColégio Militar 2 de Julho – Unidade XII – Paranã`,
+                              `Olá ${a.responsavel || "Responsável"}, tudo bem? 🙋\n\nPassando para lembrar gentilmente que o(a) ${a.sexo === "feminino" ? "aluna" : "aluno"} ${a.nome} está com ${det?.parcelas || 0} mensalidade(s) em atraso, totalizando ${det ? brl(det.total) : "—"}.\n\nQuando puder, nos procure para acertar. Estamos aqui para ajudar! 😊\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
                             );
                             window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
                           }}

@@ -218,7 +218,7 @@ function Financeiro() {
     const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
     if (!phone) return null;
     const msg = encodeURIComponent(
-      `Bombeiro Paranã - Cobrança de Mensalidade\n\nOlá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, a mensalidade do(a) aluno(a) ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} com vencimento em ${fmtDate(m.dataVencimento)} encontra-se ${m.status === "atrasado" ? "VENCIDA" : "PENDENTE"}.\n\nPor favor, regularize o pagamento o quanto antes.\n\nAtenciosamente,\nColégio Militar 2 de Julho – Unidade XII – Paranã`,
+      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem? 🙋\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição! 😊\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
     );
     return `https://wa.me/55${phone}?text=${msg}`;
   };
