@@ -68,7 +68,7 @@ function Transparencia() {
               Ouvidoria <ArrowRight className="size-4" />
             </Link>
             <Link
-              to="/dashboard"
+              to="/login"
               className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
             >
               Dashboard Financeiro
