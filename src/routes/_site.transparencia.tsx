@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, TrendingUp, TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, TrendingUp, TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown, Users } from "lucide-react";
 import { useState } from "react";
+import { getTransparencia } from "@/lib/api/transparencia";
 
 export const Route = createFileRoute("/_site/transparencia")({
   component: Transparencia,
 });
+
+function fmt(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 const statusConfig = {
   concluido: { icon: CheckCircle, label: "Concluído", color: "text-emerald-500", bg: "bg-emerald-50" },
@@ -47,6 +53,11 @@ const management = [
 
 function Transparencia() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const { data, isLoading } = useQuery({
+    queryKey: ["transparencia"],
+    queryFn: getTransparencia,
+    refetchInterval: 60_000,
+  });
 
   return (
     <>
@@ -78,29 +89,75 @@ function Transparencia() {
       </section>
 
       <section className="relative -mt-10 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { icon: TrendingUp, label: "Receitas do Mês", value: "R$ 24.580", color: "text-emerald-600" },
-            { icon: TrendingDown, label: "Despesas do Mês", value: "R$ 18.320", color: "text-red-600" },
-            { icon: DollarSign, label: "Saldo Atual", value: "R$ 42.890", color: "text-[#D62828]" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className={`size-11 rounded-lg bg-gray-50 grid place-items-center ${item.color}`}>
-                  <item.icon className="size-5" />
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900">{item.value}</p>
-                  <p className="text-xs text-gray-500">{item.label}</p>
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-emerald-50 grid place-items-center text-emerald-600">
+                <TrendingUp className="size-5" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{data ? fmt(data.financeiro.receitas_mes) : "—"}</p>
+                <p className="text-xs text-gray-500">Receitas do Mês</p>
               </div>
             </div>
-          ))}
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-amber-50 grid place-items-center text-amber-600">
+                <DollarSign className="size-5" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{data ? fmt(data.financeiro.a_receber) : "—"}</p>
+                <p className="text-xs text-gray-500">A Receber</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-blue-50 grid place-items-center text-blue-600">
+                <Users className="size-5" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{data ? String(data.alunos.ativos) : "—"}</p>
+                <p className="text-xs text-gray-500">Alunos Ativos</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-red-50 grid place-items-center text-red-600">
+                <AlertTriangle className="size-5" />
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{data ? String(data.alunos.inadimplentes) : "—"}</p>
+                <p className="text-xs text-gray-500">Inadimplentes</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
+              <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.total_pago) : "—"}</p>
+              <p className="text-xs text-gray-500 mt-1">Total Arrecadado (histórico)</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
+              <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.receitas_ano) : "—"}</p>
+              <p className="text-xs text-gray-500 mt-1">Receitas do Ano</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
+              <p className="text-2xl font-bold text-emerald-600">{data ? String(data.mensalidades.pagas) + "/" + String(data.mensalidades.total) : "—"}</p>
+              <p className="text-xs text-gray-500 mt-1">Mensalidades Pagas</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
+              <p className="text-2xl font-bold text-amber-600">{data ? String(data.alunos.em_dia) + "/" + String(data.alunos.ativos) : "—"}</p>
+              <p className="text-xs text-gray-500 mt-1">Alunos em Dia</p>
+            </div>
+          </div>
+
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-bold text-[#D62828] mb-6">Auditoria e Regularização</h2>
