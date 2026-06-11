@@ -107,6 +107,12 @@ function Financeiro() {
     [filtered],
   );
 
+  const mesCorrente = () => {
+    const hoje = new Date();
+    const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
+    return mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
+  };
+
   const abrirForm = (mode: "create" | "edit", mensalidade?: Mensalidade) => {
     setFormMode(mode);
     if (mode === "edit" && mensalidade) {
@@ -118,9 +124,23 @@ function Financeiro() {
         formaPagamento: mensalidade.formaPagamento ?? "",
       });
     } else {
-      setFormData({ alunoId: "", mesReferencia: "", valor: 0, dataVencimento: "", formaPagamento: "" });
+      setFormData({ alunoId: "", mesReferencia: mesCorrente(), valor: 0, dataVencimento: "", formaPagamento: "" });
     }
     setFormOpen(true);
+  };
+
+  const aoSelecionarAluno = (alunoId: string) => {
+    const aluno = alunos.find((a) => a.id === alunoId);
+    if (!aluno) return;
+    const hoje = new Date();
+    const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(aluno.diaVencimento || 10).padStart(2, "0");
+    setFormData((f) => ({
+      ...f,
+      alunoId,
+      valor: aluno.valorMensalidade,
+      dataVencimento: `${dia}/${mesNum}/${hoje.getFullYear()}`,
+    }));
   };
 
   const toIsoDate = (ddmmaaa: string) => {
@@ -362,7 +382,7 @@ function Financeiro() {
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Aluno</label>
               <Select
                 value={formData.alunoId}
-                onValueChange={(v) => setFormData((f) => ({ ...f, alunoId: v }))}
+                onValueChange={aoSelecionarAluno}
               >
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="Selecione um aluno..." />
