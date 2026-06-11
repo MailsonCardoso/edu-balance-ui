@@ -11,7 +11,7 @@ import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/format";
-import { createAluno } from "@/lib/api/alunos";
+import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 import { createMensalidade } from "@/lib/api/mensalidades";
 
 const schema = z.object({
@@ -64,6 +64,8 @@ function NovoAluno() {
     setValue,
     watch,
     formState: { errors, isSubmitting },
+    setError,
+    clearErrors,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { status: "ativo", valorMensalidade: 0, diaVencimento: 10 },
@@ -133,6 +135,17 @@ function NovoAluno() {
                   const masked = maskCPF(e.target.value);
                   e.target.value = masked;
                   setValue("cpf", masked, { shouldValidate: true });
+                }}
+                onBlur={async (e) => {
+                  const cpf = e.target.value;
+                  if (cpf.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
+                    const exists = await checkCpfExists(cpf);
+                    if (exists) {
+                      setError("cpf", { message: "CPF já cadastrado" });
+                    } else {
+                      clearErrors("cpf");
+                    }
+                  }
                 }}
               />
             </Field>

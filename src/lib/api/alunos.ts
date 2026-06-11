@@ -53,6 +53,13 @@ export async function updateAluno(id: string, aluno: Partial<Aluno>): Promise<Al
   return alunoFromApi(data as Record<string, unknown>);
 }
 
+export async function checkCpfExists(cpf: string, ignoreId?: string): Promise<boolean> {
+  const params: Record<string, string> = {};
+  if (ignoreId) params.ignore_id = ignoreId;
+  const { data } = await api.get(`/alunos/check-cpf/${encodeURIComponent(cpf)}`, { params });
+  return data.exists;
+}
+
 export async function deleteAluno(id: string): Promise<void> {
   await api.delete(`/alunos/${id}`);
 }

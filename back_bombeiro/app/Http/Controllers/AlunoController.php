@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AlunoController extends Controller
 {
+    public function checkCpf(string $cpf, Request $request): JsonResponse
+    {
+        $query = Aluno::where('cpf', $cpf);
+        if ($ignoreId = $request->query('ignore_id')) {
+            $query->where('id', '!=', $ignoreId);
+        }
+        return response()->json(['exists' => $query->exists()]);
+    }
+
     public function index()
     {
         return Aluno::orderBy('created_at', 'desc')->get();

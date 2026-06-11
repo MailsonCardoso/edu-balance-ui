@@ -22,6 +22,7 @@ import {
 import { StatusBadge } from "@/components/shared/Primitives";
 import type { Aluno } from "@/lib/mock-data";
 import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
+import { checkCpfExists } from "@/lib/api/alunos";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -115,6 +116,8 @@ export function AlunoSheet({
     setValue,
     control,
     formState: { errors, isSubmitting },
+    setError,
+    clearErrors,
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -192,6 +195,17 @@ export function AlunoSheet({
                       const masked = maskCPF(e.target.value);
                       e.target.value = masked;
                       setValue("cpf", masked, { shouldValidate: true });
+                    }}
+                    onBlur={async (e) => {
+                      const cpf = e.target.value;
+                      if (cpf.match(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)) {
+                        const exists = await checkCpfExists(cpf, isCreate ? undefined : current.id);
+                        if (exists) {
+                          setError("cpf", { message: "CPF já cadastrado" });
+                        } else {
+                          clearErrors("cpf");
+                        }
+                      }
                     }}
                   />
                 ) : (
