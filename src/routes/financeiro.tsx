@@ -465,21 +465,32 @@ function Financeiro() {
               Confirme o registro do pagamento e informe a forma de pagamento.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1.5 block">
+          <div className="py-4 space-y-3">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
               Forma de pagamento
             </label>
-            <Select value={pagamentoForma} onValueChange={setPagamentoForma}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">Sem forma</SelectItem>
-                <SelectItem value="pix">Pix</SelectItem>
-                <SelectItem value="debito">Débito</SelectItem>
-                <SelectItem value="credito">Crédito</SelectItem>
-              </SelectContent>
-            </Select>
+            {(["", "pix", "debito", "credito"] as const).map((v) => (
+              <label
+                key={v}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
+                  pagamentoForma === v
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:bg-accent"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="formaPagamento"
+                  value={v}
+                  checked={pagamentoForma === v}
+                  onChange={() => setPagamentoForma(v)}
+                  className="size-4 accent-primary"
+                />
+                <span className="text-sm font-medium">
+                  {v === "" ? "Sem forma" : v === "pix" ? "Pix" : v === "debito" ? "Débito" : "Crédito"}
+                </span>
+              </label>
+            ))}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
