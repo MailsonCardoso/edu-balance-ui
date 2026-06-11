@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_site/associado")({
 function Associado() {
   const navigate = useNavigate();
   const token = localStorage.getItem("associado_token");
+  const [aba, setAba] = useState<"cadastro" | "login">("cadastro");
 
   if (token) {
     navigate({ to: "/associado/painel", replace: true });
@@ -42,11 +43,26 @@ function Associado() {
       </section>
 
       <section className="py-16 lg:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-8">
-            <AssociadoCadastro />
-            <AssociadoLogin />
+        <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex rounded-lg border border-gray-200 p-1 mb-8">
+            <button
+              onClick={() => setAba("cadastro")}
+              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
+                aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Quero ser Sócio
+            </button>
+            <button
+              onClick={() => setAba("login")}
+              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
+                aba === "login" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Entrar
+            </button>
           </div>
+          {aba === "cadastro" ? <AssociadoCadastro /> : <AssociadoLogin />}
         </div>
       </section>
 
