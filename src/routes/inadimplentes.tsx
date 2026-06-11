@@ -151,7 +151,6 @@ function Inadimplentes() {
                   <th className="px-4 py-3 font-medium">Nome</th>
                   <th className="px-4 py-3 font-medium">Responsável</th>
                   <th className="px-4 py-3 font-medium">Turma</th>
-                  <th className="px-4 py-3 font-medium">Telefone</th>
                   <th className="px-4 py-3 font-medium">Situação</th>
                   <th className="px-4 py-3 font-medium text-center">Parcelas em atraso</th>
                   <th className="px-4 py-3 font-medium text-center">Dias em atraso</th>
@@ -166,7 +165,6 @@ function Inadimplentes() {
                       <td className="px-4 py-3 font-medium">{a.nome}</td>
                       <td className="px-4 py-3 text-muted-foreground">{a.responsavel}</td>
                       <td className="px-4 py-3">{a.turma}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{a.telefone}</td>
                       <td className="px-4 py-3">
                         <StatusBadge status={a.situacao} />
                       </td>
