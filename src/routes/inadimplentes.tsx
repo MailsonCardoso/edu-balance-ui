@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Clock, DollarSign, Loader2, Search } from "lucide-react";
 import { PageHeader, StatusBadge, StatCard, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
@@ -28,20 +28,26 @@ function Inadimplentes() {
   const [q, setQ] = useState("");
   const [turma, setTurma] = useState("all");
 
-  useEffect(() => {
-    (async () => {
-      try {
-        await verificarVencidas();
-        const [a, m] = await Promise.all([fetchAlunos(), fetchMensalidades()]);
-        setAlunos(a);
-        setMensalidades(m);
-      } catch {
-        toast.error("Erro ao carregar dados");
-      } finally {
-        setLoading(false);
-      }
-    })();
+  const carregar = useCallback(async () => {
+    try {
+      await verificarVencidas();
+      const [a, m] = await Promise.all([fetchAlunos(), fetchMensalidades()]);
+      setAlunos(a);
+      setMensalidades(m);
+    } catch {
+      toast.error("Erro ao carregar dados");
+    }
   }, []);
+
+  useEffect(() => {
+    carregar().finally(() => setLoading(false));
+  }, [carregar]);
+
+  useEffect(() => {
+    const onVisible = () => { if (!document.hidden) carregar(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [carregar]);
 
   const inadimplentes = useMemo(
     () =>
