@@ -37,6 +37,7 @@ function mensalidadeFromApi(raw: Record<string, unknown>): Mensalidade {
   if (raw.aluno && typeof raw.aluno === "object") {
     const a = raw.aluno as Record<string, unknown>;
     mapped.alunoNome = String(a.nome || "");
+    mapped.alunoResponsavel = String(a.responsavel || "");
   }
   return mapped as unknown as Mensalidade;
 }
@@ -47,6 +48,7 @@ function mensalidadeToApi(m: Record<string, unknown>): Record<string, unknown> {
   delete clean.createdAt;
   delete clean.updatedAt;
   delete clean.alunoNome;
+  delete clean.alunoResponsavel;
   return mapKeys(clean, toSnake);
 }
 

@@ -31,6 +31,7 @@ export interface Mensalidade {
   status: MensalidadeStatus;
   formaPagamento: FormaPagamento | null;
   alunoNome?: string;
+  alunoResponsavel?: string;
 }
 
 export const turmas = [

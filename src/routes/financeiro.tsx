@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Eye, History, Loader2, MoreVertical, Plus, Pencil, Search, Trash2, X } from "lucide-react";
+import { CheckCircle2, Eye, FileText, History, Loader2, MoreVertical, Plus, Pencil, Search, Trash2, X } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -67,6 +67,7 @@ function Financeiro() {
   const [pagamentoOpen, setPagamentoOpen] = useState(false);
   const [pagamentoId, setPagamentoId] = useState("");
   const [pagamentoForma, setPagamentoForma] = useState("");
+  const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
 
   const carregar = async () => {
     try {
@@ -192,6 +193,8 @@ function Financeiro() {
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
       await carregar();
+      const updated = data.find((m) => m.id === pagamentoId);
+      if (updated) setReciboMensalidade(updated);
     } catch {
       toast.error("Erro ao registrar pagamento");
     }
@@ -316,7 +319,7 @@ function Financeiro() {
       </div>
 
       <ActionSheet
-        open={!!selectedMensalidade && !formOpen && !pagamentoOpen && !deleteTarget}
+        open={!!selectedMensalidade && !formOpen && !pagamentoOpen && !deleteTarget && !reciboMensalidade}
         onOpenChange={(open) => {
           if (!open) setSelectedMensalidade(null);
         }}
@@ -336,8 +339,7 @@ function Financeiro() {
                 {
                   label: "Detalhes",
                   icon: <Eye className="size-5" />,
-                  onClick: () =>
-                    toast.info(`Detalhes da mensalidade de ${selectedMensalidade.mesReferencia}`),
+                  onClick: () => setReciboMensalidade(selectedMensalidade),
                 },
                 {
                   label: "Editar",
@@ -354,6 +356,15 @@ function Financeiro() {
                           setPagamentoForma(selectedMensalidade.formaPagamento ?? "");
                           setPagamentoOpen(true);
                         },
+                      },
+                    ]
+                  : []),
+                ...(selectedMensalidade.status === "pago"
+                  ? [
+                      {
+                        label: "Recibo",
+                        icon: <FileText className="size-5" />,
+                        onClick: () => setReciboMensalidade(selectedMensalidade),
                       },
                     ]
                   : []),
@@ -517,6 +528,59 @@ function Financeiro() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={confirmarPagamento}>
               Confirmar pagamento
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!reciboMensalidade} onOpenChange={(o) => { if (!o) setReciboMensalidade(null); }}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">Recibo de Pagamento</AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="py-4 space-y-4 text-sm">
+            <div className="text-center border-b border-border pb-4">
+              <p className="font-bold text-base">Bombeiro Paranã</p>
+              <p className="text-muted-foreground">Colegio Militar 2 de Julho Unidade XII - Paranã</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Aluno:</span>
+                <span className="font-medium text-right max-w-[60%]">{reciboMensalidade?.alunoNome || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Responsável:</span>
+                <span className="font-medium text-right max-w-[60%]">{reciboMensalidade?.alunoResponsavel || "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Mês referente:</span>
+                <span className="font-medium">{reciboMensalidade?.mesReferencia}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Valor:</span>
+                <span className="font-semibold">{reciboMensalidade ? brl(reciboMensalidade.valor) : "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Data pagamento:</span>
+                <span className="font-medium">{reciboMensalidade?.dataPagamento ? fmtDate(reciboMensalidade.dataPagamento) : "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Forma de pagamento:</span>
+                <span className="font-medium capitalize">{reciboMensalidade?.formaPagamento ? formaPagamentoLabel[reciboMensalidade.formaPagamento] : "—"}</span>
+              </div>
+            </div>
+            <div className="bg-success/10 border border-success/30 rounded-lg p-4 text-center">
+              <p className="text-success font-medium text-sm">
+                Pagamento recebido com sucesso!
+              </p>
+              <p className="text-muted-foreground text-xs mt-1">
+                O responsável foi informado sobre o recebimento.
+              </p>
+            </div>
+          </div>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogAction onClick={() => setReciboMensalidade(null)}>
+              Fechar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
