@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aluno;
 use App\Models\Mensalidade;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MensalidadeController extends Controller
@@ -46,6 +48,40 @@ class MensalidadeController extends Controller
 
         $mensalidade->update($validated);
         return $mensalidade;
+    }
+
+    public function verificarVencidas(): JsonResponse
+    {
+        $hoje = now()->format('Y-m-d');
+        $vencidas = Mensalidade::where('status', 'pendente')
+            ->where('data_vencimento', '<', $hoje)
+            ->get();
+
+        foreach ($vencidas as $m) {
+            $m->update(['status' => 'atrasado']);
+        }
+
+        $alunoIds = $vencidas->pluck('aluno_id')->unique();
+        foreach ($alunoIds as $alunoId) {
+            $totalAtrasadas = Mensalidade::where('aluno_id', $alunoId)
+                ->where('status', 'atrasado')
+                ->where('data_vencimento', '<', $hoje)
+                ->count();
+
+            $diasMaiorAtraso = Mensalidade::where('aluno_id', $alunoId)
+                ->where('status', 'atrasado')
+                ->where('data_vencimento', '<', $hoje)
+                ->min('data_vencimento');
+
+            $situacao = 'em_atraso';
+            if ($totalAtrasadas >= 3 || ($diasMaiorAtraso && now()->diffInDays($diasMaiorAtraso) > 90)) {
+                $situacao = 'inadimplente';
+            }
+
+            Aluno::where('id', $alunoId)->update(['situacao' => $situacao]);
+        }
+
+        return response()->json(['atualizadas' => $vencidas->count()]);
     }
 
     public function destroy(Mensalidade $mensalidade)

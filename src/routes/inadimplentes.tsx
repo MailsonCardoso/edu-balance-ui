@@ -15,7 +15,7 @@ import type { Aluno, Mensalidade } from "@/lib/mock-data";
 import { brl } from "@/lib/format";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
-import { fetchMensalidades } from "@/lib/api/mensalidades";
+import { fetchMensalidades, verificarVencidas } from "@/lib/api/mensalidades";
 
 export const Route = createFileRoute("/inadimplentes")({
   component: Inadimplentes,
@@ -29,20 +29,25 @@ function Inadimplentes() {
   const [turma, setTurma] = useState("all");
 
   useEffect(() => {
-    Promise.all([fetchAlunos(), fetchMensalidades()])
-      .then(([a, m]) => {
+    (async () => {
+      try {
+        await verificarVencidas();
+        const [a, m] = await Promise.all([fetchAlunos(), fetchMensalidades()]);
         setAlunos(a);
         setMensalidades(m);
-      })
-      .catch(() => toast.error("Erro ao carregar dados"))
-      .finally(() => setLoading(false));
+      } catch {
+        toast.error("Erro ao carregar dados");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   const inadimplentes = useMemo(
     () =>
       alunos.filter(
         (a) =>
-          a.situacao === "inadimplente" &&
+          (a.situacao === "inadimplente" || a.situacao === "em_atraso") &&
           (!q ||
             a.nome.toLowerCase().includes(q.toLowerCase()) ||
             a.responsavel.toLowerCase().includes(q.toLowerCase())) &&
@@ -84,12 +89,12 @@ function Inadimplentes() {
     <>
       <PageHeader
         title="Inadimplentes"
-        description={`${inadimplentes.length} aluno(s) com situação inadimplente`}
+        description={`${inadimplentes.length} aluno(s) com atraso ou inadimplência`}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatCard
-          label="Total de inadimplentes"
+          label="Total com atraso/inadimplência"
           value={inadimplentes.length}
           icon={<AlertTriangle className="size-5" />}
           tone="destructive"

@@ -65,6 +65,11 @@ export async function updateMensalidade(id: string, m: Partial<Mensalidade>): Pr
   return mensalidadeFromApi(data as Record<string, unknown>);
 }
 
+export async function verificarVencidas(): Promise<number> {
+  const { data } = await api.post("/mensalidades/verificar-vencidas");
+  return data.atualizadas;
+}
+
 export async function deleteMensalidade(id: string): Promise<void> {
   await api.delete(`/mensalidades/${id}`);
 }
