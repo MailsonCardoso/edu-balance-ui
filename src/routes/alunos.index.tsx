@@ -94,8 +94,10 @@ function AlunosList() {
         toast.success("Aluno atualizado com sucesso!");
         setSheetAluno(updated);
       }
-    } catch {
-      toast.error("Erro ao salvar aluno");
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } };
+      const msg = apiErr.response?.data?.errors?.cpf?.[0] || "Erro ao salvar aluno";
+      toast.error(msg);
     }
   };
 

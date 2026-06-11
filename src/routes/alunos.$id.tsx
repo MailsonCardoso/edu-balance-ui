@@ -122,8 +122,10 @@ function AlunoDetalhe() {
       setAluno(updated);
       setEditing(false);
       toast.success("Aluno atualizado com sucesso!");
-    } catch {
-      toast.error("Erro ao atualizar aluno");
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } };
+      const msg = apiErr.response?.data?.errors?.cpf?.[0] || "Erro ao atualizar aluno";
+      toast.error(msg);
     }
   };
 
