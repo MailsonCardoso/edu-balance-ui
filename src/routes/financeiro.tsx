@@ -30,7 +30,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import type { Mensalidade, Aluno, FormaPagamento } from "@/lib/mock-data";
-import { brl, fmtDate, maskDate } from "@/lib/format";
+import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades, createMensalidade, updateMensalidade, deleteMensalidade } from "@/lib/api/mensalidades";
@@ -216,6 +216,9 @@ function Financeiro() {
   const gerarPdf = (m: Mensalidade) => {
     const janela = window.open("", "_blank");
     if (!janela) return;
+    const dataPg = m.dataPagamento ? fmtDateFull(m.dataPagamento) : "—";
+    const dataPgDm = m.dataPagamento ? fmtDate(m.dataPagamento) : "—";
+    const valorExtenso = numeroExtenso(m.valor);
     janela.document.write(`
       <!DOCTYPE html>
       <html>
@@ -224,37 +227,42 @@ function Financeiro() {
         <title>Recibo - ${m.alunoNome}</title>
         <style>
           * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: Arial, sans-serif; padding: 60px; color: #111; }
-          .header { text-align: center; border-bottom: 2px solid #222; padding-bottom: 20px; margin-bottom: 30px; }
-          .header h1 { font-size: 24px; margin-bottom: 4px; }
-          .header p { font-size: 14px; color: #555; }
-          .info { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
-          .row { display: flex; justify-content: space-between; align-items: baseline; }
-          .row .label { color: #555; font-size: 14px; }
-          .row .value { font-size: 14px; font-weight: 600; text-align: right; max-width: 55%; }
-          .highlight { background: #e6f7e6; border: 1px solid #b7e6b7; border-radius: 8px; padding: 20px; text-align: center; margin-top: 20px; }
-          .highlight p { font-size: 14px; color: #2e7d32; font-weight: 600; }
-          .highlight small { font-size: 12px; color: #666; }
-          .footer { text-align: center; margin-top: 50px; font-size: 11px; color: #999; border-top: 1px solid #ddd; padding-top: 16px; }
-          @media print { body { padding: 40px; } }
+          body { font-family: 'Times New Roman', Times, serif; padding: 60px 80px; color: #111; font-size: 14px; line-height: 1.6; }
+          h1 { text-align: center; font-size: 18px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; }
+          .assinatura { margin-top: 60px; text-align: center; }
+          .assinatura .linha { width: 300px; margin: 0 auto; border-top: 1px solid #111; padding-top: 8px; }
+          .footer { text-align: center; margin-top: 50px; font-size: 11px; color: #999; }
+          .declaracao { margin-bottom: 30px; text-align: justify; }
+          .info { margin: 30px 0; }
+          .info p { margin-bottom: 6px; }
+          .info strong { display: inline-block; min-width: 180px; }
+          @media print { body { padding: 40px 60px; } }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h1>Bombeiro Paranã</h1>
-          <p>Colegio Militar 2 de Julho Unidade XII - Paranã</p>
-        </div>
+        <h1>Recibo de Pagamento de Mensalidade Escolar</h1>
+        <p style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:4px;">Bombeiro Paranã</p>
+        <p style="text-align:center;font-size:13px;margin-bottom:30px;">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+        <p class="declaracao">
+          Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:
+        </p>
         <div class="info">
-          <div class="row"><span class="label">Aluno:</span><span class="value">${m.alunoNome || "—"}</span></div>
-          <div class="row"><span class="label">Responsável:</span><span class="value">${m.alunoResponsavel || "—"}</span></div>
-          <div class="row"><span class="label">Mês referente:</span><span class="value">${m.mesReferencia}</span></div>
-          <div class="row"><span class="label">Valor:</span><span class="value">${brl(m.valor)}</span></div>
-          <div class="row"><span class="label">Data pagamento:</span><span class="value">${m.dataPagamento ? fmtDate(m.dataPagamento) : "—"}</span></div>
-          <div class="row"><span class="label">Forma de pagamento:</span><span class="value">${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}</span></div>
+          <p><strong>Aluno:</strong> ${m.alunoNome || "—"}</p>
+          <p><strong>Responsável:</strong> ${m.alunoResponsavel || "—"}</p>
+          <p><strong>Mês de Referência:</strong> ${m.mesReferencia}</p>
+          <p><strong>Valor Pago:</strong> ${brl(m.valor)} (${valorExtenso})</p>
+          <p><strong>Data do Pagamento:</strong> ${dataPgDm}</p>
+          <p><strong>Forma de Pagamento:</strong> ${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}</p>
         </div>
-        <div class="highlight">
-          <p>Pagamento recebido com sucesso!</p>
-          <small>O responsável foi informado sobre o recebimento.</small>
+        <p style="text-align:justify;">
+          Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
+        </p>
+        <p style="text-align:center;margin-top:40px;">Paranã, ${dataPg}.</p>
+        <div class="assinatura">
+          <div class="linha">
+            <p style="font-size:13px;font-weight:bold;">Responsável pelo Recebimento</p>
+            <p style="font-size:12px;margin-top:2px;">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+          </div>
         </div>
         <div class="footer">Documento gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
         <script>window.print();window.close();<\/script>
@@ -580,48 +588,49 @@ function Financeiro() {
       </AlertDialog>
 
       <AlertDialog open={!!reciboMensalidade} onOpenChange={(o) => { if (!o) setReciboMensalidade(null); }}>
-        <AlertDialogContent className="max-w-md">
+        <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-center">Recibo de Pagamento</AlertDialogTitle>
+            <AlertDialogTitle className="text-center text-base uppercase tracking-wide">
+              Recibo de Pagamento de Mensalidade Escolar
+            </AlertDialogTitle>
           </AlertDialogHeader>
           <div className="py-4 space-y-4 text-sm">
-            <div className="text-center border-b border-border pb-4">
+            <div className="text-center pb-3">
               <p className="font-bold text-base">Bombeiro Paranã</p>
-              <p className="text-muted-foreground">Colegio Militar 2 de Julho Unidade XII - Paranã</p>
+              <p className="text-muted-foreground">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between">
+            <p className="text-justify text-muted-foreground border-t border-border pt-4">
+              Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:
+            </p>
+            <div className="space-y-2 bg-muted/30 rounded-lg p-4">
+              <div className="grid grid-cols-[140px_1fr] gap-x-2">
                 <span className="text-muted-foreground">Aluno:</span>
-                <span className="font-medium text-right max-w-[60%]">{reciboMensalidade?.alunoNome || "—"}</span>
-              </div>
-              <div className="flex justify-between">
+                <span className="font-medium">{reciboMensalidade?.alunoNome || "—"}</span>
                 <span className="text-muted-foreground">Responsável:</span>
-                <span className="font-medium text-right max-w-[60%]">{reciboMensalidade?.alunoResponsavel || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Mês referente:</span>
+                <span className="font-medium">{reciboMensalidade?.alunoResponsavel || "—"}</span>
+                <span className="text-muted-foreground">Mês de Referência:</span>
                 <span className="font-medium">{reciboMensalidade?.mesReferencia}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Valor:</span>
-                <span className="font-semibold">{reciboMensalidade ? brl(reciboMensalidade.valor) : "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Data pagamento:</span>
+                <span className="text-muted-foreground">Valor Pago:</span>
+                <span className="font-medium">
+                  {reciboMensalidade ? `${brl(reciboMensalidade.valor)} (${numeroExtenso(reciboMensalidade.valor)})` : "—"}
+                </span>
+                <span className="text-muted-foreground">Data do Pagamento:</span>
                 <span className="font-medium">{reciboMensalidade?.dataPagamento ? fmtDate(reciboMensalidade.dataPagamento) : "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Forma de pagamento:</span>
+                <span className="text-muted-foreground">Forma de Pagamento:</span>
                 <span className="font-medium capitalize">{reciboMensalidade?.formaPagamento ? formaPagamentoLabel[reciboMensalidade.formaPagamento] : "—"}</span>
               </div>
             </div>
-            <div className="bg-success/10 border border-success/30 rounded-lg p-4 text-center">
-              <p className="text-success font-medium text-sm">
-                Pagamento recebido com sucesso!
-              </p>
-              <p className="text-muted-foreground text-xs mt-1">
-                O responsável foi informado sobre o recebimento.
-              </p>
+            <p className="text-justify text-muted-foreground">
+              Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
+            </p>
+            <p className="text-center font-medium">
+              Paranã, {reciboMensalidade?.dataPagamento ? fmtDateFull(reciboMensalidade.dataPagamento) : "—"}.
+            </p>
+            <div className="text-center pt-4 border-t border-border">
+              <div className="inline-block border-t border-foreground pt-2 px-12">
+                <p className="text-sm font-semibold">Responsável pelo Recebimento</p>
+                <p className="text-xs text-muted-foreground">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+              </div>
             </div>
           </div>
           <AlertDialogFooter className="sm:justify-center gap-2">
