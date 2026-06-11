@@ -81,7 +81,20 @@ class MensalidadeController extends Controller
             Aluno::where('id', $alunoId)->update(['situacao' => $situacao]);
         }
 
-        return response()->json(['atualizadas' => $vencidas->count()]);
+        $alunosEmDia = Aluno::whereIn('situacao', ['em_atraso', 'inadimplente'])
+            ->whereDoesntHave('mensalidades', function ($q) use ($hoje) {
+                $q->where('status', 'atrasado')->where('data_vencimento', '<', $hoje);
+            })
+            ->pluck('id');
+
+        if ($alunosEmDia->isNotEmpty()) {
+            Aluno::whereIn('id', $alunosEmDia)->update(['situacao' => 'em_dia']);
+        }
+
+        return response()->json([
+            'atualizadas' => $vencidas->count(),
+            'regularizadas' => $alunosEmDia->count(),
+        ]);
     }
 
     public function destroy(Mensalidade $mensalidade)
