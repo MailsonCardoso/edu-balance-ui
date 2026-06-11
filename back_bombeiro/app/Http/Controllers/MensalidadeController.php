@@ -16,7 +16,7 @@ class MensalidadeController extends Controller
     {
         $validated = $request->validate([
             'aluno_id' => 'required|exists:alunos,id',
-            'mes_referencia' => 'required|string|max:7',
+            'mes_referencia' => 'required|string|max:20',
             'valor' => 'required|numeric|min:0',
             'data_vencimento' => 'required|date',
             'data_pagamento' => 'nullable|date',
