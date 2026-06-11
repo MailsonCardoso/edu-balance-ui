@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import api from "@/lib/api";
@@ -79,6 +79,12 @@ function ResponsavelLogin() {
 
       <div className="flex items-center justify-center p-6 md:p-12">
         <div className="w-full max-w-sm animate-in">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
+          >
+            <ArrowLeft className="size-4" /> Voltar ao site
+          </Link>
           <h1 className="text-2xl font-semibold">Acesse o portal</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Use o e-mail do responsável e o CPF (somente números) como senha

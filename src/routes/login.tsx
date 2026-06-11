@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, GraduationCap, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, GraduationCap, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../lib/auth";
 import { Input } from "@/components/ui/input";
@@ -77,6 +77,12 @@ function Login() {
             </div>
             <span className="font-semibold text-lg">EduFinance</span>
           </div>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-4"
+          >
+            <ArrowLeft className="size-4" /> Voltar ao site
+          </Link>
           <h1 className="text-2xl font-semibold">Acesse sua conta</h1>
           <p className="text-sm text-muted-foreground mt-1">Entre com seu e-mail e senha</p>
 
