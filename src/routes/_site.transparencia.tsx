@@ -74,13 +74,13 @@ function Transparencia() {
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             <Link
               to="/ouvidoria"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border-2 border-white text-white font-medium text-sm hover:bg-white/10 transition-colors"
             >
               Ouvidoria <ArrowRight className="size-4" />
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium text-sm hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] font-medium text-sm hover:bg-white/90 transition-colors"
             >
               Dashboard Financeiro
             </Link>

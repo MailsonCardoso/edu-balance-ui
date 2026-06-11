@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Início", to: "/" },
   { label: "Institucional", to: "/institucional" },
   { label: "Transparência", to: "/transparencia" },
+  { label: "Ouvidoria", to: "/ouvidoria" },
   { label: "Notícias", to: "/noticias" },
   { label: "Contato", to: "/contato" },
 ];
