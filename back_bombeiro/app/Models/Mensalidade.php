@@ -10,6 +10,7 @@ class Mensalidade extends Model
     protected $fillable = [
         'aluno_id', 'mes_referencia', 'valor',
         'data_vencimento', 'data_pagamento', 'status',
+        'forma_pagamento',
     ];
 
     protected function casts(): array
@@ -19,6 +20,7 @@ class Mensalidade extends Model
             'data_vencimento' => 'date',
             'data_pagamento' => 'date',
             'status' => 'string',
+            'forma_pagamento' => 'string',
         ];
     }
 

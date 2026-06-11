@@ -11,6 +11,7 @@ class Aluno extends Model
         'nome', 'cpf', 'data_nascimento', 'telefone', 'email', 'endereco',
         'responsavel', 'cpf_responsavel', 'telefone_responsavel',
         'turma', 'status', 'situacao',
+        'valor_mensalidade', 'dia_vencimento',
     ];
 
     protected function casts(): array

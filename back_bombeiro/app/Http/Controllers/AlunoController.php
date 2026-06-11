@@ -27,6 +27,8 @@ class AlunoController extends Controller
             'turma' => 'required|string|max:50',
             'status' => 'required|in:ativo,inativo',
             'situacao' => 'required|in:em_dia,em_atraso,inadimplente',
+            'valor_mensalidade' => 'nullable|numeric|min:0',
+            'dia_vencimento' => 'nullable|integer|min:1|max:31',
         ]);
 
         return Aluno::create($validated);
@@ -52,6 +54,8 @@ class AlunoController extends Controller
             'turma' => 'sometimes|string|max:50',
             'status' => 'sometimes|in:ativo,inativo',
             'situacao' => 'sometimes|in:em_dia,em_atraso,inadimplente',
+            'valor_mensalidade' => 'nullable|numeric|min:0',
+            'dia_vencimento' => 'nullable|integer|min:1|max:31',
         ]);
 
         $aluno->update($validated);

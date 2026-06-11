@@ -21,6 +21,7 @@ class MensalidadeController extends Controller
             'data_vencimento' => 'required|date',
             'data_pagamento' => 'nullable|date',
             'status' => 'required|in:pendente,pago,atrasado',
+            'forma_pagamento' => 'nullable|in:pix,debito,credito',
         ]);
 
         return Mensalidade::create($validated);
@@ -40,6 +41,7 @@ class MensalidadeController extends Controller
             'data_vencimento' => 'sometimes|date',
             'data_pagamento' => 'nullable|date',
             'status' => 'sometimes|in:pendente,pago,atrasado',
+            'forma_pagamento' => 'nullable|in:pix,debito,credito',
         ]);
 
         $mensalidade->update($validated);
