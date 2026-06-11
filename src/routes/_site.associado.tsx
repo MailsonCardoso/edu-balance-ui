@@ -43,53 +43,52 @@ function Associado() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex rounded-lg border border-gray-200 p-1 mb-8">
-            <button
-              onClick={() => setAba("login")}
-              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                aba === "login" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Entrar
-            </button>
-            <button
-              onClick={() => setAba("cadastro")}
-              className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Cadastrar
-            </button>
-          </div>
-          {aba === "login" ? <AssociadoLogin /> : <AssociadoCadastro />}
-        </div>
-      </section>
-
-      <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Em breve</h2>
-            <p className="text-gray-500 mt-1">Tudo que você vai ter como associado</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: LogIn, title: "Painel do Sócio", desc: "Acesso completo às suas contribuições, benefícios e dados cadastrais." },
-              { icon: CheckCircle, title: "PIX e Boletos", desc: "Pague mensalidades com facilidade." },
-              { icon: ArrowRight, title: "Histórico", desc: "Todas as suas contribuições." },
-              { icon: UserPlus, title: "Dados cadastrais", desc: "Mantenha suas informações atualizadas." },
-              { icon: Shield, title: "Benefícios", desc: "Parceiros e vantagens exclusivas." },
-              { icon: LogIn, title: "Comunidade", desc: "Participe das discussões." },
-              { icon: Shield, title: "Segurança", desc: "Dados protegidos pela LGPD." },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-gray-100 p-6 text-center hover:shadow-md transition-shadow">
-                <div className="size-12 rounded-full bg-[#D62828]/10 mx-auto grid place-items-center">
-                  <item.icon className="size-6 text-[#D62828]" />
-                </div>
-                <h3 className="mt-4 font-semibold text-gray-900">{item.title}</h3>
-                <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+          <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-start">
+            <div>
+              <div className="flex rounded-lg border border-gray-200 p-1 mb-8">
+                <button
+                  onClick={() => setAba("login")}
+                  className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
+                    aba === "login" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Entrar
+                </button>
+                <button
+                  onClick={() => setAba("cadastro")}
+                  className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
+                    aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Cadastrar
+                </button>
               </div>
-            ))}
+              {aba === "login" ? <AssociadoLogin /> : <AssociadoCadastro />}
+            </div>
+            <div className="mt-12 lg:mt-0">
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828] mb-2">Em breve</h2>
+              <p className="text-gray-500 mb-8">Tudo que você vai ter como associado</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { icon: LogIn, title: "Painel do Sócio", desc: "Acesso completo às suas contribuições, benefícios e dados cadastrais." },
+                  { icon: CheckCircle, title: "PIX e Boletos", desc: "Pague mensalidades com facilidade." },
+                  { icon: ArrowRight, title: "Histórico", desc: "Todas as suas contribuições." },
+                  { icon: UserPlus, title: "Dados cadastrais", desc: "Mantenha suas informações atualizadas." },
+                  { icon: Shield, title: "Benefícios", desc: "Parceiros e vantagens exclusivas." },
+                  { icon: LogIn, title: "Comunidade", desc: "Participe das discussões." },
+                  { icon: Shield, title: "Segurança", desc: "Dados protegidos pela LGPD." },
+                ].map((item) => (
+                  <div key={item.title} className="bg-white rounded-xl border border-gray-100 p-5 text-center hover:shadow-md transition-shadow">
+                    <div className="size-10 rounded-full bg-[#D62828]/10 mx-auto grid place-items-center">
+                      <item.icon className="size-5 text-[#D62828]" />
+                    </div>
+                    <h3 className="mt-3 font-semibold text-gray-900 text-sm">{item.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
