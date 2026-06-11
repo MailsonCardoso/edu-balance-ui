@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 import api from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,8 +43,20 @@ function ResponsavelLogin() {
       localStorage.setItem("responsavel_data", JSON.stringify(res.data));
       toast.success("Bem-vindo(a) ao portal!");
       navigate({ to: "/responsavel/dashboard" });
-    } catch {
-      toast.error("E-mail ou senha inválidos");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 401 || err.response?.status === 422) {
+          toast.error("E-mail ou senha inválidos");
+        } else if (err.response?.status === 500) {
+          toast.error("Erro interno do servidor. Tente novamente.");
+        } else if (err.code === "ERR_NETWORK") {
+          toast.error("Não foi possível conectar ao servidor. Verifique sua internet.");
+        } else {
+          toast.error("Erro inesperado. Tente novamente.");
+        }
+      } else {
+        toast.error("Erro inesperado. Tente novamente.");
+      }
     }
   };
 
