@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Send, Shield, Lock, MessageSquare } from "lucide-react";
+import { Send, Shield, Lock, MessageSquare, CheckCircle, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { enviarManifestacao } from "@/lib/api/ouvidoria";
 
 export const Route = createFileRoute("/_site/ouvidoria")({
   component: Ouvidoria,
@@ -10,11 +11,38 @@ export const Route = createFileRoute("/_site/ouvidoria")({
 function Ouvidoria() {
   const [anonymous, setAnonymous] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [protocolo, setProtocolo] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast.success("Manifestação enviada com sucesso!");
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const res = await enviarManifestacao({
+        nome: data.get("nome") as string,
+        email: data.get("email") as string,
+        tipo: data.get("tipo") as string,
+        mensagem: data.get("mensagem") as string,
+        anonimo: anonymous,
+      });
+
+      setProtocolo(res.protocolo);
+      setSubmitted(true);
+      toast.success(res.message);
+    } catch {
+      toast.error("Erro ao enviar manifestação. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copiarProtocolo = () => {
+    navigator.clipboard.writeText(protocolo);
+    toast.success("Protocolo copiado!");
   };
 
   if (submitted) {
@@ -22,11 +50,32 @@ function Ouvidoria() {
       <div className="min-h-[80vh] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <div className="size-16 rounded-full bg-emerald-50 mx-auto grid place-items-center">
-            <Shield className="size-8 text-emerald-500" />
+            <CheckCircle className="size-8 text-emerald-500" />
           </div>
           <h2 className="text-2xl font-bold text-[#D62828] mt-6">Manifestação enviada</h2>
           <p className="text-gray-500 mt-2">
-            Sua manifestação foi registrada com sucesso. {anonymous ? "Por ser anônima, não será possível acompanhar individualmente." : "Você receberá uma resposta no e-mail informado."}
+            {anonymous
+              ? "Sua manifestação foi registrada de forma anônima."
+              : "Você receberá uma resposta no e-mail informado."}
+          </p>
+
+          <div className="mt-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            <p className="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">
+              Protocolo
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-2xl font-bold text-[#D62828] font-mono">{protocolo}</span>
+              <button
+                onClick={copiarProtocolo}
+                className="size-9 rounded-lg border border-gray-200 grid place-items-center text-gray-400 hover:text-[#D62828] hover:border-[#D62828] transition-colors"
+              >
+                <Copy className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mt-4">
+            Guarde este protocolo para acompanhar sua manifestação.
           </p>
         </div>
       </div>
@@ -60,6 +109,7 @@ function Ouvidoria() {
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium text-gray-700">Nome</label>
                       <input
+                        name="nome"
                         type="text"
                         className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
                         disabled={anonymous}
@@ -69,6 +119,7 @@ function Ouvidoria() {
                     <div className="space-y-1.5">
                       <label className="text-sm font-medium text-gray-700">E-mail</label>
                       <input
+                        name="email"
                         type="email"
                         className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
                         disabled={anonymous}
@@ -79,7 +130,11 @@ function Ouvidoria() {
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-gray-700">Tipo</label>
-                    <select className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors bg-white">
+                    <select
+                      name="tipo"
+                      className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors bg-white"
+                      required
+                    >
                       <option value="">Selecione...</option>
                       <option value="sugestao">Sugestão</option>
                       <option value="reclamacao">Reclamação</option>
@@ -92,10 +147,12 @@ function Ouvidoria() {
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-gray-700">Mensagem</label>
                     <textarea
+                      name="mensagem"
                       rows={5}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors resize-none"
                       placeholder="Descreva sua manifestação em detalhes..."
                       required
+                      minLength={10}
                     />
                   </div>
 
@@ -114,9 +171,15 @@ function Ouvidoria() {
 
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-[#D62828] font-medium text-sm hover:bg-[#D62828]/5 transition-colors"
+                    disabled={loading}
+                    className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] border border-[#D62828] font-medium text-sm hover:bg-[#D62828]/5 transition-colors disabled:opacity-50"
                   >
-                    <Send className="size-4" /> Enviar Manifestação
+                    {loading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Send className="size-4" />
+                    )}
+                    {loading ? "Enviando..." : "Enviar Manifestação"}
                   </button>
                 </form>
               </div>
