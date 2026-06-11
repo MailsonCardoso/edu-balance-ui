@@ -218,7 +218,7 @@ function Financeiro() {
     const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
     if (!phone) return null;
     const msg = encodeURIComponent(
-      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem? 🙋\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição! 😊\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
+      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição!\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
     );
     return `https://wa.me/55${phone}?text=${msg}`;
   };

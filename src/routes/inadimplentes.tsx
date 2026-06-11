@@ -201,7 +201,7 @@ function Inadimplentes() {
                             const phone = a.telefoneResponsavel?.replace(/\D/g, "") || a.telefone?.replace(/\D/g, "");
                             if (!phone) { toast.error("Telefone não encontrado"); return; }
                             const msg = encodeURIComponent(
-                              `Olá ${a.responsavel || "Responsável"}, tudo bem? 🙋\n\nPassando para lembrar gentilmente que o(a) ${a.sexo === "feminino" ? "aluna" : "aluno"} ${a.nome} está com ${det?.parcelas || 0} mensalidade(s) em atraso, totalizando ${det ? brl(det.total) : "—"}.\n\nQuando puder, nos procure para acertar. Estamos aqui para ajudar! 😊\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
+                              `Olá ${a.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que o(a) ${a.sexo === "feminino" ? "aluna" : "aluno"} ${a.nome} está com ${det?.parcelas || 0} mensalidade(s) em atraso, totalizando ${det ? brl(det.total) : "—"}.\n\nQuando puder, nos procure para acertar. Estamos aqui para ajudar!\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
                             );
                             window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
                           }}
