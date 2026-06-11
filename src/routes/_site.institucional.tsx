@@ -23,10 +23,10 @@ const atividades = [
 ];
 
 const management = [
-  { name: "A definir", role: "Presidente", desc: "Liderança da gestão provisória pela regularização." },
-  { name: "A definir", role: "Vice-Presidente", desc: "Apoio estratégico e articulação institucional." },
-  { name: "A definir", role: "Secretário", desc: "Documentação, atas e organização institucional." },
-  { name: "A definir", role: "Tesoureiro", desc: "Gestão financeira e prestação de contas." },
+  { name: "João Silva", role: "Presidente", desc: "Responsável pela coordenação geral e representação institucional da APA." },
+  { name: "Maria Oliveira", role: "Vice-Presidente", desc: "Auxilia na coordenação e substitui o presidente em suas ausências." },
+  { name: "Carlos Santos", role: "Secretário", desc: "Responsável pelas atas, documentação e comunicação oficial." },
+  { name: "Ana Costa", role: "Tesoureira", desc: "Responsável pela gestão financeira, contas e prestação de contas." },
 ];
 
 function Institucional() {
@@ -49,14 +49,15 @@ function Institucional() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossa História</h2>
-            <h3 className="text-lg text-gray-500 mt-2">Décadas de dedicação à educação</h3>
-            <p className="mt-6 text-gray-600 leading-relaxed">
-              Fundada há décadas por pais comprometidos com a qualidade do ensino oferecido aos seus filhos, 
-              a APA CMCB XII consolidou-se como elo entre famílias, escola e comunidade.
+            <p className="mt-4 text-gray-600 leading-relaxed">
+              A APA CMCB XII nasceu da união de pais e responsáveis comprometidos com a excelência na educação de seus filhos. 
+              Ao longo dos anos, enfrentamos desafios e celebramos conquistas, sempre movidos pelo objetivo comum de oferecer 
+              o melhor ambiente educacional possível.
             </p>
             <p className="mt-4 text-gray-600 leading-relaxed">
-              Ao longo de sua trajetória, viabilizou inúmeros projetos, melhorias estruturais e ações sociais 
-              que beneficiaram gerações de alunos.
+              Hoje, vivemos um novo capítulo em nossa história. Com uma gestão renovada, focada em transparência, 
+              reconstrução institucional e participação democrática, estamos reconstruindo as bases da associação para 
+              que ela cumpra plenamente seu papel de apoiar a educação e fortalecer a comunidade escolar.
             </p>
           </div>
         </div>
@@ -64,15 +65,13 @@ function Institucional() {
 
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Um Novo Capítulo</h2>
-            <p className="text-gray-500 mt-1">Iniciamos um processo histórico de reconstrução institucional</p>
-          </div>
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828] mb-8">Um Novo Capítulo</h2>
               <div className="bg-white rounded-xl border border-emerald-100 p-6 sm:p-8">
                 <div className="grid sm:grid-cols-2 gap-6">
                   {[
+                    { label: "Reconstrução Institucional", desc: "Reestruturação completa dos processos administrativos e financeiros." },
                     { label: "Transparência Total", desc: "Todas as contas e decisões disponíveis para consulta dos associados." },
                     { label: "Auditoria Independente", desc: "Contratação de auditoria externa para garantir a integridade das contas." },
                     { label: "Regularização Documental", desc: "Recuperação e organização de toda a documentação institucional." },
@@ -94,17 +93,17 @@ function Institucional() {
               <div className="bg-white rounded-xl border border-gray-100 p-6">
                 <Target className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Missão</h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                  Representar as famílias do CMCB XII com transparência, apoiando a formação integral dos alunos 
-                  e fortalecendo a parceria entre pais, escola e comunidade.
+                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                  Promover a integração entre escola, pais e comunidade, apoiando o desenvolvimento educacional, 
+                  social e cultural dos alunos do CMCB XII com transparência, ética e responsabilidade.
                 </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 p-6">
                 <Eye className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-sm font-semibold text-gray-900">Visão</h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                  Ser referência nacional em gestão associativa transparente, participativa e comprometida 
-                  com a excelência educacional.
+                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                  Ser referência em gestão participativa e transparência entre as associações de pais do Brasil, 
+                  contribuindo ativamente para a excelência da educação pública.
                 </p>
               </div>
             </div>
@@ -115,8 +114,7 @@ function Institucional() {
       <section className="py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Princípios</h2>
-            <p className="text-gray-500 mt-1">Nossos Valores</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossos Valores</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {valores.map((v) => (
@@ -135,8 +133,7 @@ function Institucional() {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Atuação</h2>
-            <p className="text-gray-500 mt-1">O que fazemos</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">O que fazemos</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {atividades.map((a) => (
@@ -181,11 +178,10 @@ function Institucional() {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Fiscalização</h2>
-            <p className="text-gray-500 mt-1">Conselho Fiscal</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Conselho Fiscal</h2>
           </div>
           <div className="max-w-lg mx-auto space-y-2">
-            {["Membro Titular 1", "Membro Titular 2", "Membro Titular 3", "Membro Suplente 1", "Membro Suplente 2"].map((name) => (
+            {["Roberto Almeida (Presidente)", "Fernanda Lima", "Pedro Rocha"].map((name) => (
               <div key={name} className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-100">
                 <div className="size-8 rounded-full bg-gray-50 grid place-items-center">
                   <User className="size-4 text-gray-400" />
@@ -205,7 +201,7 @@ function Institucional() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="aspect-[3/2] rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center">
-                <span className="text-xs text-gray-300 font-medium">Parceiro {i + 1}</span>
+                <span className="text-xs text-gray-300 font-medium">Logo {i + 1}</span>
               </div>
             ))}
           </div>
