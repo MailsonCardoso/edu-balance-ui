@@ -123,14 +123,21 @@ function Financeiro() {
     setFormOpen(true);
   };
 
+  const toIsoDate = (ddmmaaa: string) => {
+    const partes = ddmmaaa.split("/");
+    if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`;
+    return ddmmaaa;
+  };
+
   const salvarForm = async () => {
     try {
+      const dataVencimento = toIsoDate(formData.dataVencimento);
       if (formMode === "create") {
         await createMensalidade({
           alunoId: formData.alunoId,
           mesReferencia: formData.mesReferencia,
           valor: formData.valor,
-          dataVencimento: formData.dataVencimento,
+          dataVencimento,
           status: "pendente",
           formaPagamento: (formData.formaPagamento || null) as FormaPagamento | null,
         });
@@ -140,7 +147,7 @@ function Financeiro() {
           alunoId: formData.alunoId,
           mesReferencia: formData.mesReferencia,
           valor: formData.valor,
-          dataVencimento: formData.dataVencimento,
+          dataVencimento,
           formaPagamento: (formData.formaPagamento || null) as FormaPagamento | null,
         });
         toast.success("Mensalidade atualizada!");

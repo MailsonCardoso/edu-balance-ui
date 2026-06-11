@@ -72,19 +72,23 @@ function NovoAluno() {
   const onSubmit = async (data: FormData) => {
     try {
       const created = await createAluno({ ...data, situacao: "em_dia" });
-      if (data.valorMensalidade >= 0) {
-        const hoje = new Date();
-        const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
-        const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
-        const dia = String(data.diaVencimento || 10).padStart(2, "0");
-        const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
-        await createMensalidade({
-          alunoId: created.id,
-          mesReferencia: mesRef,
-          valor: data.valorMensalidade,
-          dataVencimento: `${dia}/${mesNum}/${hoje.getFullYear()}`,
-          status: "pendente",
-        });
+      if (data.valorMensalidade > 0) {
+        try {
+          const hoje = new Date();
+          const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
+          const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
+          const dia = String(data.diaVencimento || 10).padStart(2, "0");
+          const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
+          await createMensalidade({
+            alunoId: created.id,
+            mesReferencia: mesRef,
+            valor: data.valorMensalidade,
+            dataVencimento: `${hoje.getFullYear()}-${mesNum}-${dia}`,
+            status: "pendente",
+          });
+        } catch {
+          toast.error("Erro ao criar mensalidade inicial");
+        }
       }
       toast.success("Aluno cadastrado com sucesso!");
       navigate({ to: "/alunos" });
