@@ -20,6 +20,8 @@ function mapKeys<T>(obj: Record<string, unknown>, fn: (k: string) => string): T 
 function alunoFromApi(raw: Record<string, unknown>): Aluno {
   const mapped = mapKeys<Record<string, unknown>>(raw, toCamel);
   mapped.id = String(mapped.id);
+  mapped.valorMensalidade = Number(mapped.valorMensalidade) || 0;
+  mapped.diaVencimento = Number(mapped.diaVencimento) || 0;
   return mapped as unknown as Aluno;
 }
 

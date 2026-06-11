@@ -21,6 +21,7 @@ function mensalidadeFromApi(raw: Record<string, unknown>): Mensalidade {
   const mapped = mapKeys<Record<string, unknown>>(raw, toCamel);
   mapped.id = String(mapped.id);
   mapped.alunoId = String(mapped.alunoId);
+  mapped.valor = Number(mapped.valor) || 0;
   if (raw.aluno && typeof raw.aluno === "object") {
     const a = raw.aluno as Record<string, unknown>;
     mapped.alunoNome = String(a.nome || "");
