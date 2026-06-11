@@ -67,7 +67,7 @@ function AlunosList() {
       if (sheetMode === "create") {
         const created = await createAluno(aluno);
         setData((d) => [...d, created]);
-        if (aluno.valorMensalidade > 0) {
+        if (aluno.valorMensalidade >= 0) {
           const hoje = new Date();
           const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
           const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();

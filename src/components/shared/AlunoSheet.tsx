@@ -395,7 +395,7 @@ export function AlunoSheet({
                     />
                 ) : (
                   <p className={viewCls}>
-                    {current.valorMensalidade
+                    {current.valorMensalidade !== null && current.valorMensalidade !== undefined
                       ? current.valorMensalidade.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
                       : "—"}
                   </p>
