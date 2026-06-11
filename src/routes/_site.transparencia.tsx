@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, TrendingUp, TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown, Users } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown, Users } from "lucide-react";
 import { useState } from "react";
 import { getTransparencia } from "@/lib/api/transparencia";
 
@@ -71,20 +71,6 @@ function Transparencia() {
           <p className="mt-3 text-lg text-white/70 max-w-2xl mx-auto">
             "Nossas contas estão nas suas mãos."
           </p>
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
-            <Link
-              to="/ouvidoria"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg border-2 border-white text-white font-medium text-sm hover:bg-white/10 transition-colors"
-            >
-              Ouvidoria <ArrowRight className="size-4" />
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-2 h-11 px-6 rounded-lg bg-white text-[#D62828] font-medium text-sm hover:bg-white/90 transition-colors"
-            >
-              Dashboard Financeiro
-            </Link>
-          </div>
         </div>
       </section>
 
