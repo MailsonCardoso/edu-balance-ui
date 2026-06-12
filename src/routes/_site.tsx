@@ -11,7 +11,6 @@ const navLinks = [
   { label: "Institucional", to: "/institucional" },
   { label: "Transparência", to: "/transparencia" },
   { label: "Ouvidoria", to: "/ouvidoria" },
-  { label: "Acompanhar", to: "/acompanhar" },
   { label: "Notícias", to: "/noticias" },
   { label: "Contato", to: "/contato" },
 ];
@@ -174,7 +173,7 @@ function SiteLayout() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-4">Serviços</h4>
               <ul className="space-y-2.5">
-                {["Portal da Transparência", "Ouvidoria", "Acompanhar Protocolo", "Seja Sócio", "Contato"].map((item) => (
+                {["Portal da Transparência", "Ouvidoria", "Seja Sócio", "Contato"].map((item) => (
                   <li key={item}>
                     <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">{item}</a>
                   </li>

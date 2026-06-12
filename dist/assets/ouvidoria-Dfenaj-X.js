@@ -1,1 +1,0 @@
-import{a as o}from"./api-BGPmK0v7.js";async function r(a){const{data:t}=await o.post("/ouvidoria",a);return t}async function s(){const{data:a}=await o.get("/ouvidoria");return a.data}async function c(a){const{data:t}=await o.get(`/ouvidoria/${a}`);return t}async function u(a,t){const{data:n}=await o.put(`/ouvidoria/${a}`,t);return n}export{u as a,c as b,r as e,s as l};
