@@ -12,6 +12,8 @@ Route::apiResource('mensalidades', MensalidadeController::class);
 Route::post('/responsavel/login', [ResponsavelController::class, 'login']);
 Route::get('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'index']);
 Route::post('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'store']);
+Route::get('/ouvidoria/{protocolo}', [App\Http\Controllers\OuvidoriaController::class, 'show']);
+Route::put('/ouvidoria/{ouvidoria}', [App\Http\Controllers\OuvidoriaController::class, 'update']);
 
 Route::get('/transparencia', [App\Http\Controllers\TransparenciaController::class, 'index']);
 

@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Institucional", to: "/institucional" },
   { label: "Transparência", to: "/transparencia" },
   { label: "Ouvidoria", to: "/ouvidoria" },
+  { label: "Acompanhar", to: "/acompanhar" },
   { label: "Notícias", to: "/noticias" },
   { label: "Contato", to: "/contato" },
 ];
@@ -22,7 +23,7 @@ function SiteLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-foreground">
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center gap-3 shrink-0">
               <div className="size-9 rounded-lg bg-[#D62828] grid place-items-center text-white font-bold text-sm">
@@ -137,7 +138,7 @@ function SiteLayout() {
       </main>
 
       <footer className="bg-[#D62828] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+        <div className="container-page py-10 lg:py-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <div className="sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-3 mb-4">
@@ -173,7 +174,7 @@ function SiteLayout() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-white/50 mb-4">Serviços</h4>
               <ul className="space-y-2.5">
-                {["Portal da Transparência", "Ouvidoria", "Seja Sócio", "Contato"].map((item) => (
+                {["Portal da Transparência", "Ouvidoria", "Acompanhar Protocolo", "Seja Sócio", "Contato"].map((item) => (
                   <li key={item}>
                     <a href="#" className="text-sm text-white/70 hover:text-white transition-colors">{item}</a>
                   </li>

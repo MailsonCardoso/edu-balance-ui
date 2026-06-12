@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ouvidoria extends Model
 {
     protected $fillable = [
-        'nome', 'email', 'tipo', 'mensagem',
+        'nome', 'email', 'tipo', 'mensagem', 'descricao',
         'anonimo', 'protocolo', 'status',
     ];
 

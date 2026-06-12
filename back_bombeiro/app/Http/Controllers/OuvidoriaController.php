@@ -15,6 +15,7 @@ class OuvidoriaController extends Controller
             'protocolo' => $item->protocolo,
             'tipo' => $item->tipo,
             'mensagem' => $item->mensagem,
+            'descricao' => $item->descricao,
             'anonimo' => $item->anonimo,
             'nome' => $item->anonimo ? null : $item->nome,
             'email' => $item->anonimo ? null : $item->email,
@@ -23,6 +24,40 @@ class OuvidoriaController extends Controller
         ]);
 
         return response()->json(['data' => $ouvidorias]);
+    }
+
+    public function show(string $protocolo): JsonResponse
+    {
+        $ouvidoria = Ouvidoria::where('protocolo', $protocolo)->first();
+
+        if (!$ouvidoria) {
+            return response()->json(['message' => 'Protocolo não encontrado.'], 404);
+        }
+
+        return response()->json([
+            'id' => $ouvidoria->id,
+            'protocolo' => $ouvidoria->protocolo,
+            'tipo' => $ouvidoria->tipo,
+            'mensagem' => $ouvidoria->mensagem,
+            'descricao' => $ouvidoria->descricao,
+            'status' => $ouvidoria->status,
+            'created_at' => $ouvidoria->created_at->format('d/m/Y H:i'),
+        ]);
+    }
+
+    public function update(Request $request, Ouvidoria $ouvidoria): JsonResponse
+    {
+        $validated = $request->validate([
+            'status' => 'sometimes|in:pendente,em_andamento,respondido',
+            'descricao' => 'sometimes|nullable|string',
+        ]);
+
+        $ouvidoria->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status atualizado com sucesso.',
+        ]);
     }
 
     public function store(Request $request): JsonResponse

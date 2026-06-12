@@ -26,6 +26,7 @@ export interface OuvidoriaListItem {
   protocolo: string;
   tipo: string;
   mensagem: string;
+  descricao: string | null;
   anonimo: boolean;
   nome: string | null;
   email: string | null;
@@ -38,17 +39,34 @@ export async function listarManifestacoes(): Promise<OuvidoriaListItem[]> {
   return data.data;
 }
 
+export interface AcompanharResponse {
+  id: number;
+  protocolo: string;
+  tipo: string;
+  mensagem: string;
+  descricao: string | null;
+  status: string;
+  created_at: string;
+}
+
+export async function acompanharProtocolo(
+  protocolo: string
+): Promise<AcompanharResponse> {
+  const { data } = await api.get<AcompanharResponse>(`/ouvidoria/${protocolo}`);
+  return data;
+}
+
 export interface AtualizarStatusPayload {
   status: "pendente" | "em_andamento" | "respondido";
-  resposta?: string;
+  descricao?: string;
 }
 
 export async function atualizarStatus(
   id: number,
   payload: AtualizarStatusPayload
 ): Promise<{ success: boolean; message: string }> {
-  const { data } = await api.patch<{ success: boolean; message: string }>(
-    `/ouvidoria/${id}/status`,
+  const { data } = await api.put<{ success: boolean; message: string }>(
+    `/ouvidoria/${id}`,
     payload
   );
   return data;

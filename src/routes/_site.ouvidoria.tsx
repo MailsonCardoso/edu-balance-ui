@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Send, Shield, Lock, MessageSquare, CheckCircle, Copy, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -77,6 +77,13 @@ function Ouvidoria() {
           <p className="text-sm text-gray-400 mt-4">
             Guarde este protocolo para acompanhar sua manifestação.
           </p>
+
+          <Link
+            to="/acompanhar"
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
+          >
+            Acompanhar Protocolo
+          </Link>
         </div>
       </div>
     );
@@ -86,7 +93,7 @@ function Ouvidoria() {
     <>
       <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative container-page text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
             Canal Sigiloso
           </div>

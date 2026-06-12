@@ -62,8 +62,9 @@ function GestaoOuvidoria() {
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
   const [selected, setSelected] = useState<OuvidoriaListItem | null>(null);
+  const [inicioModal, setInicioModal] = useState<OuvidoriaListItem | null>(null);
   const [respostaModal, setRespostaModal] = useState<OuvidoriaListItem | null>(null);
-  const [resposta, setResposta] = useState("");
+  const [descricao, setDescricao] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -73,12 +74,13 @@ function GestaoOuvidoria() {
   });
 
   const mutation = useMutation({
-    mutationFn: ({ id, status, resposta }: { id: number; status: "em_andamento" | "respondido"; resposta?: string }) =>
-      atualizarStatus(id, { status, resposta }),
+    mutationFn: ({ id, status, descricao }: { id: number; status: "em_andamento" | "respondido"; descricao?: string }) =>
+      atualizarStatus(id, { status, descricao }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ouvidoria"] });
+      setInicioModal(null);
       setRespostaModal(null);
-      setResposta("");
+      setDescricao("");
       setSelected(null);
     },
   });
@@ -147,7 +149,7 @@ function GestaoOuvidoria() {
               {selected.status === "pendente" && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <button
-                    onClick={() => mutation.mutate({ id: selected.id, status: "em_andamento" })}
+                    onClick={() => setInicioModal(selected)}
                     disabled={mutation.isPending}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
@@ -196,6 +198,13 @@ function GestaoOuvidoria() {
               <h3 className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-4">Mensagem</h3>
               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selected.mensagem}</p>
             </div>
+
+            {selected.descricao && (
+              <div className="bg-white rounded-xl border border-gray-100 p-6">
+                <h3 className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-4">Resposta/Descrição</h3>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{selected.descricao}</p>
+              </div>
+            )}
           </div>
         </div>
       </>
@@ -240,6 +249,7 @@ function GestaoOuvidoria() {
           >
             <option value="">Todos os status</option>
             <option value="pendente">Pendente</option>
+            <option value="em_andamento">Em Andamento</option>
             <option value="respondido">Respondido</option>
           </select>
         </div>
@@ -307,7 +317,7 @@ function GestaoOuvidoria() {
                             </button>
                             {item.status === "pendente" && (
                               <button
-                                onClick={() => mutation.mutate({ id: item.id, status: "em_andamento" })}
+                                onClick={() => setInicioModal(item)}
                                 disabled={mutation.isPending}
                                 className="size-8 rounded-lg border border-blue-200 grid place-items-center text-blue-500 hover:text-blue-700 hover:border-blue-400 transition-colors disabled:opacity-50"
                                 title="Iniciar Atendimento"
@@ -337,6 +347,74 @@ function GestaoOuvidoria() {
         </div>
       </div>
 
+      {inicioModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Iniciar Atendimento</h3>
+              <button
+                onClick={() => {
+                  setInicioModal(null);
+                  setDescricao("");
+                }}
+                className="size-8 rounded-lg grid place-items-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500">Protocolo</p>
+              <p className="text-sm font-mono font-semibold text-gray-900">{inicioModal.protocolo}</p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Mensagem Original</label>
+              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">
+                {inicioModal.mensagem}
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Descrição (opcional)</label>
+              <textarea
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                rows={3}
+                placeholder="Adicione uma observação sobre o atendimento..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary transition-colors resize-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  setInicioModal(null);
+                  setDescricao("");
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  mutation.mutate({
+                    id: inicioModal.id,
+                    status: "em_andamento",
+                    descricao: descricao.trim() || undefined,
+                  });
+                }}
+                disabled={mutation.isPending}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                <Play className="size-4" />
+                {mutation.isPending ? "Iniciando..." : "Iniciar Atendimento"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {respostaModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
@@ -345,7 +423,7 @@ function GestaoOuvidoria() {
               <button
                 onClick={() => {
                   setRespostaModal(null);
-                  setResposta("");
+                  setDescricao("");
                 }}
                 className="size-8 rounded-lg grid place-items-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
               >
@@ -368,8 +446,8 @@ function GestaoOuvidoria() {
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">Sua Resposta *</label>
               <textarea
-                value={resposta}
-                onChange={(e) => setResposta(e.target.value)}
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
                 rows={4}
                 placeholder="Digite a resposta ao cidadão..."
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary transition-colors resize-none"
@@ -380,7 +458,7 @@ function GestaoOuvidoria() {
               <button
                 onClick={() => {
                   setRespostaModal(null);
-                  setResposta("");
+                  setDescricao("");
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
@@ -388,15 +466,15 @@ function GestaoOuvidoria() {
               </button>
               <button
                 onClick={() => {
-                  if (resposta.trim()) {
+                  if (descricao.trim()) {
                     mutation.mutate({
                       id: respostaModal.id,
                       status: "respondido",
-                      resposta: resposta.trim(),
+                      descricao: descricao.trim(),
                     });
                   }
                 }}
-                disabled={!resposta.trim() || mutation.isPending}
+                disabled={!descricao.trim() || mutation.isPending}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
               >
                 <Send className="size-4" />
