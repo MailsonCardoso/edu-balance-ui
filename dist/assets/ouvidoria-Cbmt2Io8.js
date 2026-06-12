@@ -1,0 +1,1 @@
+import{a as i}from"./api-BGPmK0v7.js";async function s(a){const{data:t}=await i.post("/ouvidoria",a);return t}async function r(){const{data:a}=await i.get("/ouvidoria");return a.data}async function c(a,t){const{data:n}=await i.patch(`/ouvidoria/${a}/status`,t);return n}export{c as a,s as e,r as l};

@@ -37,3 +37,19 @@ export async function listarManifestacoes(): Promise<OuvidoriaListItem[]> {
   const { data } = await api.get<{ data: OuvidoriaListItem[] }>("/ouvidoria");
   return data.data;
 }
+
+export interface AtualizarStatusPayload {
+  status: "pendente" | "em_andamento" | "respondido";
+  resposta?: string;
+}
+
+export async function atualizarStatus(
+  id: number,
+  payload: AtualizarStatusPayload
+): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.patch<{ success: boolean; message: string }>(
+    `/ouvidoria/${id}/status`,
+    payload
+  );
+  return data;
+}

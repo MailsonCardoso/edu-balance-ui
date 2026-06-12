@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   MessageCircle,
@@ -9,9 +9,15 @@ import {
   CheckCircle,
   Clock,
   X,
+  Play,
+  Send,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/Primitives";
-import { listarManifestacoes, type OuvidoriaListItem } from "@/lib/api/ouvidoria";
+import {
+  listarManifestacoes,
+  atualizarStatus,
+  type OuvidoriaListItem,
+} from "@/lib/api/ouvidoria";
 
 export const Route = createFileRoute("/gestao-ouvidoria")({
   component: GestaoOuvidoria,
@@ -35,12 +41,20 @@ const tipoColor: Record<string, string> = {
 
 const statusIcon: Record<string, typeof Clock> = {
   pendente: Clock,
+  em_andamento: Play,
   respondido: CheckCircle,
 };
 
 const statusColor: Record<string, string> = {
   pendente: "text-amber-600 bg-amber-50",
+  em_andamento: "text-blue-600 bg-blue-50",
   respondido: "text-emerald-600 bg-emerald-50",
+};
+
+const statusLabel: Record<string, string> = {
+  pendente: "Pendente",
+  em_andamento: "Em Andamento",
+  respondido: "Respondido",
 };
 
 function GestaoOuvidoria() {
@@ -48,10 +62,25 @@ function GestaoOuvidoria() {
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
   const [selected, setSelected] = useState<OuvidoriaListItem | null>(null);
+  const [respostaModal, setRespostaModal] = useState<OuvidoriaListItem | null>(null);
+  const [resposta, setResposta] = useState("");
+
+  const queryClient = useQueryClient();
 
   const { data: manifestacoes = [], isLoading } = useQuery({
     queryKey: ["ouvidoria"],
     queryFn: listarManifestacoes,
+  });
+
+  const mutation = useMutation({
+    mutationFn: ({ id, status, resposta }: { id: number; status: "em_andamento" | "respondido"; resposta?: string }) =>
+      atualizarStatus(id, { status, resposta }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ouvidoria"] });
+      setRespostaModal(null);
+      setResposta("");
+      setSelected(null);
+    },
   });
 
   const filtered = manifestacoes.filter((item) => {
@@ -110,10 +139,36 @@ function GestaoOuvidoria() {
                   <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Status</p>
                   <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${statusCls}`}>
                     <StatusIcon className="size-3" />
-                    {selected.status === "pendente" ? "Pendente" : "Respondido"}
+                    {statusLabel[selected.status] || selected.status}
                   </span>
                 </div>
               </div>
+
+              {selected.status === "pendente" && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() => mutation.mutate({ id: selected.id, status: "em_andamento" })}
+                    disabled={mutation.isPending}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  >
+                    <Play className="size-4" />
+                    Iniciar Atendimento
+                  </button>
+                </div>
+              )}
+
+              {selected.status === "em_andamento" && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() => setRespostaModal(selected)}
+                    disabled={mutation.isPending}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                  >
+                    <Send className="size-4" />
+                    Registrar Resposta
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="bg-white rounded-xl border border-gray-100 p-6">
@@ -239,16 +294,38 @@ function GestaoOuvidoria() {
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${statusCls}`}>
                             <StatusIcon className="size-3" />
-                            {item.status === "pendente" ? "Pendente" : "Respondido"}
+                            {statusLabel[item.status] || item.status}
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => setSelected(item)}
-                            className="size-8 rounded-lg border border-gray-200 grid place-items-center text-gray-400 hover:text-primary hover:border-primary transition-colors"
-                          >
-                            <Eye className="size-4" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => setSelected(item)}
+                              className="size-8 rounded-lg border border-gray-200 grid place-items-center text-gray-400 hover:text-primary hover:border-primary transition-colors"
+                            >
+                              <Eye className="size-4" />
+                            </button>
+                            {item.status === "pendente" && (
+                              <button
+                                onClick={() => mutation.mutate({ id: item.id, status: "em_andamento" })}
+                                disabled={mutation.isPending}
+                                className="size-8 rounded-lg border border-blue-200 grid place-items-center text-blue-500 hover:text-blue-700 hover:border-blue-400 transition-colors disabled:opacity-50"
+                                title="Iniciar Atendimento"
+                              >
+                                <Play className="size-4" />
+                              </button>
+                            )}
+                            {item.status === "em_andamento" && (
+                              <button
+                                onClick={() => setRespostaModal(item)}
+                                disabled={mutation.isPending}
+                                className="size-8 rounded-lg border border-emerald-200 grid place-items-center text-emerald-500 hover:text-emerald-700 hover:border-emerald-400 transition-colors disabled:opacity-50"
+                                title="Registrar Resposta"
+                              >
+                                <Send className="size-4" />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -259,6 +336,76 @@ function GestaoOuvidoria() {
           )}
         </div>
       </div>
+
+      {respostaModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Registrar Resposta</h3>
+              <button
+                onClick={() => {
+                  setRespostaModal(null);
+                  setResposta("");
+                }}
+                className="size-8 rounded-lg grid place-items-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500">Protocolo</p>
+              <p className="text-sm font-mono font-semibold text-gray-900">{respostaModal.protocolo}</p>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Mensagem Original</label>
+              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">
+                {respostaModal.mensagem}
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Sua Resposta *</label>
+              <textarea
+                value={resposta}
+                onChange={(e) => setResposta(e.target.value)}
+                rows={4}
+                placeholder="Digite a resposta ao cidadão..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary transition-colors resize-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  setRespostaModal(null);
+                  setResposta("");
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (resposta.trim()) {
+                    mutation.mutate({
+                      id: respostaModal.id,
+                      status: "respondido",
+                      resposta: resposta.trim(),
+                    });
+                  }
+                }}
+                disabled={!resposta.trim() || mutation.isPending}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              >
+                <Send className="size-4" />
+                {mutation.isPending ? "Enviando..." : "Enviar Resposta"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
