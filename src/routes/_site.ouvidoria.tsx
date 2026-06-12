@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
   Send,
   Shield,
   Lock,
@@ -12,6 +19,7 @@ import {
   Clock,
   Play,
   FileText,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -74,6 +82,7 @@ function Ouvidoria() {
   const [resultado, setResultado] = useState<AcompanharResponse | null>(null);
   const [error, setError] = useState("");
   const [loadingBusca, setLoadingBusca] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -117,6 +126,7 @@ function Ouvidoria() {
     try {
       const data = await acompanharProtocolo(buscaProtocolo.trim());
       setResultado(data);
+      setModalOpen(true);
     } catch {
       setError("Protocolo não encontrado. Verifique o número e tente novamente.");
     } finally {
@@ -131,7 +141,9 @@ function Ouvidoria() {
           <div className="size-16 rounded-full bg-emerald-50 mx-auto grid place-items-center">
             <CheckCircle className="size-8 text-emerald-500" />
           </div>
-          <h2 className="text-2xl font-bold text-[#D62828] mt-6">Manifestação enviada</h2>
+          <h2 className="text-2xl font-bold text-[#D62828] mt-6">
+            Manifestação enviada
+          </h2>
           <p className="text-gray-500 mt-2">
             {anonymous
               ? "Sua manifestação foi registrada de forma anônima."
@@ -143,7 +155,9 @@ function Ouvidoria() {
               Protocolo
             </p>
             <div className="flex items-center justify-center gap-3">
-              <span className="text-2xl font-bold text-[#D62828] font-mono">{protocolo}</span>
+              <span className="text-2xl font-bold text-[#D62828] font-mono">
+                {protocolo}
+              </span>
               <button
                 onClick={copiarProtocolo}
                 className="size-9 rounded-lg border border-gray-200 grid place-items-center text-gray-400 hover:text-[#D62828] hover:border-[#D62828] transition-colors"
@@ -182,7 +196,8 @@ function Ouvidoria() {
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-white">Ouvidoria</h1>
           <p className="mt-3 text-lg text-white/70 max-w-2xl mx-auto">
-            Canal de comunicação direta, sigiloso e seguro para sugestões, elogios, reclamações e denúncias.
+            Canal de comunicação direta, sigiloso e seguro para sugestões,
+            elogios, reclamações e denúncias.
           </p>
         </div>
       </section>
@@ -192,12 +207,16 @@ function Ouvidoria() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-lg font-semibold text-[#D62828] mb-6">Envie sua manifestação</h2>
+                <h2 className="text-lg font-semibold text-[#D62828] mb-6">
+                  Envie sua manifestação
+                </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Nome</label>
+                      <label className="text-sm font-medium text-gray-700">
+                        Nome
+                      </label>
                       <input
                         name="nome"
                         type="text"
@@ -207,7 +226,9 @@ function Ouvidoria() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">E-mail</label>
+                      <label className="text-sm font-medium text-gray-700">
+                        E-mail
+                      </label>
                       <input
                         name="email"
                         type="email"
@@ -219,7 +240,9 @@ function Ouvidoria() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Tipo</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Tipo
+                    </label>
                     <select
                       name="tipo"
                       className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors bg-white"
@@ -235,7 +258,9 @@ function Ouvidoria() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700">Mensagem</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Mensagem
+                    </label>
                     <textarea
                       name="mensagem"
                       rows={5}
@@ -254,8 +279,12 @@ function Ouvidoria() {
                       className="size-4 rounded border-gray-300 text-[#D62828] focus:ring-[#D62828]"
                     />
                     <div>
-                      <span className="text-sm font-medium text-gray-700">Desejo manter anonimato</span>
-                      <p className="text-xs text-gray-400">Seus dados não serão identificados</p>
+                      <span className="text-sm font-medium text-gray-700">
+                        Desejo manter anonimato
+                      </span>
+                      <p className="text-xs text-gray-400">
+                        Seus dados não serão identificados
+                      </p>
                     </div>
                   </label>
 
@@ -278,18 +307,32 @@ function Ouvidoria() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <Lock className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-base font-semibold text-gray-900">Sigilo Garantido</h3>
-                <p className="text-sm text-gray-500 mt-1">Suas informações são protegidas e tratadas com absoluto sigilo.</p>
+                <h3 className="text-base font-semibold text-gray-900">
+                  Sigilo Garantido
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Suas informações são protegidas e tratadas com absoluto
+                  sigilo.
+                </p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <MessageSquare className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-base font-semibold text-gray-900">Canal Direto</h3>
-                <p className="text-sm text-gray-500 mt-1">Sua manifestação chega diretamente à ouvidoria da associação.</p>
+                <h3 className="text-base font-semibold text-gray-900">
+                  Canal Direto
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Sua manifestação chega diretamente à ouvidoria da associação.
+                </p>
               </div>
               <div className="bg-gray-50 rounded-xl border border-gray-100 p-6">
                 <Shield className="size-6 text-[#D62828] mb-3" />
-                <h3 className="text-base font-semibold text-gray-900">Denúncia Anônima</h3>
-                <p className="text-sm text-gray-500 mt-1">Caso prefira, marque a opção anônima e seus dados não serão identificados.</p>
+                <h3 className="text-base font-semibold text-gray-900">
+                  Denúncia Anônima
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Caso prefira, marque a opção anônima e seus dados não serão
+                  identificados.
+                </p>
               </div>
             </div>
           </div>
@@ -309,7 +352,9 @@ function Ouvidoria() {
                 type="text"
                 placeholder="Ex: OUV-2026-0001"
                 value={buscaProtocolo}
-                onChange={(e) => setBuscaProtocolo(e.target.value.toUpperCase())}
+                onChange={(e) =>
+                  setBuscaProtocolo(e.target.value.toUpperCase())
+                }
                 className="flex-1 h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors font-mono"
               />
               <button
@@ -331,76 +376,135 @@ function Ouvidoria() {
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
-
-            {resultado && (
-              <div className="mt-6 space-y-4">
-                <div className="grid sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Protocolo</p>
-                    <p className="text-sm font-mono font-bold text-[#D62828]">{resultado.protocolo}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Data</p>
-                    <p className="text-sm text-gray-900">{resultado.created_at}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Tipo</p>
-                    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${tipoColor[resultado.tipo] || "text-gray-600 bg-gray-50"}`}>
-                      {tipoLabel[resultado.tipo] || resultado.tipo}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">Status</p>
-                    {(() => {
-                      const config = statusConfig[resultado.status] || statusConfig.pendente;
-                      const StatusIcon = config.icon;
-                      return (
-                        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${config.color}`}>
-                          <StatusIcon className="size-3" />
-                          {config.label}
-                        </span>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                {(() => {
-                  const config = statusConfig[resultado.status] || statusConfig.pendente;
-                  return (
-                    <div className="p-4 bg-gray-50 rounded-lg flex items-start gap-3">
-                      <div className={`size-10 rounded-lg grid place-items-center ${config.color}`}>
-                        <config.icon className="size-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-900">{config.label}</h3>
-                        <p className="text-sm text-gray-500 mt-1">{config.description}</p>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-2 flex items-center gap-2">
-                    <FileText className="size-3" />
-                    Sua Mensagem
-                  </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{resultado.mensagem}</p>
-                </div>
-
-                {resultado.descricao && (
-                  <div className="p-4 bg-[#D62828]/5 border border-[#D62828]/10 rounded-lg">
-                    <h3 className="text-xs text-[#D62828] uppercase tracking-wider font-medium mb-2 flex items-center gap-2">
-                      <MessageSquare className="size-3" />
-                      Resposta da Ouvidoria
-                    </h3>
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{resultado.descricao}</p>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </section>
+
+      {/* Modal de Resultado */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {resultado && (
+                <>
+                  <span className="font-mono text-[#D62828]">
+                    {resultado.protocolo}
+                  </span>
+                  {(() => {
+                    const config =
+                      statusConfig[resultado.status] || statusConfig.pendente;
+                    const StatusIcon = config.icon;
+                    return (
+                      <span
+                        className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${config.color}`}
+                      >
+                        <StatusIcon className="size-3" />
+                        {config.label}
+                      </span>
+                    );
+                  })()}
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription>Detalhes da manifestação</DialogDescription>
+          </DialogHeader>
+
+          {resultado && (
+            <div className="space-y-4 mt-2">
+              <div className="grid sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
+                    Protocolo
+                  </p>
+                  <p className="text-sm font-mono font-bold text-[#D62828]">
+                    {resultado.protocolo}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
+                    Data
+                  </p>
+                  <p className="text-sm text-gray-900">
+                    {resultado.created_at}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
+                    Tipo
+                  </p>
+                  <span
+                    className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${tipoColor[resultado.tipo] || "text-gray-600 bg-gray-50"}`}
+                  >
+                    {tipoLabel[resultado.tipo] || resultado.tipo}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-1">
+                    Status
+                  </p>
+                  {(() => {
+                    const config =
+                      statusConfig[resultado.status] || statusConfig.pendente;
+                    const StatusIcon = config.icon;
+                    return (
+                      <span
+                        className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${config.color}`}
+                      >
+                        <StatusIcon className="size-3" />
+                        {config.label}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {(() => {
+                const config =
+                  statusConfig[resultado.status] || statusConfig.pendente;
+                return (
+                  <div className="p-4 bg-gray-50 rounded-lg flex items-start gap-3">
+                    <div
+                      className={`size-10 rounded-lg grid place-items-center ${config.color}`}
+                    >
+                      <config.icon className="size-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900">
+                        {config.label}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {config.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-xs text-gray-400 uppercase tracking-wider font-medium mb-2 flex items-center gap-2">
+                  <FileText className="size-3" />
+                  Sua Mensagem
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {resultado.mensagem}
+                </p>
+              </div>
+
+              {resultado.descricao && (
+                <div className="p-4 bg-[#D62828]/5 border border-[#D62828]/10 rounded-lg">
+                  <h3 className="text-xs text-[#D62828] uppercase tracking-wider font-medium mb-2 flex items-center gap-2">
+                    <MessageSquare className="size-3" />
+                    Resposta da Ouvidoria
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {resultado.descricao}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
