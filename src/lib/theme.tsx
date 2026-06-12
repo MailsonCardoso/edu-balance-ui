@@ -7,81 +7,63 @@ const ThemeContext = createContext<{ theme: Theme; toggle: () => void }>({
   toggle: () => {},
 });
 
-const rubyLight = {
+const navyLight = {
   "--background": "#FFFFFF",
-  "--foreground": "#1A1A1A",
+  "--foreground": "#1A1A2E",
   "--card": "#FFFFFF",
-  "--card-foreground": "#1A1A1A",
+  "--card-foreground": "#1A1A2E",
   "--popover": "#FFFFFF",
-  "--popover-foreground": "#1A1A1A",
-  "--primary": "#D62828",
-  "--primary-foreground": "#FFFFFF",
-  "--secondary": "#C0C0C0",
-  "--secondary-foreground": "#1A1A1A",
-  "--muted": "#F5F5F5",
-  "--muted-foreground": "#737373",
-  "--accent": "#9D0208",
-  "--accent-foreground": "#FFFFFF",
+  "--popover-foreground": "#1A1A2E",
+  "--primary": "#1E3A5F",
+  "--primary-foreground": "#FCFCFD",
+  "--primary-light": "#3B5998",
+  "--secondary": "#F5F5F7",
+  "--secondary-foreground": "#1E3A5F",
+  "--muted": "#F5F5F7",
+  "--muted-foreground": "#6B7280",
+  "--accent": "#F0F0F2",
+  "--accent-foreground": "#1E3A5F",
+  "--gold": "#D4A843",
   "--destructive": "#DC2626",
   "--destructive-foreground": "#FFFFFF",
   "--success": "#16A34A",
-  "--success-foreground": "#FFFFFF",
-  "--warning": "#F59E0B",
-  "--warning-foreground": "#1A1A1A",
+  "--warning": "#D4A843",
   "--info": "#3B82F6",
-  "--info-foreground": "#FFFFFF",
-  "--border": "#E5E5E5",
-  "--input": "#E5E5E5",
-  "--ring": "#D62828",
-  "--sidebar": "#1A1A1A",
-  "--sidebar-foreground": "#E5E5E5",
-  "--sidebar-accent": "#333333",
-  "--sidebar-accent-foreground": "#FFFFFF",
-  "--sidebar-border": "#333333",
+  "--border": "#E5E7EB",
+  "--input": "#E5E7EB",
+  "--ring": "#3B5998",
 };
 
-const rubyDark = {
-  "--background": "#1A0D0D",
-  "--foreground": "#F5F5F5",
-  "--card": "#2D1515",
-  "--card-foreground": "#F5F5F5",
-  "--popover": "#2D1515",
-  "--popover-foreground": "#F5F5F5",
-  "--primary": "#EF4444",
-  "--primary-foreground": "#FFFFFF",
-  "--secondary": "#A0A0A0",
-  "--secondary-foreground": "#1A0D0D",
-  "--muted": "#2D1515",
-  "--muted-foreground": "#A3A3A3",
-  "--accent": "#BA0208",
-  "--accent-foreground": "#FFFFFF",
-  "--destructive": "#F87171",
-  "--destructive-foreground": "#1A0D0D",
-  "--success": "#4ADE80",
-  "--success-foreground": "#1A0D0D",
-  "--warning": "#FBBF24",
-  "--warning-foreground": "#1A0D0D",
-  "--info": "#60A5FA",
-  "--info-foreground": "#1A0D0D",
-  "--border": "#404040",
-  "--input": "#404040",
-  "--ring": "#EF4444",
-  "--sidebar": "#0F0808",
-  "--sidebar-foreground": "#D4D4D4",
-  "--sidebar-accent": "#333333",
-  "--sidebar-accent-foreground": "#FFFFFF",
-  "--sidebar-border": "#404040",
+const navyDark = {
+  "--background": "#0F1724",
+  "--foreground": "#F8FAFC",
+  "--card": "#1A2332",
+  "--card-foreground": "#F8FAFC",
+  "--popover": "#1A2332",
+  "--popover-foreground": "#F8FAFC",
+  "--primary": "#E8ECF1",
+  "--primary-foreground": "#1A2332",
+  "--primary-light": "#5B8BD4",
+  "--secondary": "#1E293B",
+  "--secondary-foreground": "#F8FAFC",
+  "--muted": "#1E293B",
+  "--muted-foreground": "#94A3B8",
+  "--accent": "#1E293B",
+  "--accent-foreground": "#F8FAFC",
+  "--border": "rgba(255, 255, 255, 0.1)",
+  "--input": "rgba(255, 255, 255, 0.15)",
+  "--ring": "#4A7ABF",
 };
 
-function injectRubyStyle() {
-  let el = document.getElementById("theme-ruby");
+function injectNavyStyle() {
+  let el = document.getElementById("theme-navy");
   if (!el) {
     el = document.createElement("style");
-    el.id = "theme-ruby";
+    el.id = "theme-navy";
     document.head.appendChild(el);
   }
-  const light = Object.entries(rubyLight).map(([k, v]) => `${k}: ${v};`).join("\n");
-  const dark = Object.entries(rubyDark).map(([k, v]) => `${k}: ${v};`).join("\n");
+  const light = Object.entries(navyLight).map(([k, v]) => `${k}: ${v};`).join("\n");
+  const dark = Object.entries(navyDark).map(([k, v]) => `${k}: ${v};`).join("\n");
   el.textContent = `:root {\n${light}\n}\n:root.dark {\n${dark}\n}`;
 }
 
@@ -99,7 +81,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
-    injectRubyStyle();
+    injectNavyStyle();
   }, [theme]);
 
   return (
