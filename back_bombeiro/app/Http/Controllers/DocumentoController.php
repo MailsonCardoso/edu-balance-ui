@@ -34,7 +34,7 @@ class DocumentoController extends Controller
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'tipo' => 'required|in:estatuto,transparencia',
-            'arquivo' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:51200',
+            'arquivo' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:10240',
         ]);
 
         if ($validated['tipo'] === 'estatuto') {
@@ -69,7 +69,7 @@ class DocumentoController extends Controller
     {
         $validated = $request->validate([
             'titulo' => 'sometimes|string|max:255',
-            'arquivo' => 'sometimes|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:51200',
+            'arquivo' => 'sometimes|file|mimes:pdf,doc,docx,xls,xlsx,zip|max:10240',
         ]);
 
         if ($request->hasFile('arquivo')) {
