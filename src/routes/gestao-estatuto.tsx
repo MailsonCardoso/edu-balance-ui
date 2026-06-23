@@ -10,7 +10,7 @@ import {
   fetchDocumentos,
   uploadDocumento,
   uploadDocumentoChunked,
-  updateDocumento,
+  deleteDocumento,
 } from "@/lib/api/documentos";
 
 export const Route = createFileRoute("/gestao-estatuto")({
@@ -32,16 +32,25 @@ function GestaoEstatuto() {
 
   const estatuto = documentos[0] ?? null;
 
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const fileField = formData.get("arquivo") as File;
-      const isLarge = fileField?.size > 1.5 * 1024 * 1024;
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!file) throw new Error("Nenhum arquivo selecionado");
+
+      if (estatuto) {
+        await deleteDocumento(estatuto.id);
+      }
+
+      const isLarge = file.size > 1.5 * 1024 * 1024;
       if (isLarge) {
-        return uploadDocumentoChunked(fileField, "Estatuto Social", "estatuto", (current, total) => {
+        return uploadDocumentoChunked(file, "Estatuto Social", "estatuto", (current, total) => {
           setUploadProgress(current);
           setUploadTotal(total);
         });
       }
+      const formData = new FormData();
+      formData.append("titulo", "Estatuto Social");
+      formData.append("tipo", "estatuto");
+      formData.append("arquivo", file);
       return uploadDocumento(formData);
     },
     onSuccess: () => {
@@ -54,32 +63,12 @@ function GestaoEstatuto() {
     onError: () => toast.error("Erro ao enviar estatuto"),
   });
 
-  const replaceMutation = useMutation({
-    mutationFn: ({ id, formData }: { id: number; formData: FormData }) =>
-      updateDocumento(id, formData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["documentos"] });
-      toast.success("Estatuto substituído com sucesso!");
-      setFile(null);
-    },
-    onError: () => toast.error("Erro ao substituir estatuto"),
-  });
-
   function handleSubmit() {
     if (!file) return;
-    const formData = new FormData();
-    formData.append("titulo", "Estatuto Social");
-    formData.append("tipo", "estatuto");
-    formData.append("arquivo", file);
-
-    if (estatuto) {
-      replaceMutation.mutate({ id: estatuto.id, formData });
-    } else {
-      uploadMutation.mutate(formData);
-    }
+    mutation.mutate();
   }
 
-  const isPending = uploadMutation.isPending || replaceMutation.isPending;
+  const isPending = mutation.isPending;
 
   return (
     <div>

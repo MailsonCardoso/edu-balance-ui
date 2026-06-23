@@ -193,8 +193,8 @@ function GestaoDocumentos() {
             )}
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setNewTitulo(""); setNewFile(null); }}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
+            <AlertDialogCancel disabled={uploadMutation.isPending} onClick={() => { setNewTitulo(""); setNewFile(null); }}>Cancelar</AlertDialogCancel>
+            <Button
               disabled={!newTitulo.trim() || !newFile || uploadMutation.isPending}
               onClick={handleUpload}
             >
@@ -204,7 +204,7 @@ function GestaoDocumentos() {
                 <Upload className="size-4" />
               )}
               {uploadMutation.isPending ? " Enviando..." : " Enviar"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
