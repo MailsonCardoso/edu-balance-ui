@@ -190,7 +190,7 @@ function SiteHome() {
                   <h3 className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{item.summary}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{item.summary ?? item.content}</p>
                 </div>
               </div>
             ))}
