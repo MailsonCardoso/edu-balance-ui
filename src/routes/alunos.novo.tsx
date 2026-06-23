@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF } from "@/lib/format";
+import { maskCPF, maskPhone } from "@/lib/format";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 import { createMensalidade } from "@/lib/api/mensalidades";
 
@@ -163,7 +163,16 @@ function NovoAluno() {
               <Input type="date" className="h-10" {...register("dataNascimento")} />
             </Field>
             <Field label="Telefone" error={errors.telefone?.message}>
-              <Input className="h-10" placeholder="(00) 00000-0000" {...register("telefone")} />
+              <Input
+                className="h-10"
+                placeholder="(00) 00000-0000"
+                {...register("telefone")}
+                onChange={(e) => {
+                  const masked = maskPhone(e.target.value);
+                  e.target.value = masked;
+                  setValue("telefone", masked, { shouldValidate: true });
+                }}
+              />
             </Field>
             <Field label="Endereço" error={errors.endereco?.message} className="md:col-span-2">
               <Input className="h-10" {...register("endereco")} />
@@ -190,7 +199,16 @@ function NovoAluno() {
               />
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
-              <Input className="h-10" {...register("telefoneResponsavel")} />
+              <Input
+                className="h-10"
+                placeholder="(00) 00000-0000"
+                {...register("telefoneResponsavel")}
+                onChange={(e) => {
+                  const masked = maskPhone(e.target.value);
+                  e.target.value = masked;
+                  setValue("telefoneResponsavel", masked, { shouldValidate: true });
+                }}
+              />
             </Field>
             <Field label="E-mail do responsável" error={errors.email?.message}>
               <Input type="email" className="h-10" placeholder="usado para login no portal" {...register("email")} />
