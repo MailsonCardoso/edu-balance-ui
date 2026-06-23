@@ -155,7 +155,7 @@ function GestaoDocumentos() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Arquivo (PDF, DOC, XLS, ZIP - máx 10MB)</label>
+              <label className="text-sm font-medium mb-1 block">Arquivo (PDF, DOC, XLS, ZIP - máx 50MB)</label>
               <Input
                 ref={fileRef}
                 type="file"
