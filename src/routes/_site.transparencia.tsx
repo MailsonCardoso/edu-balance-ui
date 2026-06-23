@@ -95,7 +95,18 @@ function Transparencia() {
       </section>
 
       <section className="relative -mt-10 z-10 container-page">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="size-11 rounded-lg bg-emerald-50 grid place-items-center text-emerald-600">
+                <TrendingUp className="size-5" />
+              </div>
+              <div>
+                <p className="text-xl font-bold text-gray-900">{data ? fmt(data.financeiro.receitas_mes) : "—"}</p>
+                <p className="text-sm text-gray-500">Arrecadação do Mês</p>
+              </div>
+            </div>
+          </div>
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="size-11 rounded-lg bg-blue-50 grid place-items-center text-blue-600">
