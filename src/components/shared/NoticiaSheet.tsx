@@ -84,6 +84,25 @@ export function NoticiaSheet({
 
   const [saving, setSaving] = useState(false);
 
+  const resetFields = () => {
+    setTitle(item?.title ?? "");
+    setSummary(item?.summary ?? "");
+    setContent(item?.content ?? "");
+    setCategory(item?.category ?? "");
+    setImage(item?.image ?? "");
+    setAuthor(item?.author ?? "");
+    setStatus(item?.status ?? "publicado");
+  };
+
+  const handleCancel = () => {
+    if (isCreate) {
+      onOpenChange(false);
+    } else {
+      resetFields();
+      setEditing(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!title.trim()) {
       toast.error("O título é obrigatório");
@@ -260,13 +279,7 @@ export function NoticiaSheet({
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                if (isCreate) {
-                  onOpenChange(false);
-                } else {
-                  setEditing(false);
-                }
-              }}
+              onClick={handleCancel}
             >
               <X className="size-4" /> Cancelar
             </Button>

@@ -80,6 +80,8 @@ function GestaoNoticias() {
       queryClient.invalidateQueries({ queryKey: ["noticias"] });
       toast.success("Notícia excluída com sucesso!");
       setDeleteTarget(null);
+      setSheetOpen(false);
+      setEditItem(null);
     },
     onError: () => {
       toast.error("Erro ao excluir notícia");
