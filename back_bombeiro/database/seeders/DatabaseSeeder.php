@@ -10,10 +10,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $categorias = ['Comunicados', 'Eventos', 'Transparência', 'Projetos', 'Homenagens'];
-
-        foreach ($categorias as $name) {
-            Categoria::firstOrCreate(['name' => $name]);
-        }
+        $this->call([
+            CategoriaSeeder::class,
+            NoticiaSeeder::class,
+        ]);
     }
 }
