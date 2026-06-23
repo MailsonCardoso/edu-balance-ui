@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as GestaoOuvidoriaRouteImport } from './routes/gestao-ouvidoria'
 import { Route as GestaoNoticiasRouteImport } from './routes/gestao-noticias'
+import { Route as GestaoInventarioRouteImport } from './routes/gestao-inventario'
 import { Route as GestaoEstatutoRouteImport } from './routes/gestao-estatuto'
 import { Route as GestaoDocumentosRouteImport } from './routes/gestao-documentos'
 import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
@@ -70,6 +71,11 @@ const GestaoOuvidoriaRoute = GestaoOuvidoriaRouteImport.update({
 const GestaoNoticiasRoute = GestaoNoticiasRouteImport.update({
   id: '/gestao-noticias',
   path: '/gestao-noticias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoInventarioRoute = GestaoInventarioRouteImport.update({
+  id: '/gestao-inventario',
+  path: '/gestao-inventario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestaoEstatutoRoute = GestaoEstatutoRouteImport.update({
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -350,6 +362,7 @@ export interface RootRouteChildren {
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
+  GestaoInventarioRoute: typeof GestaoInventarioRoute
   GestaoNoticiasRoute: typeof GestaoNoticiasRoute
   GestaoOuvidoriaRoute: typeof GestaoOuvidoriaRoute
   InadimplentesRoute: typeof InadimplentesRoute
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/gestao-noticias'
       fullPath: '/gestao-noticias'
       preLoaderRoute: typeof GestaoNoticiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-inventario': {
+      id: '/gestao-inventario'
+      path: '/gestao-inventario'
+      fullPath: '/gestao-inventario'
+      preLoaderRoute: typeof GestaoInventarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestao-estatuto': {
@@ -613,6 +633,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,
+  GestaoInventarioRoute: GestaoInventarioRoute,
   GestaoNoticiasRoute: GestaoNoticiasRoute,
   GestaoOuvidoriaRoute: GestaoOuvidoriaRoute,
   InadimplentesRoute: InadimplentesRoute,

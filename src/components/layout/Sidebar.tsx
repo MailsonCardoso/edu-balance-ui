@@ -14,6 +14,7 @@ import {
   Tags,
   FileText,
   ScrollText,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ const nav = [
   { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/perfil", label: "Perfil", icon: UserCircle },
+  { to: "/gestao-inventario", label: "Inventário", icon: Package },
   { to: "/gestao-categorias", label: "Categorias", icon: Tags },
   { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
   { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
