@@ -192,8 +192,9 @@ function Financeiro() {
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
-      await carregar();
-      const updated = data.find((m) => m.id === pagamentoId);
+      const [m] = await Promise.all([fetchMensalidades(), fetchAlunos()]);
+      setData(m);
+      const updated = m.find((x) => x.id === pagamentoId);
       if (updated) setReciboMensalidade(updated);
     } catch {
       toast.error("Erro ao registrar pagamento");
@@ -219,6 +220,25 @@ function Financeiro() {
     if (!phone) return null;
     const msg = encodeURIComponent(
       `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição!\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
+    );
+    return `https://wa.me/55${phone}?text=${msg}`;
+  };
+
+  const whatsAppReciboUrl = (m: Mensalidade) => {
+    const a = alunos.find((x) => x.id === m.alunoId);
+    const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
+    if (!phone) return null;
+    const msg = encodeURIComponent(
+      `✅ *Comprovante de Pagamento*\n\n` +
+      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\n` +
+      `Confirmamos o pagamento da mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} *${m.alunoNome || a?.nome || ""}*.\n\n` +
+      `📅 Mês: ${m.mesReferencia}\n` +
+      `💰 Valor: ${brl(m.valor)}\n` +
+      `📆 Data do pagamento: ${m.dataPagamento ? fmtDate(m.dataPagamento) : "—"}\n` +
+      `💳 Forma: ${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}\n\n` +
+      `Segue em anexo o recibo oficial.\n\n` +
+      `Atenciosamente,\n` +
+      `Associação Bombeiro Paranã`
     );
     return `https://wa.me/55${phone}?text=${msg}`;
   };
@@ -662,9 +682,21 @@ function Financeiro() {
               Fechar
             </Button>
             {reciboMensalidade && (
-              <Button onClick={() => gerarPdf(reciboMensalidade)}>
-                <Printer className="size-4" /> Baixar PDF
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const url = whatsAppReciboUrl(reciboMensalidade);
+                    if (url) window.open(url, "_blank");
+                    else toast.error("Telefone não encontrado para este aluno");
+                  }}
+                >
+                  <MessageCircle className="size-4" /> Enviar WhatsApp
+                </Button>
+                <Button onClick={() => gerarPdf(reciboMensalidade)}>
+                  <Printer className="size-4" /> Baixar PDF
+                </Button>
+              </>
             )}
           </AlertDialogFooter>
         </AlertDialogContent>
