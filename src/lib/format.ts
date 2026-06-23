@@ -24,10 +24,11 @@ export const maskDate = (value: string) => {
 
 export const maskPhone = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 11);
-  return digits
-    .replace(/(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2")
-    .replace(/-(\d{4})\d*$/, "-$1");
+  if (digits.length <= 2) return digits;
+  const ddd = digits.slice(0, 2);
+  const rest = digits.slice(2);
+  if (digits.length <= 7) return `(${ddd}) ${rest}`;
+  return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
 };
 
 export const maskCurrency = (value: string): string => {
