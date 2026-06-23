@@ -16,6 +16,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as GestaoOuvidoriaRouteImport } from './routes/gestao-ouvidoria'
 import { Route as GestaoNoticiasRouteImport } from './routes/gestao-noticias'
+import { Route as GestaoEstatutoRouteImport } from './routes/gestao-estatuto'
+import { Route as GestaoDocumentosRouteImport } from './routes/gestao-documentos'
 import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -68,6 +70,16 @@ const GestaoOuvidoriaRoute = GestaoOuvidoriaRouteImport.update({
 const GestaoNoticiasRoute = GestaoNoticiasRouteImport.update({
   id: '/gestao-noticias',
   path: '/gestao-noticias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoEstatutoRoute = GestaoEstatutoRouteImport.update({
+  id: '/gestao-estatuto',
+  path: '/gestao-estatuto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoDocumentosRoute = GestaoDocumentosRouteImport.update({
+  id: '/gestao-documentos',
+  path: '/gestao-documentos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestaoCategoriasRoute = GestaoCategoriasRouteImport.update({
@@ -166,6 +178,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
+  '/gestao-documentos': typeof GestaoDocumentosRoute
+  '/gestao-estatuto': typeof GestaoEstatutoRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -190,6 +204,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
+  '/gestao-documentos': typeof GestaoDocumentosRoute
+  '/gestao-estatuto': typeof GestaoEstatutoRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -217,6 +233,8 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
+  '/gestao-documentos': typeof GestaoDocumentosRoute
+  '/gestao-estatuto': typeof GestaoEstatutoRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -246,6 +264,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/gestao-categorias'
+    | '/gestao-documentos'
+    | '/gestao-estatuto'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -270,6 +290,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/gestao-categorias'
+    | '/gestao-documentos'
+    | '/gestao-estatuto'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -296,6 +318,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/gestao-categorias'
+    | '/gestao-documentos'
+    | '/gestao-estatuto'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -324,6 +348,8 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FinanceiroRoute: typeof FinanceiroRoute
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
+  GestaoDocumentosRoute: typeof GestaoDocumentosRoute
+  GestaoEstatutoRoute: typeof GestaoEstatutoRoute
   GestaoNoticiasRoute: typeof GestaoNoticiasRoute
   GestaoOuvidoriaRoute: typeof GestaoOuvidoriaRoute
   InadimplentesRoute: typeof InadimplentesRoute
@@ -383,6 +409,20 @@ declare module '@tanstack/react-router' {
       path: '/gestao-noticias'
       fullPath: '/gestao-noticias'
       preLoaderRoute: typeof GestaoNoticiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-estatuto': {
+      id: '/gestao-estatuto'
+      path: '/gestao-estatuto'
+      fullPath: '/gestao-estatuto'
+      preLoaderRoute: typeof GestaoEstatutoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-documentos': {
+      id: '/gestao-documentos'
+      path: '/gestao-documentos'
+      fullPath: '/gestao-documentos'
+      preLoaderRoute: typeof GestaoDocumentosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestao-categorias': {
@@ -571,6 +611,8 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FinanceiroRoute: FinanceiroRoute,
   GestaoCategoriasRoute: GestaoCategoriasRoute,
+  GestaoDocumentosRoute: GestaoDocumentosRoute,
+  GestaoEstatutoRoute: GestaoEstatutoRoute,
   GestaoNoticiasRoute: GestaoNoticiasRoute,
   GestaoOuvidoriaRoute: GestaoOuvidoriaRoute,
   InadimplentesRoute: InadimplentesRoute,

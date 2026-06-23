@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, Target, Eye, Heart, GraduationCap, Shield, Handshake, Users, BookOpen, Palette, Trophy, Leaf, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Download, Target, Eye, Heart, GraduationCap, Shield, Handshake, Users, BookOpen, Palette, Trophy, Leaf, User, Loader2 } from "lucide-react";
+import { fetchDocumentos } from "@/lib/api/documentos";
 
 export const Route = createFileRoute("/_site/institucional")({
   component: Institucional,
@@ -30,6 +32,14 @@ const management = [
 ];
 
 function Institucional() {
+  const { data: documentos = [], isLoading } = useQuery({
+    queryKey: ["documentos", "estatuto"],
+    queryFn: () => fetchDocumentos("estatuto"),
+    staleTime: 60000,
+  });
+
+  const estatuto = documentos[0] ?? null;
+
   return (
     <>
       <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
@@ -215,9 +225,22 @@ function Institucional() {
           <p className="mt-3 text-white/70 max-w-xl mx-auto">
             Faça o download do estatuto social da APA CMCB XII para consultar nossas normas e regulamentos.
           </p>
-          <button className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium hover:bg-white/90 transition-colors mt-8">
-            <Download className="size-4" /> Baixar Estatuto (PDF)
-          </button>
+          {isLoading ? (
+            <div className="mt-8 flex justify-center">
+              <Loader2 className="size-6 animate-spin text-white/70" />
+            </div>
+          ) : estatuto ? (
+            <a
+              href={estatuto.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 h-12 px-8 rounded-lg bg-white text-[#D62828] border border-white/40 font-medium hover:bg-white/90 transition-colors mt-8"
+            >
+              <Download className="size-4" /> Baixar Estatuto (PDF)
+            </a>
+          ) : (
+            <p className="text-white/50 text-sm mt-8">Estatuto indisponível no momento.</p>
+          )}
         </div>
       </section>
     </>

@@ -12,6 +12,8 @@ import {
   MessageCircle,
   Newspaper,
   Tags,
+  FileText,
+  ScrollText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,8 @@ const nav = [
   { to: "/gestao-categorias", label: "Categorias", icon: Tags },
   { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
   { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
+  { to: "/gestao-documentos", label: "Documentos", icon: FileText },
+  { to: "/gestao-estatuto", label: "Estatuto", icon: ScrollText },
 ] as const;
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
