@@ -102,6 +102,7 @@ class NoticiaController extends Controller
                 'id' => $item->id,
                 'title' => $item->title,
                 'summary' => $item->summary,
+                'content' => $item->content,
                 'category' => $item->category,
                 'image' => $item->image,
                 'published_at' => $item->published_at->format('d/m/Y'),

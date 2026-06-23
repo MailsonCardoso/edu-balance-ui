@@ -9,6 +9,12 @@ import {
   FileText,
 } from "lucide-react";
 import { fetchNoticiasPublicas } from "@/lib/api/noticias";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_site/")({
   component: SiteHome,
@@ -69,6 +75,7 @@ const fallbackNews = [
 
 function SiteHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedNews, setSelectedNews] = useState<typeof fallbackNews[0] | null>(null);
 
   const { data: apiNews } = useQuery({
     queryKey: ["noticias-publicas"],
@@ -165,7 +172,11 @@ function SiteHome() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {news.map((item) => (
-              <div key={item.title} className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+              <div
+                key={item.title}
+                onClick={() => setSelectedNews(item)}
+                className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+              >
                 <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center">
                   <FileText className="size-10 text-[#D62828]/20" />
                 </div>
@@ -220,6 +231,36 @@ function SiteHome() {
           </div>
         </div>
       </section>
+
+      <Dialog open={!!selectedNews} onOpenChange={(open) => { if (!open) setSelectedNews(null); }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          {selectedNews && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl leading-snug">
+                  {selectedNews.title}
+                </DialogTitle>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
+                    {selectedNews.category}
+                  </span>
+                  <span className="text-sm text-gray-400">{selectedNews.published_at}</span>
+                </div>
+              </DialogHeader>
+
+              {"content" in selectedNews && selectedNews.content ? (
+                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                  {selectedNews.content}
+                </div>
+              ) : selectedNews.summary ? (
+                <div className="text-sm text-gray-700 leading-relaxed">
+                  {selectedNews.summary}
+                </div>
+              ) : null}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
