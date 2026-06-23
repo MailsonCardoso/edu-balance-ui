@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingUp, TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown, Users, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getTransparencia } from "@/lib/api/transparencia";
 import { fetchDocumentos } from "@/lib/api/documentos";
 
@@ -52,8 +52,11 @@ const management = [
   { name: "Ana Costa", role: "Tesoureira", desc: "Responsável pela gestão financeira, contas e prestação de contas." },
 ];
 
+const PER_PAGE = 6;
+
 function Transparencia() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
   const { data, isLoading } = useQuery({
     queryKey: ["transparencia"],
     queryFn: getTransparencia,
@@ -67,6 +70,14 @@ function Transparencia() {
   });
 
   const documents = apiDocuments.length > 0 ? apiDocuments : hardcodedDocuments;
+  const totalPages = Math.ceil(documents.length / PER_PAGE);
+  const paged = documents.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  useEffect(() => { setPage(1); }, [documents.length]);
+
+  function goTo(p: number) {
+    if (p >= 1 && p <= totalPages) setPage(p);
+  }
 
   return (
     <>
@@ -189,7 +200,7 @@ function Transparencia() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {documents.map((doc, i) => {
+                  {paged.map((doc, i) => {
                     const isReal = "url" in doc;
                     return (
                       <div key={isReal ? (doc as any).id : i} className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
@@ -217,6 +228,37 @@ function Transparencia() {
                       </div>
                     );
                   })}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-1 pt-3">
+                      <button
+                        onClick={() => goTo(page - 1)}
+                        disabled={page === 1}
+                        className="size-8 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      >
+                        ‹
+                      </button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => goTo(p)}
+                          className={`size-8 rounded-lg text-sm font-medium transition-colors ${
+                            p === page
+                              ? "bg-[#D62828] text-white"
+                              : "text-gray-500 hover:bg-gray-100"
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => goTo(page + 1)}
+                        disabled={page === totalPages}
+                        className="size-8 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                      >
+                        ›
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
