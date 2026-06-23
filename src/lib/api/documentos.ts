@@ -16,16 +16,12 @@ export async function fetchDocumentos(tipo?: string): Promise<Documento[]> {
 }
 
 export async function uploadDocumento(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const { data } = await api.post("/documentos", formData, {
-    headers: { "Content-Type": undefined },
-  });
+  const { data } = await api.post("/documentos", formData);
   return data;
 }
 
 export async function updateDocumento(id: number, formData: FormData): Promise<{ success: boolean; message: string }> {
-  const { data } = await api.post(`/documentos/${id}`, formData, {
-    headers: { "Content-Type": undefined },
-  });
+  const { data } = await api.post(`/documentos/${id}`, formData);
   return data;
 }
 
