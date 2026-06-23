@@ -118,22 +118,22 @@ export function NoticiaSheet({
       if (isCreate) {
         await createNoticia({
           title: title.trim(),
-          summary: summary.trim() || undefined,
-          content: content.trim() || undefined,
+          summary: summary.trim() || null,
+          content: content.trim() || null,
           category,
-          image: image.trim() || undefined,
-          author: author.trim() || undefined,
+          image: image.trim() || null,
+          author: author.trim() || null,
           status,
         });
         toast.success("Notícia criada com sucesso!");
       } else {
         await updateNoticia(item.id, {
           title: title.trim(),
-          summary: summary.trim() || undefined,
-          content: content.trim() || undefined,
+          summary: summary.trim() || null,
+          content: content.trim() || null,
           category,
-          image: image.trim() || undefined,
-          author: author.trim() || undefined,
+          image: image.trim() || null,
+          author: author.trim() || null,
           status,
         });
         toast.success("Notícia atualizada com sucesso!");

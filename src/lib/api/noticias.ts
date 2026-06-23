@@ -15,11 +15,11 @@ export interface Noticia {
 
 export interface NoticiaPayload {
   title: string;
-  summary?: string;
-  content?: string;
+  summary?: string | null;
+  content?: string | null;
   category: string;
-  image?: string;
-  author?: string;
+  image?: string | null;
+  author?: string | null;
   status?: string;
   published_at?: string;
 }
