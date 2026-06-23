@@ -177,6 +177,20 @@ function GestaoDocumentos() {
                 onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
               />
             </div>
+            {uploadMutation.isPending && uploadTotal > 0 && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>Enviando partes...</span>
+                  <span>{uploadProgress}/{uploadTotal}</span>
+                </div>
+                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-300"
+                    style={{ width: `${(uploadProgress / uploadTotal) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => { setNewTitulo(""); setNewFile(null); }}>Cancelar</AlertDialogCancel>
