@@ -201,17 +201,15 @@ function Noticias() {
                 </div>
               </DialogHeader>
 
-              {selectedNews.content && (
+              {"content" in selectedNews && selectedNews.content ? (
                 <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                   {selectedNews.content}
                 </div>
-              )}
-
-              {!selectedNews.content && selectedNews.summary && (
+              ) : selectedNews.summary ? (
                 <div className="text-sm text-gray-700 leading-relaxed">
                   {selectedNews.summary}
                 </div>
-              )}
+              ) : null}
             </>
           )}
         </DialogContent>
