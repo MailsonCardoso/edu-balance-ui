@@ -1,14 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchNoticiasPublicas } from "@/lib/api/noticias";
+import { fetchCategorias } from "@/lib/api/categorias";
 
 export const Route = createFileRoute("/_site/noticias")({
   component: Noticias,
 });
-
-const categories = ["Todas", "Comunicados", "Eventos", "Transparência", "Projetos", "Homenagens"];
 
 const fallbackNews = [
   { title: "Nova diretoria toma posse e inicia processo de regularização", summary: "A nova gestão da APA CMCB XII iniciou os trabalhos com foco em transparência, reconstrução institucional e regularização documental de todos os processos.", published_at: "10 Jun 2026", category: "Comunicados", image: null },
@@ -37,6 +36,17 @@ function Noticias() {
     queryFn: fetchNoticiasPublicas,
     staleTime: 60000,
   });
+
+  const { data: categorias = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: fetchCategorias,
+    staleTime: 60000,
+  });
+
+  const categories = useMemo(
+    () => ["Todas", ...categorias.map((c) => c.name)],
+    [categorias],
+  );
 
   const allNews = apiNews && apiNews.length > 0 ? apiNews : fallbackNews;
 

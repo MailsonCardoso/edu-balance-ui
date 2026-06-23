@@ -13,6 +13,8 @@ Route::post('/responsavel/login', [ResponsavelController::class, 'login']);
 Route::get('/noticias/publicas', [App\Http\Controllers\NoticiaController::class, 'publicas']);
 Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
 
+Route::apiResource('categorias', App\Http\Controllers\CategoriaController::class)->except(['show']);
+
 Route::get('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'index']);
 Route::post('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'store']);
 Route::get('/ouvidoria/{protocolo}', [App\Http\Controllers\OuvidoriaController::class, 'show']);

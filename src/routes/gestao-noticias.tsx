@@ -37,18 +37,11 @@ import {
   deleteNoticia,
   type Noticia,
 } from "@/lib/api/noticias";
+import { fetchCategorias } from "@/lib/api/categorias";
 
 export const Route = createFileRoute("/gestao-noticias")({
   component: GestaoNoticias,
 });
-
-const categories = [
-  "Comunicados",
-  "Eventos",
-  "Transparência",
-  "Projetos",
-  "Homenagens",
-];
 
 const statusColor: Record<string, string> = {
   publicado: "text-emerald-600 bg-emerald-50",
@@ -73,6 +66,12 @@ function GestaoNoticias() {
   const { data: noticias = [], isLoading } = useQuery({
     queryKey: ["noticias"],
     queryFn: fetchNoticias,
+  });
+
+  const { data: categorias = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: fetchCategorias,
+    staleTime: 60000,
   });
 
   const deleteMutation = useMutation({
@@ -144,9 +143,9 @@ function GestaoNoticias() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas categorias</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
+              {categorias.map((cat) => (
+                <SelectItem key={cat.id} value={cat.name}>
+                  {cat.name}
                 </SelectItem>
               ))}
             </SelectContent>

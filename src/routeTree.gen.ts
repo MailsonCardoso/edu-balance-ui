@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as GestaoOuvidoriaRouteImport } from './routes/gestao-ouvidoria'
 import { Route as GestaoNoticiasRouteImport } from './routes/gestao-noticias'
+import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlunosRouteImport } from './routes/alunos'
@@ -67,6 +68,11 @@ const GestaoOuvidoriaRoute = GestaoOuvidoriaRouteImport.update({
 const GestaoNoticiasRoute = GestaoNoticiasRouteImport.update({
   id: '/gestao-noticias',
   path: '/gestao-noticias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoCategoriasRoute = GestaoCategoriasRouteImport.update({
+  id: '/gestao-categorias',
+  path: '/gestao-categorias',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceiroRoute = FinanceiroRouteImport.update({
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRoute
+  '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
   '/inadimplentes': typeof InadimplentesRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-categorias'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
   to:
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-categorias'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-categorias'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
     | '/inadimplentes'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   AlunosRoute: typeof AlunosRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   FinanceiroRoute: typeof FinanceiroRoute
+  GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoNoticiasRoute: typeof GestaoNoticiasRoute
   GestaoOuvidoriaRoute: typeof GestaoOuvidoriaRoute
   InadimplentesRoute: typeof InadimplentesRoute
@@ -370,6 +383,13 @@ declare module '@tanstack/react-router' {
       path: '/gestao-noticias'
       fullPath: '/gestao-noticias'
       preLoaderRoute: typeof GestaoNoticiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-categorias': {
+      id: '/gestao-categorias'
+      path: '/gestao-categorias'
+      fullPath: '/gestao-categorias'
+      preLoaderRoute: typeof GestaoCategoriasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financeiro': {
@@ -550,6 +570,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlunosRoute: AlunosRouteWithChildren,
   DashboardRoute: DashboardRoute,
   FinanceiroRoute: FinanceiroRoute,
+  GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoNoticiasRoute: GestaoNoticiasRoute,
   GestaoOuvidoriaRoute: GestaoOuvidoriaRoute,
   InadimplentesRoute: InadimplentesRoute,

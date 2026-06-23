@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Pencil, Save, X } from "lucide-react";
 import {
   Sheet,
@@ -23,14 +24,7 @@ import {
   updateNoticia,
   type Noticia,
 } from "@/lib/api/noticias";
-
-const categories = [
-  "Comunicados",
-  "Eventos",
-  "Transparência",
-  "Projetos",
-  "Homenagens",
-];
+import { fetchCategorias } from "@/lib/api/categorias";
 
 const viewCls =
   "w-full min-h-10 px-3 py-2.5 rounded-md bg-muted/30 border border-border text-sm text-foreground flex items-center";
@@ -82,6 +76,12 @@ export function NoticiaSheet({
   const [image, setImage] = useState(item?.image ?? "");
   const [author, setAuthor] = useState(item?.author ?? "");
   const [status, setStatus] = useState(item?.status ?? "publicado");
+  const { data: categorias = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: fetchCategorias,
+    staleTime: 60000,
+  });
+
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -197,9 +197,9 @@ export function NoticiaSheet({
                     <SelectValue placeholder="Selecione..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                    {categorias.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.name}>
+                        {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
