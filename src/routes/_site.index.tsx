@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { ArrowRight, Users, DollarSign, FolderOpen, FileText, CheckCircle, AlertTriangle, Building2, Target, Eye, Heart, GraduationCap, Shield, Handshake } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  Users,
+  DollarSign,
+  FolderOpen,
+  FileText,
+} from "lucide-react";
+import { fetchNoticiasPublicas } from "@/lib/api/noticias";
 
 export const Route = createFileRoute("/_site/")({
   component: SiteHome,
@@ -28,32 +36,32 @@ const indicators = [
   { icon: FileText, label: "Prestações de Contas", value: "12", color: "text-purple-600" },
 ];
 
-const news = [
+const fallbackNews = [
   {
     title: "Nova diretoria toma posse e inicia processo de regularização",
     summary: "A nova gestão da APA CMCB XII iniciou os trabalhos com foco em transparência, reconstrução institucional e regularização documental.",
-    date: "10 Jun 2026",
+    published_at: "10 Jun 2026",
     image: null,
     category: "Comunicados",
   },
   {
     title: "Prestação de contas do primeiro trimestre disponível",
     summary: "Balancete referente ao período de janeiro a março já está disponível no Portal da Transparência para consulta dos associados.",
-    date: "05 Jun 2026",
+    published_at: "05 Jun 2026",
     image: null,
     category: "Transparência",
   },
   {
     title: "Assembleia Geral convocada para o dia 30 de julho",
     summary: "Edital de convocação foi publicado. Pauta inclui eleição da diretoria definitiva e aprovação do estatuto.",
-    date: "01 Jun 2026",
+    published_at: "01 Jun 2026",
     image: null,
     category: "Eventos",
-    },
+  },
   {
     title: "Campanha de regularização de associados",
     summary: "Associados com contribuições pendentes podem regularizar sua situação com condições especiais até o fim do mês.",
-    date: "28 Mai 2026",
+    published_at: "28 Mai 2026",
     image: null,
     category: "Comunicados",
   },
@@ -61,6 +69,14 @@ const news = [
 
 function SiteHome() {
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const { data: apiNews } = useQuery({
+    queryKey: ["noticias-publicas"],
+    queryFn: fetchNoticiasPublicas,
+    staleTime: 60000,
+  });
+
+  const news = apiNews && apiNews.length > 0 ? apiNews.slice(0, 4) : fallbackNews;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -74,7 +90,7 @@ function SiteHome() {
       <section className="relative bg-[#D62828] min-h-[80vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#D62828] via-[#D62828]/95 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 w-full">
+        <div className="relative container-page py-20 lg:py-32 w-full">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
               <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -114,7 +130,7 @@ function SiteHome() {
         </div>
       </section>
 
-      <section className="relative -mt-10 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative -mt-10 z-10 container-page">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {indicators.map((item) => (
             <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
@@ -133,7 +149,7 @@ function SiteHome() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="flex items-center justify-between mb-10">
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Últimas Notícias</h2>
@@ -158,7 +174,7 @@ function SiteHome() {
                     <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
                       {item.category}
                     </span>
-                    <span className="text-sm text-gray-400">{item.date}</span>
+                    <span className="text-sm text-gray-400">{item.published_at}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                     {item.title}

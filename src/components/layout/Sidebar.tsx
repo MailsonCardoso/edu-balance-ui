@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   LogOut,
   MessageCircle,
+  Newspaper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const nav = [
   { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/perfil", label: "Perfil", icon: UserCircle },
+  { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
   { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
 ] as const;
 

@@ -34,7 +34,7 @@ function Institucional() {
     <>
       <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative container-page text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
             Institucional
           </div>
@@ -46,7 +46,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="max-w-3xl">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossa História</h2>
             <p className="mt-4 text-gray-600 leading-relaxed">
@@ -64,7 +64,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828] mb-8">Um Novo Capítulo</h2>
@@ -112,7 +112,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossos Valores</h2>
           </div>
@@ -131,7 +131,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">O que fazemos</h2>
           </div>
@@ -150,7 +150,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Diretoria Provisória</h2>
             <p className="text-gray-500 mt-1">Mandato de 90 dias para regularização e eleições diretas</p>
@@ -176,7 +176,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Conselho Fiscal</h2>
           </div>
@@ -194,7 +194,7 @@ function Institucional() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-10">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Parceiros</h2>
           </div>

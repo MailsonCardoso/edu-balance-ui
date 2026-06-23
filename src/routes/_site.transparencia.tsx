@@ -63,7 +63,7 @@ function Transparencia() {
     <>
       <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative container-page text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
             Transparência
           </div>
@@ -74,7 +74,7 @@ function Transparencia() {
         </div>
       </section>
 
-      <section className="relative -mt-10 z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative -mt-10 z-10 container-page">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ function Transparencia() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
               <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.total_pago) : "—"}</p>
@@ -196,7 +196,7 @@ function Transparencia() {
       </section>
 
       <section className="py-12 lg:py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Gestão Atual</h2>
             <p className="text-gray-500 mt-1">Diretoria Provisória — Mandato de 90 dias para regularização</p>

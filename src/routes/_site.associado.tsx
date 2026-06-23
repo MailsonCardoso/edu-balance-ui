@@ -31,7 +31,7 @@ function Associado() {
     <>
       <section className="relative bg-[#D62828] py-12 lg:py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative container-page text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
             Associados
           </div>
@@ -43,7 +43,7 @@ function Associado() {
       </section>
 
       <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container-page">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-start">
             <div>
               <div className="flex rounded-lg border border-gray-200 p-1 mb-8">

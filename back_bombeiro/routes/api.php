@@ -10,6 +10,9 @@ Route::apiResource('alunos', AlunoController::class);
 Route::post('/mensalidades/verificar-vencidas', [MensalidadeController::class, 'verificarVencidas']);
 Route::apiResource('mensalidades', MensalidadeController::class);
 Route::post('/responsavel/login', [ResponsavelController::class, 'login']);
+Route::get('/noticias/publicas', [App\Http\Controllers\NoticiaController::class, 'publicas']);
+Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
+
 Route::get('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'index']);
 Route::post('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'store']);
 Route::get('/ouvidoria/{protocolo}', [App\Http\Controllers\OuvidoriaController::class, 'show']);

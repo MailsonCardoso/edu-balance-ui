@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Search, FileText, ChevronLeft, ChevronRight } from "lucide-react";
+import { fetchNoticiasPublicas } from "@/lib/api/noticias";
 
 export const Route = createFileRoute("/_site/noticias")({
   component: Noticias,
@@ -8,19 +10,19 @@ export const Route = createFileRoute("/_site/noticias")({
 
 const categories = ["Todas", "Comunicados", "Eventos", "Transparência", "Projetos", "Homenagens"];
 
-const allNews = [
-  { title: "Nova diretoria toma posse e inicia processo de regularização", summary: "A nova gestão da APA CMCB XII iniciou os trabalhos com foco em transparência, reconstrução institucional e regularização documental de todos os processos.", date: "10 Jun 2026", category: "Comunicados", image: null },
-  { title: "Prestação de contas do primeiro trimestre disponível", summary: "Balancete referente ao período de janeiro a março já está disponível no Portal da Transparência para consulta e download dos associados.", date: "05 Jun 2026", category: "Transparência", image: null },
-  { title: "Assembleia Geral convocada para o dia 30 de julho", summary: "Edital de convocação foi publicado com antecedência. Pauta inclui eleição da diretoria definitiva e aprovação do novo estatuto.", date: "01 Jun 2026", category: "Eventos", image: null },
-  { title: "Campanha de regularização de associados", summary: "Associados com pendências podem regularizar sua situação com condições especiais até o fim do mês. Procure a secretaria da APA.", date: "28 Mai 2026", category: "Comunicados", image: null },
-  { title: "Projeto de apoio pedagógico é aprovado", summary: "Novo projeto de reforço escolar será implementado a partir do segundo semestre, beneficiando alunos com dificuldades de aprendizagem.", date: "20 Mai 2026", category: "Projetos", image: null },
-  { title: "Homenagem aos professores pelo seu dia", summary: "A APA presta homenagem a todos os professores pelo seu dia, reconhecendo o trabalho essencial na formação dos nossos alunos.", date: "15 Mai 2026", category: "Homenagens", image: null },
-  { title: "Oficina de música abre inscrições", summary: "Estão abertas as inscrições para a oficina de música da APA. Vagas limitadas para alunos do 6º ao 9º ano.", date: "10 Mai 2026", category: "Projetos", image: null },
-  { title: "Resultados da pesquisa de satisfação", summary: "Pesquisa realizada com os associados aponta alto grau de satisfação com as novas medidas de transparência adotadas pela gestão.", date: "05 Mai 2026", category: "Comunicados", image: null },
-  { title: "Festival de talentos da APA", summary: "Inscrições abertas para o festival de talentos. Alunos podem se inscrever nas categorias música, dança, teatro e artes visuais.", date: "28 Abr 2026", category: "Eventos", image: null },
-  { title: "Parceria com universidade local", summary: "Nova parceria firmada com universidade local para oferecer estágios e projetos de extensão aos alunos do CMCB XII.", date: "20 Abr 2026", category: "Projetos", image: null },
-  { title: "Relatório de auditoria é concluído", summary: "Auditoria independente concluiu os trabalhos. Relatório completo está disponível para consulta dos associados.", date: "15 Abr 2026", category: "Transparência", image: null },
-  { title: "Doação de livros para biblioteca", summary: "Campanha de doação de livros arrecadou mais de 200 exemplares que serão incorporados ao acervo da biblioteca escolar.", date: "10 Abr 2026", category: "Projetos", image: null },
+const fallbackNews = [
+  { title: "Nova diretoria toma posse e inicia processo de regularização", summary: "A nova gestão da APA CMCB XII iniciou os trabalhos com foco em transparência, reconstrução institucional e regularização documental de todos os processos.", published_at: "10 Jun 2026", category: "Comunicados", image: null },
+  { title: "Prestação de contas do primeiro trimestre disponível", summary: "Balancete referente ao período de janeiro a março já está disponível no Portal da Transparência para consulta e download dos associados.", published_at: "05 Jun 2026", category: "Transparência", image: null },
+  { title: "Assembleia Geral convocada para o dia 30 de julho", summary: "Edital de convocação foi publicado com antecedência. Pauta inclui eleição da diretoria definitiva e aprovação do novo estatuto.", published_at: "01 Jun 2026", category: "Eventos", image: null },
+  { title: "Campanha de regularização de associados", summary: "Associados com pendências podem regularizar sua situação com condições especiais até o fim do mês. Procure a secretaria da APA.", published_at: "28 Mai 2026", category: "Comunicados", image: null },
+  { title: "Projeto de apoio pedagógico é aprovado", summary: "Novo projeto de reforço escolar será implementado a partir do segundo semestre, beneficiando alunos com dificuldades de aprendizagem.", published_at: "20 Mai 2026", category: "Projetos", image: null },
+  { title: "Homenagem aos professores pelo seu dia", summary: "A APA presta homenagem a todos os professores pelo seu dia, reconhecendo o trabalho essencial na formação dos nossos alunos.", published_at: "15 Mai 2026", category: "Homenagens", image: null },
+  { title: "Oficina de música abre inscrições", summary: "Estão abertas as inscrições para a oficina de música da APA. Vagas limitadas para alunos do 6º ao 9º ano.", published_at: "10 Mai 2026", category: "Projetos", image: null },
+  { title: "Resultados da pesquisa de satisfação", summary: "Pesquisa realizada com os associados aponta alto grau de satisfação com as novas medidas de transparência adotadas pela gestão.", published_at: "05 Mai 2026", category: "Comunicados", image: null },
+  { title: "Festival de talentos da APA", summary: "Inscrições abertas para o festival de talentos. Alunos podem se inscrever nas categorias música, dança, teatro e artes visuais.", published_at: "28 Abr 2026", category: "Eventos", image: null },
+  { title: "Parceria com universidade local", summary: "Nova parceria firmada com universidade local para oferecer estágios e projetos de extensão aos alunos do CMCB XII.", published_at: "20 Abr 2026", category: "Projetos", image: null },
+  { title: "Relatório de auditoria é concluído", summary: "Auditoria independente concluiu os trabalhos. Relatório completo está disponível para consulta dos associados.", published_at: "15 Abr 2026", category: "Transparência", image: null },
+  { title: "Doação de livros para biblioteca", summary: "Campanha de doação de livros arrecadou mais de 200 exemplares que serão incorporados ao acervo da biblioteca escolar.", published_at: "10 Abr 2026", category: "Projetos", image: null },
 ];
 
 const ITEMS_PER_PAGE = 6;
@@ -30,9 +32,17 @@ function Noticias() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  const { data: apiNews } = useQuery({
+    queryKey: ["noticias-publicas"],
+    queryFn: fetchNoticiasPublicas,
+    staleTime: 60000,
+  });
+
+  const allNews = apiNews && apiNews.length > 0 ? apiNews : fallbackNews;
+
   const filtered = allNews.filter((n) => {
     const matchCategory = activeCategory === "Todas" || n.category === activeCategory;
-    const matchSearch = !search || n.title.toLowerCase().includes(search.toLowerCase()) || n.summary.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || n.title.toLowerCase().includes(search.toLowerCase()) || (n.summary && n.summary.toLowerCase().includes(search.toLowerCase()));
     return matchCategory && matchSearch;
   });
 
@@ -99,7 +109,7 @@ function Noticias() {
                       <span className="text-[10px] font-medium uppercase tracking-wider text-[#D62828] bg-[#D62828]/5 px-2 py-0.5 rounded">
                         {item.category}
                       </span>
-                    <span className="text-sm text-gray-400">{item.date}</span>
+                    <span className="text-sm text-gray-400">{item.published_at}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 text-base leading-snug mb-2 line-clamp-2 group-hover:text-[#D62828] transition-colors">
                       {item.title}
