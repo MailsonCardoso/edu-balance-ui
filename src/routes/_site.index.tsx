@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
   Users,
-  DollarSign,
   FolderOpen,
   FileText,
 } from "lucide-react";
@@ -37,7 +36,6 @@ const slides = [
 
 const indicators = [
   { icon: Users, label: "Total de Associados", value: "487", color: "text-blue-600" },
-  { icon: DollarSign, label: "Arrecadação do Mês", value: "R$ 24.580", color: "text-emerald-600" },
   { icon: FolderOpen, label: "Projetos em Andamento", value: "6", color: "text-amber-600" },
   { icon: FileText, label: "Prestações de Contas", value: "12", color: "text-purple-600" },
 ];
@@ -138,7 +136,7 @@ function SiteHome() {
       </section>
 
       <section className="relative -mt-10 z-10 container-page">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {indicators.map((item) => (
             <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
               <div className="flex items-center gap-3">
