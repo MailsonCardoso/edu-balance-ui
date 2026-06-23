@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import {
   fetchDocumentos,
   uploadDocumento,
+  uploadDocumentoChunked,
   updateDocumento,
 } from "@/lib/api/documentos";
 
@@ -18,6 +19,8 @@ export const Route = createFileRoute("/gestao-estatuto")({
 
 function GestaoEstatuto() {
   const [file, setFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTotal, setUploadTotal] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
@@ -30,11 +33,23 @@ function GestaoEstatuto() {
   const estatuto = documentos[0] ?? null;
 
   const uploadMutation = useMutation({
-    mutationFn: (formData: FormData) => uploadDocumento(formData),
+    mutationFn: async (formData: FormData) => {
+      const fileField = formData.get("arquivo") as File;
+      const isLarge = fileField?.size > 1.5 * 1024 * 1024;
+      if (isLarge) {
+        return uploadDocumentoChunked(fileField, "Estatuto Social", "estatuto", (current, total) => {
+          setUploadProgress(current);
+          setUploadTotal(total);
+        });
+      }
+      return uploadDocumento(formData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documentos"] });
       toast.success("Estatuto enviado com sucesso!");
       setFile(null);
+      setUploadProgress(0);
+      setUploadTotal(0);
     },
     onError: () => toast.error("Erro ao enviar estatuto"),
   });
@@ -135,11 +150,11 @@ function GestaoEstatuto() {
             onClick={handleSubmit}
           >
             {isPending ? (
-              <Loader2 className="size-4 animate-spin" />
+              uploadTotal > 0 ? `${uploadProgress}/${uploadTotal}` : <Loader2 className="size-4 animate-spin" />
             ) : (
               <Upload className="size-4" />
             )}
-            {estatuto ? "Substituir Estatuto" : "Enviar Estatuto"}
+            {isPending ? " Enviando..." : estatuto ? "Substituir Estatuto" : "Enviar Estatuto"}
           </Button>
         </div>
       </div>

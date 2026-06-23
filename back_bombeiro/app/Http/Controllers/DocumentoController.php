@@ -6,6 +6,7 @@ use App\Models\Documento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DocumentoController extends Controller
 {
@@ -83,6 +84,74 @@ class DocumentoController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Documento atualizado com sucesso.',
+        ]);
+    }
+
+    public function chunks(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'chunk' => 'required|file|max:2048',
+            'chunk_index' => 'required|integer|min:0',
+            'total_chunks' => 'required|integer|min:1',
+            'chunk_id' => 'required|string|max:100',
+            'titulo' => 'required|string|max:255',
+            'tipo' => 'required|in:estatuto,transparencia',
+            'filename' => 'required|string|max:255',
+        ]);
+
+        $tempDisk = Storage::disk('local');
+        $chunkDir = 'chunks/' . $validated['chunk_id'];
+        $tempDisk->makeDirectory($chunkDir);
+
+        $request->file('chunk')->storeAs($chunkDir, 'chunk_' . $validated['chunk_index'], 'local');
+
+        $received = count($tempDisk->files($chunkDir));
+        $isLast = $validated['chunk_index'] == $validated['total_chunks'] - 1;
+
+        if ($isLast) {
+            $ext = pathinfo($validated['filename'], PATHINFO_EXTENSION);
+            $finalFilename = Str::ulid() . '.' . $ext;
+            $finalPath = 'documentos/' . $finalFilename;
+            $finalFile = fopen(storage_path('app/public/' . $finalPath), 'wb');
+
+            for ($i = 0; $i < $validated['total_chunks']; $i++) {
+                $chunkContent = $tempDisk->get($chunkDir . '/chunk_' . $i);
+                fwrite($finalFile, $chunkContent);
+            }
+            fclose($finalFile);
+
+            $tempDisk->deleteDirectory($chunkDir);
+
+            if ($validated['tipo'] === 'estatuto') {
+                $existing = Documento::where('tipo', 'estatuto')->first();
+                if ($existing) {
+                    Storage::disk('public')->delete($existing->arquivo);
+                    $existing->delete();
+                }
+            }
+
+            $documento = Documento::create([
+                'titulo' => $validated['titulo'],
+                'arquivo' => $finalPath,
+                'tipo' => $validated['tipo'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Documento enviado com sucesso.',
+                'completed' => true,
+                'data' => [
+                    'id' => $documento->id,
+                    'titulo' => $documento->titulo,
+                    'url' => url('storage/' . $documento->arquivo),
+                ],
+            ], 201);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Chunk recebido.',
+            'completed' => false,
         ]);
     }
 

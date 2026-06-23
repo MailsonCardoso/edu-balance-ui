@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import {
   fetchDocumentos,
   uploadDocumento,
+  uploadDocumentoChunked,
   deleteDocumento,
   type Documento,
 } from "@/lib/api/documentos";
@@ -32,6 +33,8 @@ function GestaoDocumentos() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [newTitulo, setNewTitulo] = useState("");
   const [newFile, setNewFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTotal, setUploadTotal] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
@@ -42,13 +45,28 @@ function GestaoDocumentos() {
   });
 
   const uploadMutation = useMutation({
-    mutationFn: (formData: FormData) => uploadDocumento(formData),
+    mutationFn: async ({ file, titulo }: { file: File; titulo: string }) => {
+      const isLarge = file.size > 1.5 * 1024 * 1024;
+      if (isLarge) {
+        return uploadDocumentoChunked(file, titulo, "transparencia", (current, total) => {
+          setUploadProgress(current);
+          setUploadTotal(total);
+        });
+      }
+      const formData = new FormData();
+      formData.append("titulo", titulo);
+      formData.append("tipo", "transparencia");
+      formData.append("arquivo", file);
+      return uploadDocumento(formData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documentos"] });
       toast.success("Documento enviado com sucesso!");
       setUploadOpen(false);
       setNewTitulo("");
       setNewFile(null);
+      setUploadProgress(0);
+      setUploadTotal(0);
     },
     onError: () => toast.error("Erro ao enviar documento"),
   });
@@ -65,11 +83,7 @@ function GestaoDocumentos() {
 
   function handleUpload() {
     if (!newTitulo.trim() || !newFile) return;
-    const formData = new FormData();
-    formData.append("titulo", newTitulo.trim());
-    formData.append("tipo", "transparencia");
-    formData.append("arquivo", newFile);
-    uploadMutation.mutate(formData);
+    uploadMutation.mutate({ file: newFile, titulo: newTitulo.trim() });
   }
 
   return (
@@ -170,8 +184,12 @@ function GestaoDocumentos() {
               disabled={!newTitulo.trim() || !newFile || uploadMutation.isPending}
               onClick={handleUpload}
             >
-              {uploadMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-              Enviar
+              {uploadMutation.isPending ? (
+                uploadTotal > 0 ? `${uploadProgress}/${uploadTotal}` : <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Upload className="size-4" />
+              )}
+              {uploadMutation.isPending ? " Enviando..." : " Enviar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

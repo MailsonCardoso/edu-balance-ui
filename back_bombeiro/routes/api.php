@@ -22,6 +22,7 @@ Route::put('/ouvidoria/{ouvidoria}', [App\Http\Controllers\OuvidoriaController::
 
 Route::get('/transparencia', [App\Http\Controllers\TransparenciaController::class, 'index']);
 
+Route::post('/documentos/chunks', [App\Http\Controllers\DocumentoController::class, 'chunks']);
 Route::get('/documentos', [App\Http\Controllers\DocumentoController::class, 'index']);
 Route::post('/documentos', [App\Http\Controllers\DocumentoController::class, 'store']);
 Route::post('/documentos/{documento}', [App\Http\Controllers\DocumentoController::class, 'update']);
