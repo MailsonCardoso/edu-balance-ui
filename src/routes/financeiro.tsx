@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { Mensalidade, Aluno, FormaPagamento } from "@/lib/mock-data";
 import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
+import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades, createMensalidade, updateMensalidade, deleteMensalidade } from "@/lib/api/mensalidades";
@@ -224,83 +225,121 @@ function Financeiro() {
     return `https://wa.me/55${phone}?text=${msg}`;
   };
 
-  const whatsAppReciboUrl = (m: Mensalidade) => {
-    const a = alunos.find((x) => x.id === m.alunoId);
-    const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
-    if (!phone) return null;
-    const msg = encodeURIComponent(
-      `✅ *Comprovante de Pagamento*\n\n` +
-      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\n` +
-      `Confirmamos o pagamento da mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} *${m.alunoNome || a?.nome || ""}*.\n\n` +
-      `📅 Mês: ${m.mesReferencia}\n` +
-      `💰 Valor: ${brl(m.valor)}\n` +
-      `📆 Data do pagamento: ${m.dataPagamento ? fmtDate(m.dataPagamento) : "—"}\n` +
-      `💳 Forma: ${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}\n\n` +
-      `Segue em anexo o recibo oficial.\n\n` +
-      `Atenciosamente,\n` +
-      `Associação Bombeiro Paranã`
-    );
-    return `https://wa.me/55${phone}?text=${msg}`;
-  };
-
-  const gerarPdf = (m: Mensalidade) => {
-    const janela = window.open("", "_blank");
-    if (!janela) return;
+  const gerarPdfBlob = (m: Mensalidade): Promise<Blob> => {
     const dataPg = m.dataPagamento ? fmtDateFull(m.dataPagamento) : "—";
-    const dataPgDm = m.dataPagamento ? fmtDate(m.dataPagamento) : "—";
     const valorExtenso = numeroExtenso(m.valor);
     const rotuloAluno = m.alunoSexo === "feminino" ? "Aluna" : "Aluno";
-    janela.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Recibo - ${m.alunoNome}</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body { font-family: 'Times New Roman', Times, serif; padding: 60px 80px; color: #111; font-size: 14px; line-height: 1.6; }
-          h1 { text-align: center; font-size: 18px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px; }
-          .assinatura { margin-top: 60px; text-align: center; }
-          .assinatura .linha { width: 300px; margin: 0 auto; border-top: 1px solid #111; padding-top: 8px; }
-          .footer { text-align: center; margin-top: 50px; font-size: 11px; color: #999; }
-          .declaracao { margin-bottom: 30px; text-align: justify; }
-          .info { margin: 30px 0; }
-          .info p { margin-bottom: 6px; }
-          .info strong { display: inline-block; min-width: 180px; }
-          @media print { body { padding: 40px 60px; } }
-        </style>
-      </head>
-      <body>
-        <h1>Recibo de Pagamento de Mensalidade Escolar</h1>
-        <p style="text-align:center;font-size:16px;font-weight:bold;margin-bottom:4px;">Bombeiro Paranã</p>
-        <p style="text-align:center;font-size:13px;margin-bottom:30px;">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
-        <p class="declaracao">
-          Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:
-        </p>
-        <div class="info">
-          <p><strong>${rotuloAluno}:</strong> ${m.alunoNome || "—"}</p>
-          <p><strong>Responsável:</strong> ${m.alunoResponsavel || "—"}</p>
-          <p><strong>Mês de Referência:</strong> ${m.mesReferencia}</p>
-          <p><strong>Valor Pago:</strong> ${brl(m.valor)} (${valorExtenso})</p>
-          <p><strong>Data do Pagamento:</strong> ${dataPgDm}</p>
-          <p><strong>Forma de Pagamento:</strong> ${m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"}</p>
-        </div>
-        <p style="text-align:justify;">
-          Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
-        </p>
-        <p style="text-align:center;margin-top:40px;">Paranã, ${dataPg}.</p>
-        <div class="assinatura">
-          <div class="linha">
-            <p style="font-size:13px;font-weight:bold;">Responsável pelo Recebimento</p>
-            <p style="font-size:12px;margin-top:2px;">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
-          </div>
-        </div>
-        <div class="footer">Documento gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
-        <script>window.print();window.close();<\/script>
-      </body>
-      </html>
-    `);
-    janela.document.close();
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const ml = 25;
+    const cw = 160;
+    let y = 30;
+
+    doc.setFont("times", "bold");
+    doc.setFontSize(14);
+    doc.text("Recibo de Pagamento de Mensalidade Escolar", ml + cw / 2, y, { align: "center" });
+
+    y += 10;
+    doc.setFontSize(12);
+    doc.text("Bombeiro Paranã", ml + cw / 2, y, { align: "center" });
+
+    y += 6;
+    doc.setFont("times", "normal");
+    doc.setFontSize(10);
+    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y, { align: "center" });
+
+    y += 8;
+    doc.setDrawColor(200);
+    doc.line(ml, y, ml + cw, y);
+
+    y += 8;
+    doc.setFontSize(10);
+    doc.text("Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:", ml, y, { maxWidth: cw, align: "justify" });
+
+    y += 14;
+    doc.setDrawColor(220);
+    doc.setFillColor(248, 248, 248);
+    doc.roundedRect(ml, y, cw, 50, 3, 3, "FD");
+    const ix = ml + 6;
+    let iy = y + 7;
+    const labelW = 42;
+    doc.setFont("times", "bold");
+    doc.setFontSize(10);
+    const info: [string, string][] = [
+      [`${rotuloAluno}:`, m.alunoNome || "—"],
+      ["Responsável:", m.alunoResponsavel || "—"],
+      ["Mês de Referência:", m.mesReferencia],
+      ["Valor Pago:", `${brl(m.valor)} (${valorExtenso})`],
+      ["Data do Pagamento:", m.dataPagamento ? fmtDate(m.dataPagamento) : "—"],
+      ["Forma de Pagamento:", m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"],
+    ];
+    for (const [label, value] of info) {
+      doc.setFont("times", "bold");
+      doc.text(label, ix, iy);
+      doc.setFont("times", "normal");
+      doc.text(value, ix + labelW, iy, { maxWidth: cw - labelW - 12 });
+      iy += 7;
+    }
+
+    y = iy + 8;
+    doc.setFont("times", "normal");
+    doc.setFontSize(10);
+    doc.text("Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.", ml, y, { maxWidth: cw, align: "justify" });
+
+    y += 12;
+    doc.text(`Paranã, ${dataPg}.`, ml + cw / 2, y, { align: "center" });
+
+    y += 30;
+    doc.setDrawColor(0);
+    doc.line(ml + 30, y, ml + cw - 30, y);
+    y += 2;
+    doc.setFont("times", "bold");
+    doc.setFontSize(10);
+    doc.text("Responsável pelo Recebimento", ml + cw / 2, y + 4, { align: "center" });
+    doc.setFont("times", "normal");
+    doc.setFontSize(9);
+    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y + 10, { align: "center" });
+
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    const agora = new Date();
+    doc.text(`Documento gerado em ${agora.toLocaleDateString("pt-BR")} às ${agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`, ml + cw / 2, 288, { align: "center" });
+
+    return Promise.resolve(doc.output("blob"));
+  };
+
+  const baixarPdf = async (m: Mensalidade) => {
+    const blob = await gerarPdfBlob(m);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `recibo-${m.id}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const enviarPdfWhatsApp = async (m: Mensalidade) => {
+    const blob = await gerarPdfBlob(m);
+    const file = new File([blob], `recibo-${m.id}.pdf`, { type: "application/pdf" });
+
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], title: "Recibo de Pagamento" });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `recibo-${m.id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      const a2 = alunos.find((x) => x.id === m.alunoId);
+      const phone = a2?.telefoneResponsavel?.replace(/\D/g, "") || a2?.telefone?.replace(/\D/g, "");
+      if (phone) {
+        const msg = encodeURIComponent(
+          `Olá! Segue em anexo o recibo de pagamento de ${m.mesReferencia} do(a) ${m.alunoNome || "aluno(a)"}.`,
+        );
+        window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
+      }
+      toast.info("PDF baixado. Envie o arquivo pelo WhatsApp.");
+    }
   };
 
   return (
@@ -685,15 +724,11 @@ function Financeiro() {
               <>
                 <Button
                   variant="outline"
-                  onClick={() => {
-                    const url = whatsAppReciboUrl(reciboMensalidade);
-                    if (url) window.open(url, "_blank");
-                    else toast.error("Telefone não encontrado para este aluno");
-                  }}
+                  onClick={() => enviarPdfWhatsApp(reciboMensalidade)}
                 >
                   <MessageCircle className="size-4" /> Enviar WhatsApp
                 </Button>
-                <Button onClick={() => gerarPdf(reciboMensalidade)}>
+                <Button onClick={() => baixarPdf(reciboMensalidade)}>
                   <Printer className="size-4" /> Baixar PDF
                 </Button>
               </>
