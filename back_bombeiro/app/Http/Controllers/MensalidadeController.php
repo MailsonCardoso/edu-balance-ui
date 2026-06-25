@@ -24,6 +24,7 @@ class MensalidadeController extends Controller
             'data_pagamento' => 'nullable|date',
             'status' => 'required|in:pendente,pago,atrasado',
             'forma_pagamento' => 'nullable|in:pix,debito,credito',
+            'origem' => 'nullable|in:mercadopago,caixa,admin,pix_manual,dinheiro,transferencia',
         ]);
 
         return Mensalidade::create($validated);
@@ -44,6 +45,7 @@ class MensalidadeController extends Controller
             'data_pagamento' => 'nullable|date',
             'status' => 'sometimes|in:pendente,pago,atrasado',
             'forma_pagamento' => 'nullable|in:pix,debito,credito',
+            'origem' => 'nullable|in:mercadopago,caixa,admin,pix_manual,dinheiro,transferencia',
         ]);
 
         $mensalidade->update($validated);

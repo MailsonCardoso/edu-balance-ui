@@ -32,3 +32,4 @@ Route::post('/associado', [App\Http\Controllers\AssociadoController::class, 'sto
 Route::post('/associado/login', [App\Http\Controllers\AssociadoController::class, 'login']);
 Route::get('/associado', [App\Http\Controllers\AssociadoController::class, 'show']);
 Route::put('/associado', [App\Http\Controllers\AssociadoController::class, 'update']);
+Route::get('/associado/mensalidades', [App\Http\Controllers\AssociadoController::class, 'mensalidades']);

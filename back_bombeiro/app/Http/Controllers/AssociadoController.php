@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Associado;
+use App\Models\Mensalidade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -121,6 +122,47 @@ class AssociadoController extends Controller
             'success' => true,
             'message' => 'Dados atualizados com sucesso.',
         ]);
+    }
+
+    public function mensalidades(Request $request): JsonResponse
+    {
+        $associado = $this->getAuthenticated($request);
+
+        if (!$associado) {
+            return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
+        }
+
+        $query = Mensalidade::with('aluno')->orderBy('data_vencimento', 'desc');
+
+        // If associado has a linked aluno_id, use it
+        if ($associado->aluno_id) {
+            $query->where('aluno_id', $associado->aluno_id);
+        } elseif ($associado->nome_aluno) {
+            // Fallback: match by aluno name
+            $query->whereHas('aluno', function ($q) use ($associado) {
+                $q->where('nome', $associado->nome_aluno);
+            });
+        } else {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $mensalidades = $query->get()->map(function ($m) {
+            return [
+                'id' => $m->id,
+                'aluno_id' => $m->aluno_id,
+                'mes_referencia' => $m->mes_referencia,
+                'valor' => $m->valor,
+                'data_vencimento' => $m->data_vencimento->format('d/m/Y'),
+                'data_pagamento' => $m->data_pagamento?->format('d/m/Y'),
+                'status' => $m->status,
+                'forma_pagamento' => $m->forma_pagamento,
+                'origem' => $m->origem,
+                'aluno_nome' => $m->aluno?->nome,
+                'created_at' => $m->created_at->format('d/m/Y H:i'),
+            ];
+        });
+
+        return response()->json(['success' => true, 'data' => $mensalidades]);
     }
 
     private function getAuthenticated(Request $request): ?Associado

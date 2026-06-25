@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   User,
   CreditCard,
@@ -10,14 +10,29 @@ import {
   Shield,
   LogOut,
   Loader2,
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  ArrowUpRight,
+  Banknote,
+  Building2,
+  HandCoins,
+  Smartphone,
+  type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/Primitives";
+import { brl } from "@/lib/format";
 import {
   getAssociado,
   updateAssociado,
   type AssociadoData,
 } from "@/lib/api/associado";
+import {
+  fetchAssociadoMensalidades,
+} from "@/lib/api/associado-mensalidades";
+import type { Mensalidade, OrigemPagamento } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/associado/painel")({
   component: PainelAssociado,
@@ -173,26 +188,307 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   );
 }
 
+const origemConfig: Record<OrigemPagamento, { label: string; color: string; icon: LucideIcon }> = {
+  mercadopago: { label: "Mercado Pago", color: "text-sky-700 bg-sky-50", icon: ArrowUpRight },
+  caixa: { label: "Caixa Econômica", color: "text-blue-700 bg-blue-50", icon: Building2 },
+  admin: { label: "Admin", color: "text-gray-700 bg-gray-100", icon: Shield },
+  pix_manual: { label: "PIX", color: "text-emerald-700 bg-emerald-50", icon: Smartphone },
+  dinheiro: { label: "Dinheiro", color: "text-amber-700 bg-amber-50", icon: Banknote },
+  transferencia: { label: "Transferência", color: "text-purple-700 bg-purple-50", icon: HandCoins },
+};
+
+const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
+  pago: { label: "Pago", color: "text-emerald-600 bg-emerald-50", icon: CheckCircle2 },
+  pendente: { label: "Pendente", color: "text-amber-600 bg-amber-50", icon: Clock },
+  atrasado: { label: "Atrasado", color: "text-red-600 bg-red-50", icon: AlertCircle },
+};
+
 function PagamentosTab() {
+  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("todas");
+
+  useEffect(() => {
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => toast.error("Erro ao carregar mensalidades"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (filter === "todas") return mensalidades;
+    return mensalidades.filter((m) => m.status === filter);
+  }, [mensalidades, filter]);
+
+  const pendentes = useMemo(
+    () => mensalidades.filter((m) => m.status === "pendente"),
+    [mensalidades]
+  );
+  const vencidas = useMemo(
+    () => mensalidades.filter((m) => m.status === "atrasado"),
+    [mensalidades]
+  );
+  const pagasEsteMes = useMemo(
+    () =>
+      mensalidades.filter((m) => {
+        if (m.status !== "pago" || !m.dataPagamento) return false;
+        const [d, mês, a] = m.dataPagamento.split("/").map(Number);
+        const hoje = new Date();
+        return mês === hoje.getMonth() + 1 && a === hoje.getFullYear();
+      }),
+    [mensalidades]
+  );
+
+  const handlePagar = (m: Mensalidade) => {
+    toast.info("Integração com Mercado Pago em breve!");
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-center h-64">
+        <Loader2 className="size-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">PIX e Boletos</h3>
-      <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-        <CreditCard className="size-10 mb-3 opacity-50" />
-        <p className="text-sm">Em breve você poderá pagar suas mensalidades aqui.</p>
+    <div className="space-y-6">
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <p className="text-xs text-gray-400 mb-1">Pendentes</p>
+          <p className="text-2xl font-bold text-amber-600">{pendentes.length}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {pendentes.length > 0
+              ? `Total: ${brl(pendentes.reduce((a, m) => a + m.valor, 0))}`
+              : "Nenhuma pendente"}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <p className="text-xs text-gray-400 mb-1">Vencidas</p>
+          <p className="text-2xl font-bold text-red-600">{vencidas.length}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {vencidas.length > 0
+              ? `Total: ${brl(vencidas.reduce((a, m) => a + m.valor, 0))}`
+              : "Nenhuma vencida"}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <p className="text-xs text-gray-400 mb-1">Pago este mês</p>
+          <p className="text-2xl font-bold text-emerald-600">
+            {brl(pagasEsteMes.reduce((a, m) => a + m.valor, 0))}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {pagasEsteMes.length} mensalidade{pagasEsteMes.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <div className="flex flex-wrap items-center gap-2 mb-5">
+          {[
+            { key: "todas", label: "Todas" },
+            { key: "pendente", label: "Pendentes" },
+            { key: "pago", label: "Pagas" },
+            { key: "atrasado", label: "Vencidas" },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                filter === f.key
+                  ? "bg-[#D62828] text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+            <CreditCard className="size-10 mb-3 opacity-50" />
+            <p className="text-sm">Nenhuma mensalidade encontrada.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-3 px-2 text-gray-400 font-medium">Mês</th>
+                  <th className="text-left py-3 px-2 text-gray-400 font-medium">Vencimento</th>
+                  <th className="text-right py-3 px-2 text-gray-400 font-medium">Valor</th>
+                  <th className="text-center py-3 px-2 text-gray-400 font-medium">Status</th>
+                  <th className="text-center py-3 px-2 text-gray-400 font-medium">Origem</th>
+                  <th className="text-center py-3 px-2 text-gray-400 font-medium">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((m) => {
+                  const StatusIcon = statusConfig[m.status]?.icon || Clock;
+                  const origem = m.origem ? origemConfig[m.origem] : null;
+                  const OrigemIcon = origem?.icon || Shield;
+                  return (
+                    <tr key={m.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                      <td className="py-3 px-2 font-medium text-gray-900">{m.mesReferencia}</td>
+                      <td className="py-3 px-2 text-gray-500">{m.dataVencimento}</td>
+                      <td className="py-3 px-2 text-right font-medium text-gray-900">{brl(m.valor)}</td>
+                      <td className="py-3 px-2">
+                        <div className="flex justify-center">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium ${statusConfig[m.status]?.color}`}>
+                            <StatusIcon className="size-3" />
+                            {statusConfig[m.status]?.label}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="flex justify-center">
+                          {origem ? (
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium ${origem.color}`}>
+                              <OrigemIcon className="size-3" />
+                              {origem.label}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-300">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-2">
+                        <div className="flex justify-center">
+                          {m.status === "pendente" || m.status === "atrasado" ? (
+                            <button
+                              onClick={() => handlePagar(m)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#D62828] text-white text-xs font-medium hover:bg-[#D62828]/90 transition-colors"
+                            >
+                              Pagar
+                              <ExternalLink className="size-3" />
+                            </button>
+                          ) : (
+                            <span className="text-xs text-gray-300">—</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 function HistoricoTab() {
+  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => toast.error("Erro ao carregar histórico"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const sorted = useMemo(
+    () =>
+      [...mensalidades].sort((a, b) => {
+        const parseDate = (d: string) => {
+          const [dd, mm, yyyy] = d.split("/").map(Number);
+          return new Date(yyyy, mm - 1, dd).getTime();
+        };
+        const dateA = a.dataPagamento ? parseDate(a.dataPagamento) : parseDate(a.dataVencimento);
+        const dateB = b.dataPagamento ? parseDate(b.dataPagamento) : parseDate(b.dataVencimento);
+        return dateB - dateA;
+      }),
+    [mensalidades]
+  );
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 p-6 flex items-center justify-center h-64">
+        <Loader2 className="size-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Histórico de Contribuições</h3>
-      <div className="flex flex-col items-center justify-center h-48 text-gray-400">
-        <History className="size-10 mb-3 opacity-50" />
-        <p className="text-sm">Em breve todas as suas contribuições estarão disponíveis aqui.</p>
-      </div>
+      <h3 className="text-lg font-semibold text-gray-900 mb-6">Histórico de Contribuições</h3>
+
+      {sorted.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+          <History className="size-10 mb-3 opacity-50" />
+          <p className="text-sm">Nenhuma contribuição registrada ainda.</p>
+        </div>
+      ) : (
+        <div className="relative">
+          <div className="absolute left-[19px] top-2 bottom-2 w-0.5 bg-gray-200" />
+          <div className="space-y-0">
+            {sorted.map((m, idx) => {
+              const StatusIcon = statusConfig[m.status]?.icon || Clock;
+              const origem = m.origem ? origemConfig[m.origem] : null;
+              const OrigemIcon = origem?.icon || Shield;
+              const isLast = idx === sorted.length - 1;
+
+              return (
+                <div key={m.id} className="relative flex gap-5 pb-6">
+                  <div className="relative z-10 flex-shrink-0 grid place-items-center">
+                    <div
+                      className={`size-10 rounded-full grid place-items-center ${
+                        m.status === "pago"
+                          ? "bg-emerald-50"
+                          : m.status === "atrasado"
+                          ? "bg-red-50"
+                          : "bg-amber-50"
+                      }`}
+                    >
+                      <StatusIcon
+                        className={`size-5 ${
+                          m.status === "pago"
+                            ? "text-emerald-500"
+                            : m.status === "atrasado"
+                            ? "text-red-500"
+                            : "text-amber-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0 pt-1">
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
+                      <p className="text-sm font-semibold text-gray-900">{brl(m.valor)}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${statusConfig[m.status]?.color}`}>
+                        <StatusIcon className="size-3" />
+                        {statusConfig[m.status]?.label}
+                      </span>
+                      {origem && (
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${origem.color}`}>
+                          <OrigemIcon className="size-3" />
+                          {origem.label}
+                        </span>
+                      )}
+                      {m.dataPagamento && (
+                        <span className="text-xs text-gray-400">
+                          Pago em {m.dataPagamento}
+                        </span>
+                      )}
+                      {!m.dataPagamento && (
+                        <span className="text-xs text-gray-400">
+                          Vence {m.dataVencimento}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

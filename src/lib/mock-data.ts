@@ -2,6 +2,7 @@ export type AlunoStatus = "ativo" | "inativo";
 export type SituacaoFinanceira = "em_dia" | "em_atraso" | "inadimplente";
 export type MensalidadeStatus = "pendente" | "pago" | "atrasado";
 export type FormaPagamento = "pix" | "debito" | "credito";
+export type OrigemPagamento = "mercadopago" | "caixa" | "admin" | "pix_manual" | "dinheiro" | "transferencia";
 
 export interface Aluno {
   id: string;
@@ -31,6 +32,7 @@ export interface Mensalidade {
   dataPagamento: string | null;
   status: MensalidadeStatus;
   formaPagamento: FormaPagamento | null;
+  origem: OrigemPagamento | null;
   alunoNome?: string;
   alunoResponsavel?: string;
   alunoSexo?: string;
