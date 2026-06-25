@@ -22,7 +22,7 @@ import {
   HandCoins,
   type LucideIcon,
 } from "lucide-react";
-import { brl } from "@/lib/format";
+import { brl, fmtDate } from "@/lib/format";
 
 interface MensalidadeData {
   id: string;
@@ -79,15 +79,6 @@ const situacaoConfig: Record<string, { label: string; color: string }> = {
   em_atraso: { label: "Em atraso", color: "text-amber-700 bg-amber-50 ring-1 ring-amber-200" },
   inadimplente: { label: "Inadimplente", color: "text-red-700 bg-red-50 ring-1 ring-red-200" },
 };
-
-function formatDate(dateStr: string): string {
-  if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
-    const [d] = dateStr.split(" ");
-    const partes = d.split("-");
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-  }
-  return dateStr;
-}
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -338,11 +329,11 @@ function Dashboard() {
                                 {brl(m.valor)}
                               </p>
                               <p className="text-xs text-gray-400 mt-0.5">
-                                Vence {formatDate(m.data_vencimento)}
+                                Vence {fmtDate(m.data_vencimento)}
                               </p>
                               {m.data_pagamento && (
                                 <p className="text-xs text-emerald-500 font-medium">
-                                  Pago em {formatDate(m.data_pagamento)}
+                                  Pago em {fmtDate(m.data_pagamento)}
                                 </p>
                               )}
                             </div>
