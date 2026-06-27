@@ -1,39 +1,60 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import api from "./api";
 
-const USER = { email: "admin@escola.com", senha: "admin123", nome: "Administrador" };
-
-type User = { email: string; nome: string };
+type User = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+};
 
 type AuthContext = {
   user: User | null;
-  login: (email: string, senha: string) => boolean;
-  logout: () => void;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
 };
 
 const Ctx = createContext<AuthContext | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("edu_user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = useCallback((email: string, senha: string) => {
-    if (email === USER.email && senha === USER.senha) {
-      const u = { email: USER.email, nome: USER.nome };
-      setUser(u);
-      localStorage.setItem("edu_user", JSON.stringify(u));
-      return true;
+  useEffect(() => {
+    const token = localStorage.getItem("edu_token");
+    if (token) {
+      api.get("/auth/me")
+        .then((r) => setUser(r.data))
+        .catch(() => localStorage.removeItem("edu_token"))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
     }
-    return false;
   }, []);
 
-  const logout = useCallback(() => {
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const { data } = await api.post("/auth/login", { email, password });
+      localStorage.setItem("edu_token", data.token);
+      setUser(data.user);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const logout = useCallback(async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // ignore
+    }
+    localStorage.removeItem("edu_token");
     setUser(null);
-    localStorage.removeItem("edu_user");
   }, []);
 
-  return <Ctx.Provider value={{ user, login, logout }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, loading, login, logout }}>{children}</Ctx.Provider>;
 }
 
 export function useAuth() {

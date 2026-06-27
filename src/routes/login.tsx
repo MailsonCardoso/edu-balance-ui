@@ -37,8 +37,7 @@ function Login() {
   });
 
   const onSubmit = async (data: Data) => {
-    await new Promise((r) => setTimeout(r, 700));
-    const ok = login(data.email, data.senha);
+    const ok = await login(data.email, data.senha);
     if (!ok) {
       toast.error("E-mail ou senha inválidos");
       return;
