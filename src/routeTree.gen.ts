@@ -25,9 +25,13 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as ResponsavelIndexRouteImport } from './routes/responsavel.index'
+import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
+import { Route as FinanceiroSaidasRouteImport } from './routes/financeiro.saidas'
+import { Route as FinanceiroEntradasRouteImport } from './routes/financeiro.entradas'
+import { Route as FinanceiroDashboardRouteImport } from './routes/financeiro.dashboard'
 import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
@@ -117,6 +121,11 @@ const ResponsavelIndexRoute = ResponsavelIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ResponsavelRoute,
 } as any)
+const FinanceiroIndexRoute = FinanceiroIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
 const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -131,6 +140,21 @@ const ResponsavelDashboardRoute = ResponsavelDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => ResponsavelRoute,
+} as any)
+const FinanceiroSaidasRoute = FinanceiroSaidasRouteImport.update({
+  id: '/saidas',
+  path: '/saidas',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
+const FinanceiroEntradasRoute = FinanceiroEntradasRouteImport.update({
+  id: '/entradas',
+  path: '/entradas',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
+const FinanceiroDashboardRoute = FinanceiroDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => FinanceiroRoute,
 } as any)
 const AssociadoPainelRoute = AssociadoPainelRouteImport.update({
   id: '/associado/painel',
@@ -182,7 +206,7 @@ export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
+  '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -203,13 +227,16 @@ export interface FileRoutesByFullPath {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/dashboard': typeof FinanceiroDashboardRoute
+  '/financeiro/entradas': typeof FinanceiroEntradasRoute
+  '/financeiro/saidas': typeof FinanceiroSaidasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/financeiro/': typeof FinanceiroIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -229,9 +256,13 @@ export interface FileRoutesByTo {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/dashboard': typeof FinanceiroDashboardRoute
+  '/financeiro/entradas': typeof FinanceiroEntradasRoute
+  '/financeiro/saidas': typeof FinanceiroSaidasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosIndexRoute
+  '/financeiro': typeof FinanceiroIndexRoute
   '/responsavel': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesById {
@@ -239,7 +270,7 @@ export interface FileRoutesById {
   '/_site': typeof SiteRouteWithChildren
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
+  '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -260,9 +291,13 @@ export interface FileRoutesById {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/dashboard': typeof FinanceiroDashboardRoute
+  '/financeiro/entradas': typeof FinanceiroEntradasRoute
+  '/financeiro/saidas': typeof FinanceiroSaidasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/_site/': typeof SiteIndexRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/financeiro/': typeof FinanceiroIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRouteTypes {
@@ -292,13 +327,16 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/dashboard'
+    | '/financeiro/entradas'
+    | '/financeiro/saidas'
     | '/responsavel/dashboard'
     | '/alunos/'
+    | '/financeiro/'
     | '/responsavel/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
-    | '/financeiro'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -318,9 +356,13 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/dashboard'
+    | '/financeiro/entradas'
+    | '/financeiro/saidas'
     | '/responsavel/dashboard'
     | '/'
     | '/alunos'
+    | '/financeiro'
     | '/responsavel'
   id:
     | '__root__'
@@ -348,9 +390,13 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/dashboard'
+    | '/financeiro/entradas'
+    | '/financeiro/saidas'
     | '/responsavel/dashboard'
     | '/_site/'
     | '/alunos/'
+    | '/financeiro/'
     | '/responsavel/'
   fileRoutesById: FileRoutesById
 }
@@ -358,7 +404,7 @@ export interface RootRouteChildren {
   SiteRoute: typeof SiteRouteWithChildren
   AlunosRoute: typeof AlunosRouteWithChildren
   DashboardRoute: typeof DashboardRoute
-  FinanceiroRoute: typeof FinanceiroRoute
+  FinanceiroRoute: typeof FinanceiroRouteWithChildren
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
@@ -487,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResponsavelIndexRouteImport
       parentRoute: typeof ResponsavelRoute
     }
+    '/financeiro/': {
+      id: '/financeiro/'
+      path: '/'
+      fullPath: '/financeiro/'
+      preLoaderRoute: typeof FinanceiroIndexRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
     '/alunos/': {
       id: '/alunos/'
       path: '/'
@@ -507,6 +560,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/responsavel/dashboard'
       preLoaderRoute: typeof ResponsavelDashboardRouteImport
       parentRoute: typeof ResponsavelRoute
+    }
+    '/financeiro/saidas': {
+      id: '/financeiro/saidas'
+      path: '/saidas'
+      fullPath: '/financeiro/saidas'
+      preLoaderRoute: typeof FinanceiroSaidasRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
+    '/financeiro/entradas': {
+      id: '/financeiro/entradas'
+      path: '/entradas'
+      fullPath: '/financeiro/entradas'
+      preLoaderRoute: typeof FinanceiroEntradasRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
+    '/financeiro/dashboard': {
+      id: '/financeiro/dashboard'
+      path: '/dashboard'
+      fullPath: '/financeiro/dashboard'
+      preLoaderRoute: typeof FinanceiroDashboardRouteImport
+      parentRoute: typeof FinanceiroRoute
     }
     '/associado/painel': {
       id: '/associado/painel'
@@ -611,6 +685,24 @@ const AlunosRouteChildren: AlunosRouteChildren = {
 const AlunosRouteWithChildren =
   AlunosRoute._addFileChildren(AlunosRouteChildren)
 
+interface FinanceiroRouteChildren {
+  FinanceiroDashboardRoute: typeof FinanceiroDashboardRoute
+  FinanceiroEntradasRoute: typeof FinanceiroEntradasRoute
+  FinanceiroSaidasRoute: typeof FinanceiroSaidasRoute
+  FinanceiroIndexRoute: typeof FinanceiroIndexRoute
+}
+
+const FinanceiroRouteChildren: FinanceiroRouteChildren = {
+  FinanceiroDashboardRoute: FinanceiroDashboardRoute,
+  FinanceiroEntradasRoute: FinanceiroEntradasRoute,
+  FinanceiroSaidasRoute: FinanceiroSaidasRoute,
+  FinanceiroIndexRoute: FinanceiroIndexRoute,
+}
+
+const FinanceiroRouteWithChildren = FinanceiroRoute._addFileChildren(
+  FinanceiroRouteChildren,
+)
+
 interface ResponsavelRouteChildren {
   ResponsavelDashboardRoute: typeof ResponsavelDashboardRoute
   ResponsavelIndexRoute: typeof ResponsavelIndexRoute
@@ -629,7 +721,7 @@ const rootRouteChildren: RootRouteChildren = {
   SiteRoute: SiteRouteWithChildren,
   AlunosRoute: AlunosRouteWithChildren,
   DashboardRoute: DashboardRoute,
-  FinanceiroRoute: FinanceiroRoute,
+  FinanceiroRoute: FinanceiroRouteWithChildren,
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,
