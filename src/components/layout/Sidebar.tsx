@@ -33,6 +33,7 @@ const nav: (NavItemLink | NavItemGroup)[] = [
     label: "Financeiro",
     icon: Wallet,
     children: [
+      { to: "/financeiro", label: "Mensalidades", icon: Wallet },
       { to: "/financeiro/entradas", label: "Entradas", icon: ArrowUpCircle },
       { to: "/financeiro/saidas", label: "Saídas", icon: ArrowDownCircle },
     ],
