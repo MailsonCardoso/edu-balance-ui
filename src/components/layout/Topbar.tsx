@@ -41,11 +41,11 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
         <div className="flex items-center gap-3 pl-3 ml-2 border-l border-border">
           <div className="hidden sm:flex flex-col items-end leading-tight">
-            <span className="text-sm font-medium">{user?.nome}</span>
+            <span className="text-sm font-medium">{user?.name}</span>
             <span className="text-xs text-muted-foreground">{user?.email}</span>
           </div>
           <div className="size-9 rounded-full bg-gradient-to-br from-primary to-info grid place-items-center text-primary-foreground font-semibold text-sm">
-            {user?.nome.charAt(0).toUpperCase()}
+            {user?.name.charAt(0).toUpperCase()}
           </div>
           <button
             onClick={() => {
