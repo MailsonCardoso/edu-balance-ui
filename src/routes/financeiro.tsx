@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, FileText, History, Loader2, MessageCircle, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { CheckCircle2, FileText, History, Loader2, MessageCircle, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X, TrendingUp, AlertTriangle, Users, DollarSign } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades, createMensalidade, updateMensalidade, deleteMensalidade } from "@/lib/api/mensalidades";
+import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 
 export const Route = createFileRoute("/financeiro")({
   component: Financeiro,
@@ -47,6 +49,7 @@ const formaPagamentoLabel: Record<string, string> = {
 };
 
 function Financeiro() {
+  const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [data, setData] = useState<Mensalidade[]>([]);
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,9 +75,10 @@ function Financeiro() {
 
   const carregar = async () => {
     try {
-      const [m, a] = await Promise.all([fetchMensalidades(), fetchAlunos()]);
+      const [m, a, d] = await Promise.all([fetchMensalidades(), fetchAlunos(), fetchDashboardFinanceiro()]);
       setData(m);
       setAlunos(a);
+      setDashboard(d);
     } catch {
       toast.error("Erro ao carregar dados");
     } finally {
@@ -353,6 +357,57 @@ function Financeiro() {
           </Button>
         }
       />
+
+      {dashboard && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 text-success mb-1">
+                <DollarSign className="size-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">Receita do mês</span>
+              </div>
+              <p className="text-xl font-semibold">{brl(dashboard.receita_mes)}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 text-warning mb-1">
+                <TrendingUp className="size-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">Previsto</span>
+              </div>
+              <p className="text-xl font-semibold">{brl(dashboard.receita_prevista)}</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 text-destructive mb-1">
+                <AlertTriangle className="size-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">Inadimplência</span>
+              </div>
+              <p className="text-xl font-semibold">{dashboard.perc_inadimplencia}%</p>
+              <p className="text-xs text-muted-foreground">{dashboard.alunos_inadimplentes} de {dashboard.alunos_ativos} alunos</p>
+            </div>
+            <div className="bg-card border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 text-info mb-1">
+                <Users className="size-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">Mensalidades</span>
+              </div>
+              <p className="text-xl font-semibold">{dashboard.qtd_pagas} / {dashboard.qtd_pendentes + dashboard.qtd_vencidas}</p>
+              <p className="text-xs text-muted-foreground">pagas / pendentes</p>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-4 mb-6">
+            <p className="text-sm font-medium mb-3">Receitas dos últimos 6 meses</p>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dashboard.receitas_mensais}>
+                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `R$${(v / 1000).toFixed(0)}k`} />
+                  <Tooltip formatter={(v: number) => [brl(v), "Receita"]} />
+                  <Bar dataKey="receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-card border border-border rounded-xl p-5">

@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
+    Route::get('/dashboard/financeiro', [App\Http\Controllers\DashboardController::class, 'financeiro']);
     Route::apiResource('alunos', AlunoController::class);
     Route::post('/mensalidades/verificar-vencidas', [MensalidadeController::class, 'verificarVencidas']);
     Route::apiResource('mensalidades', MensalidadeController::class);
