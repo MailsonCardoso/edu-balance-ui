@@ -74,6 +74,23 @@ class AlunoController extends Controller
         return $aluno;
     }
 
+    public function extrato(Aluno $aluno): JsonResponse
+    {
+        $mensalidades = $aluno->mensalidades()->orderBy('created_at', 'desc')->get();
+
+        $totalPago = $mensalidades->where('status', 'pago')->sum('valor');
+        $totalPendente = $mensalidades->whereIn('status', ['pendente', 'atrasado'])->sum('valor');
+
+        return response()->json([
+            'aluno' => $aluno,
+            'mensalidades' => $mensalidades,
+            'total_pago' => $totalPago,
+            'total_pendente' => $totalPendente,
+            'qtd_pagas' => $mensalidades->where('status', 'pago')->count(),
+            'qtd_pendentes' => $mensalidades->whereIn('status', ['pendente', 'atrasado'])->count(),
+        ]);
+    }
+
     public function destroy(Aluno $aluno)
     {
         $aluno->delete();

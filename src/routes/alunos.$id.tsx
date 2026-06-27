@@ -22,8 +22,9 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate, brl } from "@/lib/format";
 import { fetchAluno, updateAluno, deleteAluno, checkCpfExists } from "@/lib/api/alunos";
+import api from "@/lib/api";
 
 export const Route = createFileRoute("/alunos/$id")({
   component: AlunoDetalhe,
@@ -397,6 +398,50 @@ function AlunoDetalhe() {
           </div>
         </section>
       </form>
+
+      <ExtratoFinanceiro alunoId={aluno.id} />
     </>
+  );
+}
+
+function ExtratoFinanceiro({ alunoId }: { alunoId: string }) {
+  const [data, setData] = useState<{ mensalidades: any[]; total_pago: number; total_pendente: number; qtd_pagas: number; qtd_pendentes: number } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get(`/alunos/${alunoId}/extrato`).then((r) => { setData(r.data); setLoading(false); }).catch(() => { setLoading(false); });
+  }, [alunoId]);
+
+  if (loading) return <div className="flex items-center justify-center py-8"><Loader2 className="size-5 animate-spin text-muted-foreground" /></div>;
+  if (!data) return null;
+
+  return (
+    <section className="mt-8">
+      <h2 className="text-lg font-semibold mb-4">Extrato financeiro</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Total pago</p><p className="text-lg font-semibold mt-1 text-success">{brl(data.total_pago)}</p></div>
+        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Total pendente</p><p className="text-lg font-semibold mt-1 text-warning">{brl(data.total_pendente)}</p></div>
+        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Pagas</p><p className="text-lg font-semibold mt-1">{data.qtd_pagas}</p></div>
+        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Pendentes</p><p className="text-lg font-semibold mt-1">{data.qtd_pendentes}</p></div>
+      </div>
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr><th className="px-4 py-3 font-medium">Mês</th><th className="px-4 py-3 font-medium">Vencimento</th><th className="px-4 py-3 font-medium">Valor</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 font-medium">Pagamento</th></tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {data.mensalidades.map((m: any) => (
+              <tr key={m.id} className="hover:bg-muted/30">
+                <td className="px-4 py-3 font-medium">{m.mes_referencia}</td>
+                <td className="px-4 py-3 text-muted-foreground">{fmtDate(m.data_vencimento)}</td>
+                <td className="px-4 py-3">{brl(Number(m.valor))}</td>
+                <td className="px-4 py-3"><StatusBadge status={m.status} /></td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">{m.data_pagamento ? fmtDate(m.data_pagamento) : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

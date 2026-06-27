@@ -15,13 +15,17 @@ import {
   FileText,
   ScrollText,
   Package,
+  TrendingUp,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/alunos", label: "Alunos", icon: Users },
-  { to: "/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/financeiro", label: "Mensalidades", icon: Wallet },
+  { to: "/financeiro/receitas", label: "Receitas", icon: TrendingUp },
+  { to: "/financeiro/despesas", label: "Despesas", icon: DollarSign },
   { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/perfil", label: "Perfil", icon: UserCircle },

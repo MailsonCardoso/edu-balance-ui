@@ -25,9 +25,12 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlunosRouteImport } from './routes/alunos'
 import { Route as SiteRouteImport } from './routes/_site'
 import { Route as ResponsavelIndexRouteImport } from './routes/responsavel.index'
+import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
+import { Route as FinanceiroReceitasRouteImport } from './routes/financeiro.receitas'
+import { Route as FinanceiroDespesasRouteImport } from './routes/financeiro.despesas'
 import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
@@ -117,6 +120,11 @@ const ResponsavelIndexRoute = ResponsavelIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ResponsavelRoute,
 } as any)
+const FinanceiroIndexRoute = FinanceiroIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
 const AlunosIndexRoute = AlunosIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -131,6 +139,16 @@ const ResponsavelDashboardRoute = ResponsavelDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => ResponsavelRoute,
+} as any)
+const FinanceiroReceitasRoute = FinanceiroReceitasRouteImport.update({
+  id: '/receitas',
+  path: '/receitas',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
+const FinanceiroDespesasRoute = FinanceiroDespesasRouteImport.update({
+  id: '/despesas',
+  path: '/despesas',
+  getParentRoute: () => FinanceiroRoute,
 } as any)
 const AssociadoPainelRoute = AssociadoPainelRouteImport.update({
   id: '/associado/painel',
@@ -182,7 +200,7 @@ export interface FileRoutesByFullPath {
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
+  '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -203,13 +221,15 @@ export interface FileRoutesByFullPath {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/financeiro/': typeof FinanceiroIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -229,9 +249,12 @@ export interface FileRoutesByTo {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosIndexRoute
+  '/financeiro': typeof FinanceiroIndexRoute
   '/responsavel': typeof ResponsavelIndexRoute
 }
 export interface FileRoutesById {
@@ -239,7 +262,7 @@ export interface FileRoutesById {
   '/_site': typeof SiteRouteWithChildren
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
-  '/financeiro': typeof FinanceiroRoute
+  '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -260,9 +283,12 @@ export interface FileRoutesById {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
+  '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/_site/': typeof SiteIndexRoute
   '/alunos/': typeof AlunosIndexRoute
+  '/financeiro/': typeof FinanceiroIndexRoute
   '/responsavel/': typeof ResponsavelIndexRoute
 }
 export interface FileRouteTypes {
@@ -292,13 +318,15 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/despesas'
+    | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/alunos/'
+    | '/financeiro/'
     | '/responsavel/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
-    | '/financeiro'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -318,9 +346,12 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/despesas'
+    | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/'
     | '/alunos'
+    | '/financeiro'
     | '/responsavel'
   id:
     | '__root__'
@@ -348,9 +379,12 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
+    | '/financeiro/despesas'
+    | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/_site/'
     | '/alunos/'
+    | '/financeiro/'
     | '/responsavel/'
   fileRoutesById: FileRoutesById
 }
@@ -358,7 +392,7 @@ export interface RootRouteChildren {
   SiteRoute: typeof SiteRouteWithChildren
   AlunosRoute: typeof AlunosRouteWithChildren
   DashboardRoute: typeof DashboardRoute
-  FinanceiroRoute: typeof FinanceiroRoute
+  FinanceiroRoute: typeof FinanceiroRouteWithChildren
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
@@ -487,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResponsavelIndexRouteImport
       parentRoute: typeof ResponsavelRoute
     }
+    '/financeiro/': {
+      id: '/financeiro/'
+      path: '/'
+      fullPath: '/financeiro/'
+      preLoaderRoute: typeof FinanceiroIndexRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
     '/alunos/': {
       id: '/alunos/'
       path: '/'
@@ -507,6 +548,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/responsavel/dashboard'
       preLoaderRoute: typeof ResponsavelDashboardRouteImport
       parentRoute: typeof ResponsavelRoute
+    }
+    '/financeiro/receitas': {
+      id: '/financeiro/receitas'
+      path: '/receitas'
+      fullPath: '/financeiro/receitas'
+      preLoaderRoute: typeof FinanceiroReceitasRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
+    '/financeiro/despesas': {
+      id: '/financeiro/despesas'
+      path: '/despesas'
+      fullPath: '/financeiro/despesas'
+      preLoaderRoute: typeof FinanceiroDespesasRouteImport
+      parentRoute: typeof FinanceiroRoute
     }
     '/associado/painel': {
       id: '/associado/painel'
@@ -611,6 +666,22 @@ const AlunosRouteChildren: AlunosRouteChildren = {
 const AlunosRouteWithChildren =
   AlunosRoute._addFileChildren(AlunosRouteChildren)
 
+interface FinanceiroRouteChildren {
+  FinanceiroDespesasRoute: typeof FinanceiroDespesasRoute
+  FinanceiroReceitasRoute: typeof FinanceiroReceitasRoute
+  FinanceiroIndexRoute: typeof FinanceiroIndexRoute
+}
+
+const FinanceiroRouteChildren: FinanceiroRouteChildren = {
+  FinanceiroDespesasRoute: FinanceiroDespesasRoute,
+  FinanceiroReceitasRoute: FinanceiroReceitasRoute,
+  FinanceiroIndexRoute: FinanceiroIndexRoute,
+}
+
+const FinanceiroRouteWithChildren = FinanceiroRoute._addFileChildren(
+  FinanceiroRouteChildren,
+)
+
 interface ResponsavelRouteChildren {
   ResponsavelDashboardRoute: typeof ResponsavelDashboardRoute
   ResponsavelIndexRoute: typeof ResponsavelIndexRoute
@@ -629,7 +700,7 @@ const rootRouteChildren: RootRouteChildren = {
   SiteRoute: SiteRouteWithChildren,
   AlunosRoute: AlunosRouteWithChildren,
   DashboardRoute: DashboardRoute,
-  FinanceiroRoute: FinanceiroRoute,
+  FinanceiroRoute: FinanceiroRouteWithChildren,
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,

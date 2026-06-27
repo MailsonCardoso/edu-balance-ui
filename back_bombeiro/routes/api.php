@@ -30,8 +30,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/dashboard/financeiro', [App\Http\Controllers\DashboardController::class, 'financeiro']);
     Route::apiResource('alunos', AlunoController::class);
+    Route::get('/alunos/{aluno}/extrato', [AlunoController::class, 'extrato']);
     Route::post('/mensalidades/verificar-vencidas', [MensalidadeController::class, 'verificarVencidas']);
     Route::apiResource('mensalidades', MensalidadeController::class);
+    Route::apiResource('financial-categories', FinancialCategoryController::class)->except(['show']);
+    Route::apiResource('revenues', RevenueController::class);
+    Route::apiResource('expenses', ExpenseController::class);
 
     Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
     Route::apiResource('categorias', App\Http\Controllers\CategoriaController::class)->except(['show']);
