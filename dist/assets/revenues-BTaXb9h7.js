@@ -1,1 +1,0 @@
-import{K as t}from"./index-CKju0Ui5.js";async function u(){const{data:e}=await t.get("/revenues");return e}async function c(e){const{data:a}=await t.post("/revenues",e);return a}async function r(e,a){const{data:n}=await t.put(`/revenues/${e}`,a);return n}async function o(e){await t.delete(`/revenues/${e}`)}export{c,o as d,u as f,r as u};

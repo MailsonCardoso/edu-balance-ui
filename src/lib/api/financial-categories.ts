@@ -8,8 +8,12 @@ export interface FinancialCategory {
 }
 
 export async function fetchCategories(): Promise<FinancialCategory[]> {
-  const { data } = await api.get("/financial-categories");
-  return data;
+  try {
+    const { data } = await api.get("/financial-categories");
+    return data;
+  } catch {
+    return [];
+  }
 }
 
 export async function createCategory(c: Partial<FinancialCategory>): Promise<FinancialCategory> {

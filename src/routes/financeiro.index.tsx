@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { CheckCircle2, FileText, History, Loader2, MessageCircle, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X, TrendingUp, AlertTriangle, Users, DollarSign } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
@@ -393,19 +392,7 @@ function Financeiro() {
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-xl p-4 mb-6">
-            <p className="text-sm font-medium mb-3">Receitas dos últimos 6 meses</p>
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dashboard.receitas_mensais}>
-                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `R$${(v / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v: number) => [brl(v), "Receita"]} />
-                  <Bar dataKey="receita" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+
         </>
       )}
 

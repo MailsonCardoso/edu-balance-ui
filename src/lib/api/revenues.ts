@@ -15,8 +15,12 @@ export interface Revenue {
 }
 
 export async function fetchRevenues(): Promise<Revenue[]> {
-  const { data } = await api.get("/revenues");
-  return data;
+  try {
+    const { data } = await api.get("/revenues");
+    return data;
+  } catch {
+    return [];
+  }
 }
 
 export async function createRevenue(r: Partial<Revenue>): Promise<Revenue> {

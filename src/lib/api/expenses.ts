@@ -15,8 +15,12 @@ export interface Expense {
 }
 
 export async function fetchExpenses(): Promise<Expense[]> {
-  const { data } = await api.get("/expenses");
-  return data;
+  try {
+    const { data } = await api.get("/expenses");
+    return data;
+  } catch {
+    return [];
+  }
 }
 
 export async function createExpense(e: Partial<Expense>): Promise<Expense> {
