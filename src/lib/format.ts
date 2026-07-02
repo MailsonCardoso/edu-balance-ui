@@ -1,4 +1,4 @@
-export const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+export const brl = (v: number | string) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const fmtDate = (iso: string) => {
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(iso)) return iso;
