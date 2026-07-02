@@ -255,7 +255,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <ChartCard title="Receita mensal" subtitle="Valores recebidos por mês" index={0}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <AreaChart data={chartData.receitaMensal}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
@@ -276,7 +276,7 @@ function Dashboard() {
         </ChartCard>
 
         <ChartCard title="Receita anual" subtitle="Por ano" index={1}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <BarChart data={chartData.receitaAnual}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="ano" tick={axisStyle} stroke="var(--border)" />
@@ -293,7 +293,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Inadimplência por período" subtitle="Percentual do valor em atraso" index={2}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <LineChart data={chartData.inadimplencia}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />
@@ -308,7 +308,7 @@ function Dashboard() {
         </ChartCard>
 
         <ChartCard title="Evolução de pagamentos" subtitle="Pagos vs pendentes no mês" index={3}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <AreaChart data={pagamentosDiarios}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="dia" tick={axisStyle} stroke="var(--border)" />

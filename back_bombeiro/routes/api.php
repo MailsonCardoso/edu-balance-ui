@@ -3,7 +3,11 @@
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MensalidadeController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FinancialCategoryController;
+use App\Http\Controllers\PatrimonioController;
 use App\Http\Controllers\ResponsavelController;
+use App\Http\Controllers\RevenueController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas
