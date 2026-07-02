@@ -45,7 +45,7 @@ function ChartCard({
         <h3 className="font-semibold">{title}</h3>
         {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
-      <div className="h-64 min-w-0">{children}</div>
+      <div className="h-64 w-full min-w-0">{children}</div>
     </div>
   );
 }
@@ -308,7 +308,7 @@ function Dashboard() {
         </ChartCard>
 
         <ChartCard title="Evolução de pagamentos" subtitle="Pagos vs pendentes no mês" index={3}>
-          <ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={pagamentosDiarios}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="dia" tick={axisStyle} stroke="var(--border)" />
