@@ -45,7 +45,7 @@ function ChartCard({
         <h3 className="font-semibold">{title}</h3>
         {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
-      <div className="h-64">{children}</div>
+      <div className="h-64 min-w-0">{children}</div>
     </div>
   );
 }
@@ -255,7 +255,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <ChartCard title="Receita mensal" subtitle="Valores recebidos por mês" index={0}>
-          <ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData.receitaMensal}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
@@ -276,7 +276,7 @@ function Dashboard() {
         </ChartCard>
 
         <ChartCard title="Receita anual" subtitle="Por ano" index={1}>
-          <ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData.receitaAnual}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="ano" tick={axisStyle} stroke="var(--border)" />
@@ -293,7 +293,7 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChartCard title="Inadimplência por período" subtitle="Percentual do valor em atraso" index={2}>
-          <ResponsiveContainer>
+          <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData.inadimplencia}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />

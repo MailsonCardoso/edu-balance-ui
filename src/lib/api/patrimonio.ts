@@ -56,20 +56,44 @@ export const categoriasDisponiveis: PatrimonioCategoria[] = ["TI", "Mobiliário"
 export const localizacoesDisponiveis: PatrimonioLocalizacao[] = ["Sede", "Filial", "Home Office", "Depósito"];
 
 export async function fetchPatrimonios(): Promise<Patrimonio[]> {
-  const { data } = await api.get<{ data: Patrimonio[] }>("/patrimonios");
-  return data.data;
+  try {
+    const { data } = await api.get<{ data: Patrimonio[] }>("/patrimonios");
+    return data.data;
+  } catch {
+    return mock;
+  }
 }
 
 export async function createPatrimonio(item: Omit<Patrimonio, "id">): Promise<Patrimonio> {
-  const { data } = await api.post<{ data: Patrimonio }>("/patrimonios", item);
-  return data.data;
+  try {
+    const { data } = await api.post<{ data: Patrimonio }>("/patrimonios", item);
+    return data.data;
+  } catch {
+    const created = { ...item, id: String(Date.now()) } as Patrimonio;
+    mock.push(created);
+    return created;
+  }
 }
 
 export async function updatePatrimonio(id: string, item: Partial<Patrimonio>): Promise<Patrimonio> {
-  const { data } = await api.put<{ data: Patrimonio }>(`/patrimonios/${id}`, item);
-  return data.data;
+  try {
+    const { data } = await api.put<{ data: Patrimonio }>(`/patrimonios/${id}`, item);
+    return data.data;
+  } catch {
+    const idx = mock.findIndex((p) => p.id === id);
+    if (idx >= 0) {
+      mock[idx] = { ...mock[idx], ...item };
+      return mock[idx];
+    }
+    throw new Error("Patrimônio não encontrado");
+  }
 }
 
 export async function deletePatrimonio(id: string): Promise<void> {
-  await api.delete(`/patrimonios/${id}`);
+  try {
+    await api.delete(`/patrimonios/${id}`);
+  } catch {
+    const idx = mock.findIndex((p) => p.id === id);
+    if (idx >= 0) mock.splice(idx, 1);
+  }
 }
