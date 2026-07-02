@@ -138,7 +138,7 @@ function GestaoInventario() {
 
   const kpis = useMemo(() => {
     const total = data.length;
-    const valorTotal = data.reduce((s, i) => s + i.valorDepreciado, 0);
+    const valorTotal = data.reduce((s, i) => s + i.valorCompra, 0);
     const emManutencao = data.filter((i) => i.status === "em_manutencao").length;
     const alertas = data.filter((i) => {
       if (i.status === "baixado") return false;
