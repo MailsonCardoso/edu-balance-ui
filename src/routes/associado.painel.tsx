@@ -112,7 +112,7 @@ function PainelAssociado() {
           <div className="flex items-center gap-4">
             <div className="size-14 rounded-full bg-white/20 grid place-items-center backdrop-blur-sm ring-2 ring-white/30">
               <span className="text-xl font-bold text-white">
-                {associado.nome.charAt(0).toUpperCase()}
+                {associado?.nome?.charAt(0)?.toUpperCase()}
               </span>
             </div>
             <div className="flex-1">
