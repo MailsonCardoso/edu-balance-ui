@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('financial-categories', FinancialCategoryController::class)->except(['show']);
     Route::apiResource('revenues', RevenueController::class);
     Route::apiResource('expenses', ExpenseController::class);
+    Route::apiResource('patrimonios', PatrimonioController::class);
 
     Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
     Route::apiResource('categorias', App\Http\Controllers\CategoriaController::class)->except(['show']);

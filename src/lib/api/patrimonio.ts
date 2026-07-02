@@ -29,18 +29,18 @@ export const categoriasDisponiveis: PatrimonioCategoria[] = ["TI", "Mobiliário"
 export const localizacoesDisponiveis: PatrimonioLocalizacao[] = ["Sede", "Filial", "Home Office", "Depósito"];
 
 export async function fetchPatrimonios(): Promise<Patrimonio[]> {
-  const { data } = await api.get<{ data: Patrimonio[] }>("/patrimonios");
-  return data.data;
+  const { data } = await api.get<Patrimonio[]>("/patrimonios");
+  return data;
 }
 
 export async function createPatrimonio(item: Omit<Patrimonio, "id">): Promise<Patrimonio> {
-  const { data } = await api.post<{ data: Patrimonio }>("/patrimonios", item);
-  return data.data;
+  const { data } = await api.post<Patrimonio>("/patrimonios", item);
+  return data;
 }
 
 export async function updatePatrimonio(id: string, item: Partial<Patrimonio>): Promise<Patrimonio> {
-  const { data } = await api.put<{ data: Patrimonio }>(`/patrimonios/${id}`, item);
-  return data.data;
+  const { data } = await api.put<Patrimonio>(`/patrimonios/${id}`, item);
+  return data;
 }
 
 export async function deletePatrimonio(id: string): Promise<void> {
