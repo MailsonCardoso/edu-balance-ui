@@ -420,8 +420,7 @@ function GestaoInventario() {
                         </div>
                       </td>
                       <td className="px-4 py-2.5 text-right">
-                        <span className="font-medium tabular-nums">{brl(item.valorDepreciado)}</span>
-                        <p className="text-[11px] text-muted-foreground">Original: {brl(item.valorCompra)}</p>
+                        <span className="font-medium tabular-nums">{brl(item.valorCompra)}</span>
                       </td>
                       <td className="px-4 py-2.5">
                         <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border", statusColor(item.status))}>
@@ -765,10 +764,6 @@ function InventarioDetails({ patrimonio, onClose }: { patrimonio: Patrimonio; on
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-wide">Valor de Compra</p>
           <p className="font-medium">{brl(patrimonio.valorCompra)}</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground text-xs uppercase tracking-wide">Valor Depreciado</p>
-          <p className="font-medium">{brl(patrimonio.valorDepreciado)}</p>
         </div>
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-wide">Data de Compra</p>
