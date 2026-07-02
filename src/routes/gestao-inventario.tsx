@@ -54,7 +54,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { brl, fmtDate } from "@/lib/format";
+import { brl, fmtDate, maskCurrency, parseCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
   fetchPatrimonios,
@@ -596,6 +596,11 @@ function GestaoInventario() {
   );
 }
 
+function generateTag(): string {
+  const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+  return `PAT-${rand}`;
+}
+
 function InventarioForm({
   patrimonio,
   onSave,
@@ -606,14 +611,14 @@ function InventarioForm({
   onCancel: () => void;
 }) {
   const [form, setForm] = useState({
-    tag: patrimonio?.tag ?? "",
+    tag: patrimonio?.tag ?? generateTag(),
     nome: patrimonio?.nome ?? "",
     numeroSerie: patrimonio?.numeroSerie ?? "",
     categoria: (patrimonio?.categoria ?? "TI") as PatrimonioCategoria,
     localizacao: (patrimonio?.localizacao ?? "Sede") as PatrimonioLocalizacao,
     responsavel: patrimonio?.responsavel ?? "",
     setor: patrimonio?.setor ?? "",
-    valorCompra: patrimonio?.valorCompra ?? 0,
+    valorCompra: patrimonio?.valorCompra ? maskCurrency(String(Math.round(patrimonio.valorCompra * 100))) : "",
     valorDepreciado: patrimonio?.valorDepreciado ?? 0,
     dataCompra: patrimonio?.dataCompra ?? "",
     status: (patrimonio?.status ?? "ativo") as PatrimonioStatus,
@@ -630,7 +635,7 @@ function InventarioForm({
       localizacao: form.localizacao,
       responsavel: form.responsavel,
       setor: form.setor,
-      valorCompra: form.valorCompra,
+      valorCompra: form.valorCompra ? parseCurrency(form.valorCompra) : 0,
       valorDepreciado: form.valorDepreciado,
       dataCompra: form.dataCompra,
       dataUltimaAuditoria: patrimonio?.dataUltimaAuditoria ?? null,
@@ -643,7 +648,7 @@ function InventarioForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tag Patrimonial</label>
-          <Input value={form.tag} onChange={(e) => setForm((f) => ({ ...f, tag: e.target.value }))} placeholder="PAT-0001" />
+          <Input value={form.tag} onChange={(e) => setForm((f) => ({ ...f, tag: e.target.value }))} placeholder="PAT-0001" disabled={!patrimonio} className="bg-muted/40" />
         </div>
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Nº de Série</label>
@@ -684,15 +689,13 @@ function InventarioForm({
           <Input value={form.setor} onChange={(e) => setForm((f) => ({ ...f, setor: e.target.value }))} placeholder="TI" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor de Compra (R$)</label>
-          <Input type="number" step="0.01" value={form.valorCompra} onChange={(e) => setForm((f) => ({ ...f, valorCompra: Number(e.target.value) }))} />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor Depreciado (R$)</label>
-          <Input type="number" step="0.01" value={form.valorDepreciado} onChange={(e) => setForm((f) => ({ ...f, valorDepreciado: Number(e.target.value) }))} />
-        </div>
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor de Compra (R$)</label>
+        <Input
+          value={form.valorCompra}
+          onChange={(e) => setForm((f) => ({ ...f, valorCompra: maskCurrency(e.target.value) }))}
+          placeholder="R$ 0,00"
+        />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
