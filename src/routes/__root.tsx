@@ -17,7 +17,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -29,6 +29,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const hasResponsavelData = localStorage.getItem("responsavel_data");
 
   useEffect(() => {
+    if (loading) return;
     if (isPublicRoute) return;
 
     if (isResponsavelRoute && !hasResponsavelData) {
@@ -39,8 +40,9 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     if (!user) {
       navigate({ to: "/login", replace: true });
     }
-  }, [user, pathname, isPublicRoute, isResponsavelRoute, hasResponsavelData, navigate]);
+  }, [user, loading, pathname, isPublicRoute, isResponsavelRoute, hasResponsavelData, navigate]);
 
+  if (loading) return null;
   if (isPublicRoute) return <>{children}</>;
   if (isResponsavelRoute && !hasResponsavelData) return null;
   if (!user) return null;

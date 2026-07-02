@@ -30,6 +30,7 @@ import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as ResponsavelDashboardRouteImport } from './routes/responsavel.dashboard'
 import { Route as FinanceiroReceitasRouteImport } from './routes/financeiro.receitas'
+import { Route as FinanceiroReceitaDespesaRouteImport } from './routes/financeiro.receita-despesa'
 import { Route as FinanceiroDespesasRouteImport } from './routes/financeiro.despesas'
 import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
@@ -145,6 +146,12 @@ const FinanceiroReceitasRoute = FinanceiroReceitasRouteImport.update({
   path: '/receitas',
   getParentRoute: () => FinanceiroRoute,
 } as any)
+const FinanceiroReceitaDespesaRoute =
+  FinanceiroReceitaDespesaRouteImport.update({
+    id: '/receita-despesa',
+    path: '/receita-despesa',
+    getParentRoute: () => FinanceiroRoute,
+  } as any)
 const FinanceiroDespesasRoute = FinanceiroDespesasRouteImport.update({
   id: '/despesas',
   path: '/despesas',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/alunos/': typeof AlunosIndexRoute
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/': typeof SiteIndexRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/responsavel/dashboard': typeof ResponsavelDashboardRoute
   '/_site/': typeof SiteIndexRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/alunos/'
@@ -347,6 +358,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/responsavel/dashboard'
     | '/_site/'
@@ -556,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceiroReceitasRouteImport
       parentRoute: typeof FinanceiroRoute
     }
+    '/financeiro/receita-despesa': {
+      id: '/financeiro/receita-despesa'
+      path: '/receita-despesa'
+      fullPath: '/financeiro/receita-despesa'
+      preLoaderRoute: typeof FinanceiroReceitaDespesaRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
     '/financeiro/despesas': {
       id: '/financeiro/despesas'
       path: '/despesas'
@@ -668,12 +688,14 @@ const AlunosRouteWithChildren =
 
 interface FinanceiroRouteChildren {
   FinanceiroDespesasRoute: typeof FinanceiroDespesasRoute
+  FinanceiroReceitaDespesaRoute: typeof FinanceiroReceitaDespesaRoute
   FinanceiroReceitasRoute: typeof FinanceiroReceitasRoute
   FinanceiroIndexRoute: typeof FinanceiroIndexRoute
 }
 
 const FinanceiroRouteChildren: FinanceiroRouteChildren = {
   FinanceiroDespesasRoute: FinanceiroDespesasRoute,
+  FinanceiroReceitaDespesaRoute: FinanceiroReceitaDespesaRoute,
   FinanceiroReceitasRoute: FinanceiroReceitasRoute,
   FinanceiroIndexRoute: FinanceiroIndexRoute,
 }

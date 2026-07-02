@@ -7,8 +7,7 @@ export const Route = createFileRoute("/financeiro")({
 
 const tabs = [
   { to: "/financeiro", label: "Mensalidades", exact: true },
-  { to: "/financeiro/receitas", label: "Receitas" },
-  { to: "/financeiro/despesas", label: "Despesas" },
+  { to: "/financeiro/receita-despesa", label: "Receita/Despesa" },
 ];
 
 function FinanceiroLayout() {
