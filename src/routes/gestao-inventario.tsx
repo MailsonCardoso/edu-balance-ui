@@ -75,6 +75,15 @@ export const Route = createFileRoute("/gestao-inventario")({
 
 const statusList: PatrimonioStatus[] = ["ativo", "em_manutencao", "baixado", "emprestado"];
 
+const motivosBaixa = [
+  "Danificado (sem conserto)",
+  "Doado",
+  "Vendido",
+  "Roubo ou perda",
+  "Obsoleto/Substituído",
+  "Outro",
+] as const;
+
 function GestaoInventario() {
   const [data, setData] = useState<Patrimonio[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,8 +100,9 @@ function GestaoInventario() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Patrimonio | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<Patrimonio | null>(null);
   const [detailsTarget, setDetailsTarget] = useState<Patrimonio | null>(null);
+  const [baixaTarget, setBaixaTarget] = useState<{ item?: Patrimonio; bulkIds?: Set<string> } | null>(null);
+  const [baixaMotivo, setBaixaMotivo] = useState("");
 
   const allSelected = data.length > 0 && selected.size === data.length;
 
@@ -184,27 +194,25 @@ function GestaoInventario() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
+  const handleBaixaConfirm = async () => {
+    if (!baixaTarget || !baixaMotivo) return;
+    const motivo = `Motivo: ${baixaMotivo}`;
     try {
-      await deletePatrimonio(deleteTarget.id);
-      setData((d) => d.filter((a) => a.id !== deleteTarget.id));
-      toast.success("Ativo removido");
-      setDeleteTarget(null);
+      if (baixaTarget.item) {
+        const updated = await updatePatrimonio(baixaTarget.item.id, { status: "baixado" as PatrimonioStatus, observacao: motivo });
+        setData((d) => d.map((a) => (a.id === updated.id ? updated : a)));
+        toast.success("Ativo baixado!");
+      } else if (baixaTarget.bulkIds) {
+        const ids = Array.from(baixaTarget.bulkIds);
+        await Promise.all(ids.map((id) => updatePatrimonio(id, { status: "baixado" as PatrimonioStatus, observacao: motivo })));
+        setData((d) => d.map((a) => (ids.includes(a.id) ? { ...a, status: "baixado" as PatrimonioStatus, observacao: motivo } : a)));
+        toast.success(`${ids.length} ativo(s) baixado(s)!`);
+        setSelected(new Set());
+      }
+      setBaixaTarget(null);
+      setBaixaMotivo("");
     } catch {
-      toast.error("Erro ao excluir ativo");
-    }
-  };
-
-  const handleBulkBaixa = async () => {
-    if (selected.size === 0) return;
-    try {
-      await Promise.all(Array.from(selected).map((id) => deletePatrimonio(id)));
-      setData((d) => d.filter((a) => !selected.has(a.id)));
-      toast.success(`${selected.size} ativo(s) baixado(s)!`);
-      setSelected(new Set());
-    } catch {
-      toast.error("Erro ao baixar ativos");
+      toast.error("Erro ao dar baixa");
     }
   };
 
@@ -479,7 +487,7 @@ function GestaoInventario() {
                                 <FileSpreadsheet className="size-4 mr-2" /> Histórico
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => setDeleteTarget(item)}
+                                onClick={() => { setBaixaTarget({ item }); setBaixaMotivo(""); }}
                                 className="text-destructive"
                               >
                                 <Trash2 className="size-4 mr-2" /> Dar Baixa
@@ -503,7 +511,7 @@ function GestaoInventario() {
                     <Button size="sm" variant="outline" onClick={() => toast.success("Funcionalidade em desenvolvimento")}>
                       <Printer className="size-4" /> Etiquetas
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={handleBulkBaixa}>
+                    <Button size="sm" variant="destructive" onClick={() => { setBaixaTarget({ bulkIds: selected }); setBaixaMotivo(""); }}>
                       Dar Baixa
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
@@ -591,18 +599,42 @@ function GestaoInventario() {
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+      <AlertDialog open={!!baixaTarget} onOpenChange={(open) => { if (!open) { setBaixaTarget(null); setBaixaMotivo(""); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Dar baixa no ativo</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja baixar <strong>{deleteTarget?.nome}</strong> ({deleteTarget?.tag})? Esta ação pode ser desfeita posteriormente.
+              {baixaTarget?.item
+                ? `Informe o motivo para baixar ${baixaTarget.item.nome} (${baixaTarget.item.tag})`
+                : `Informe o motivo para baixar ${baixaTarget?.bulkIds?.size ?? 0} ativo(s)`}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-2 py-2">
+            {motivosBaixa.map((motivo) => (
+              <label
+                key={motivo}
+                className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors ${
+                  baixaMotivo === motivo
+                    ? "border-destructive bg-destructive/5 text-destructive"
+                    : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="baixaMotivo"
+                  value={motivo}
+                  checked={baixaMotivo === motivo}
+                  onChange={(e) => setBaixaMotivo(e.target.value)}
+                  className="size-4 accent-destructive"
+                />
+                <span className="text-sm font-medium">{motivo}</span>
+              </label>
+            ))}
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Sim, dar baixa
+            <AlertDialogAction onClick={handleBaixaConfirm} disabled={!baixaMotivo} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Confirmar Baixa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
