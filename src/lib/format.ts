@@ -6,6 +6,12 @@ export const fmtDate = (iso: string) => {
   return isNaN(d.getTime()) ? iso : d.toLocaleDateString("pt-BR");
 };
 
+export const toDateInput = (iso: string | null | undefined): string => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toISOString().slice(0, 10);
+};
+
 export const maskCPF = (value: string) => {
   const digits = value.replace(/\D/g, "").slice(0, 11);
   return digits

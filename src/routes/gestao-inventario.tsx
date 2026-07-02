@@ -54,7 +54,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { brl, fmtDate, maskCurrency, parseCurrency } from "@/lib/format";
+import { brl, fmtDate, maskCurrency, parseCurrency, toDateInput } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
   fetchPatrimonios,
@@ -193,6 +193,18 @@ function GestaoInventario() {
       setDeleteTarget(null);
     } catch {
       toast.error("Erro ao excluir ativo");
+    }
+  };
+
+  const handleBulkBaixa = async () => {
+    if (selected.size === 0) return;
+    try {
+      await Promise.all(Array.from(selected).map((id) => deletePatrimonio(id)));
+      setData((d) => d.filter((a) => !selected.has(a.id)));
+      toast.success(`${selected.size} ativo(s) baixado(s)!`);
+      setSelected(new Set());
+    } catch {
+      toast.error("Erro ao baixar ativos");
     }
   };
 
@@ -485,13 +497,13 @@ function GestaoInventario() {
                 <div className="sticky bottom-0 left-0 right-0 bg-primary/5 border-t border-border px-4 py-2.5 flex items-center justify-between animate-in">
                   <p className="text-sm font-medium">{selected.size} selecionado(s)</p>
                   <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => toast.success(`${selected.size} itens transferidos!`)}>
+                    <Button size="sm" variant="outline" onClick={() => toast.success("Funcionalidade em desenvolvimento")}>
                       <ArrowUpDown className="size-4" /> Transferir
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => toast.success(`${selected.size} etiquetas geradas!`)}>
+                    <Button size="sm" variant="outline" onClick={() => toast.success("Funcionalidade em desenvolvimento")}>
                       <Printer className="size-4" /> Etiquetas
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => toast.success(`${selected.size} itens baixados!`)}>
+                    <Button size="sm" variant="destructive" onClick={handleBulkBaixa}>
                       Dar Baixa
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
@@ -623,7 +635,7 @@ function InventarioForm({
     setor: patrimonio?.setor ?? "",
     valorCompra: patrimonio?.valorCompra ? maskCurrency(String(Math.round(patrimonio.valorCompra * 100))) : "",
     valorDepreciado: patrimonio?.valorDepreciado ?? 0,
-    dataCompra: patrimonio?.dataCompra ?? "",
+    dataCompra: toDateInput(patrimonio?.dataCompra),
     status: (patrimonio?.status ?? "ativo") as PatrimonioStatus,
   });
 
