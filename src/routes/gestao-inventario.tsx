@@ -630,6 +630,7 @@ function InventarioForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const parsedCompra = form.valorCompra ? parseCurrency(form.valorCompra) : 0;
     onSave({
       id: patrimonio?.id ?? "",
       tag: form.tag,
@@ -639,8 +640,8 @@ function InventarioForm({
       localizacao: form.localizacao,
       responsavel: form.responsavel,
       setor: form.setor,
-      valorCompra: form.valorCompra ? parseCurrency(form.valorCompra) : 0,
-      valorDepreciado: form.valorDepreciado,
+      valorCompra: parsedCompra,
+      valorDepreciado: patrimonio ? form.valorDepreciado : parsedCompra,
       dataCompra: form.dataCompra,
       dataUltimaAuditoria: patrimonio?.dataUltimaAuditoria ?? null,
       status: form.status,
