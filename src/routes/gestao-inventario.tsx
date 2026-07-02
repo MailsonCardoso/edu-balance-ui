@@ -175,8 +175,12 @@ function GestaoInventario() {
         toast.success("Ativo cadastrado!");
         setSheetOpen(false);
       }
-    } catch {
-      toast.error("Erro ao salvar ativo");
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response: { data: { message?: string } } }).response?.data?.message
+          : null;
+      toast.error(msg || "Erro ao salvar ativo");
     }
   };
 
