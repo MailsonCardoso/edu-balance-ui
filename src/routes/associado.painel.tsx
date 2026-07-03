@@ -88,7 +88,9 @@ function PainelAssociado() {
         }
       })
       .catch(() => {
-        console.warn("Falha ao atualizar dados do associado, usando cache");
+        localStorage.removeItem("associado_token");
+        localStorage.removeItem("associado_data");
+        navigate({ to: "/associado", replace: true });
       })
       .finally(() => {
         if (!stored) setLoading(false);

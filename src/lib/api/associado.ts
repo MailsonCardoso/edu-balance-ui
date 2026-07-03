@@ -52,8 +52,7 @@ export async function loginAssociado(
 }
 
 export async function getAssociado(): Promise<AssociadoResponse> {
-  const token = localStorage.getItem("associado_token") || localStorage.getItem("edu_token");
-  const { data } = await api.get<AssociadoResponse>(`/associado?token=${token || ""}`);
+  const { data } = await api.get<AssociadoResponse>("/associado");
   return data;
 }
 

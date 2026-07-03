@@ -9,8 +9,6 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    config.headers["X-Auth-Token"] = token;
-    config.params = { ...config.params, token };
   }
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];

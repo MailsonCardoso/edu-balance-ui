@@ -109,24 +109,7 @@ class AssociadoController extends Controller
         $associado = $this->getAuthenticated($request);
 
         if (!$associado) {
-            $bearerToken = $request->bearerToken() ?: '(none)';
-            $authHeader = $request->header('Authorization') ?: '(none)';
-            $xAuthToken = $request->header('X-Auth-Token') ?: '(none)';
-            $queryToken = $request->query('token') ?: '(none)';
-            $allHeaders = json_encode(array_keys($request->headers->all()));
-            $storedKeys = json_encode(array_keys($_SERVER));
-            return response()->json([
-                'success' => false,
-                'message' => 'Não autorizado.',
-                'debug' => [
-                    'bearer_token' => $bearerToken,
-                    'auth_header' => $authHeader,
-                    'x_auth_token' => $xAuthToken,
-                    'query_token' => $queryToken,
-                    'all_header_keys' => $allHeaders,
-                    'server_keys_count' => count($_SERVER),
-                ],
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
         }
 
         $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
@@ -295,9 +278,6 @@ class AssociadoController extends Controller
     private function getAuthenticated(Request $request): ?Associado
     {
         $token = $request->bearerToken();
-        if (!$token) {
-            $token = $request->query('token') ?: $request->header('X-Auth-Token');
-        }
         if (!$token) return null;
         return Associado::where('api_token', $token)->first();
     }
