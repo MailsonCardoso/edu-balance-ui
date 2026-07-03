@@ -70,14 +70,18 @@ function PainelAssociado() {
 
     const stored = localStorage.getItem("associado_data");
     if (stored) {
-      setAssociado(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      if (!parsed.alunos) parsed.alunos = [];
+      setAssociado(parsed);
     }
 
     getAssociado()
       .then((res) => {
         if (res.success && res.associado) {
-          setAssociado(res.associado);
-          localStorage.setItem("associado_data", JSON.stringify(res.associado));
+          const data = res.associado;
+          if (!data.alunos) data.alunos = [];
+          setAssociado(data);
+          localStorage.setItem("associado_data", JSON.stringify(data));
         }
       })
       .catch(() => {

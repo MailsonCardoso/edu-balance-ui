@@ -37,6 +37,8 @@ class AssociadoController extends Controller
         $token = Str::random(60);
         $associado->forceFill(['api_token' => $token])->save();
 
+        $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
+
         return response()->json([
             'success' => true,
             'message' => 'Cadastro realizado com sucesso!',
@@ -44,6 +46,12 @@ class AssociadoController extends Controller
                 'id' => $associado->id,
                 'nome' => $associado->nome,
                 'email' => $associado->email,
+                'telefone' => $associado->telefone,
+                'cpf' => $associado->cpf,
+                'nome_aluno' => $associado->nome_aluno,
+                'alunos' => $alunos->map(fn ($al) => ['nome' => $al->nome, 'id' => $al->id])->values()->toArray(),
+                'status' => $associado->status,
+                'created_at' => $associado->created_at->format('d/m/Y'),
             ],
             'token' => $token,
         ], 201);
@@ -76,6 +84,8 @@ class AssociadoController extends Controller
         $token = Str::random(60);
         $associado->forceFill(['api_token' => $token])->save();
 
+        $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
+
         return response()->json([
             'success' => true,
             'message' => 'Login realizado com sucesso.',
@@ -86,6 +96,7 @@ class AssociadoController extends Controller
                 'telefone' => $associado->telefone,
                 'cpf' => $associado->cpf,
                 'nome_aluno' => $associado->nome_aluno,
+                'alunos' => $alunos->map(fn ($al) => ['nome' => $al->nome, 'id' => $al->id])->values()->toArray(),
                 'status' => $associado->status,
                 'created_at' => $associado->created_at->format('d/m/Y'),
             ],
