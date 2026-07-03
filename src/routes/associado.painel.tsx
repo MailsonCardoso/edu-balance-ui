@@ -71,8 +71,7 @@ function PainelAssociado() {
     }
 
     const token = localStorage.getItem("associado_token");
-    const email = localStorage.getItem("associado_email");
-    if (!token && !email) {
+    if (!token) {
       if (!stored) {
         navigate({ to: "/associado", replace: true });
       }

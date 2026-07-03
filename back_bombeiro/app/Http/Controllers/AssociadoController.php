@@ -109,18 +109,12 @@ class AssociadoController extends Controller
         $associado = $this->getAuthenticated($request);
 
         if (!$associado) {
-            $email = $request->query('email');
-            if ($email) {
-                $associado = Associado::where('email', $email)->first();
-            }
-        }
-
-        if (!$associado) {
             $bearerToken = $request->bearerToken() ?: '(none)';
             $authHeader = $request->header('Authorization') ?: '(none)';
             $xAuthToken = $request->header('X-Auth-Token') ?: '(none)';
             $queryToken = $request->query('token') ?: '(none)';
             $allHeaders = json_encode(array_keys($request->headers->all()));
+            $storedKeys = json_encode(array_keys($_SERVER));
             return response()->json([
                 'success' => false,
                 'message' => 'Não autorizado.',
@@ -130,6 +124,7 @@ class AssociadoController extends Controller
                     'x_auth_token' => $xAuthToken,
                     'query_token' => $queryToken,
                     'all_header_keys' => $allHeaders,
+                    'server_keys_count' => count($_SERVER),
                 ],
             ], 401);
         }
@@ -178,13 +173,6 @@ class AssociadoController extends Controller
     public function mensalidades(Request $request): JsonResponse
     {
         $associado = $this->getAuthenticated($request);
-
-        if (!$associado) {
-            $email = $request->query('email');
-            if ($email) {
-                $associado = Associado::where('email', $email)->first();
-            }
-        }
 
         if (!$associado) {
             return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
