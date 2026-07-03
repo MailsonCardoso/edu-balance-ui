@@ -62,17 +62,20 @@ function PainelAssociado() {
   const [tab, setTab] = useState("painel");
 
   useEffect(() => {
-    const token = localStorage.getItem("associado_token");
-    if (!token) {
-      navigate({ to: "/associado", replace: true });
-      return;
-    }
-
     const stored = localStorage.getItem("associado_data");
     if (stored) {
       const parsed = JSON.parse(stored);
       if (!parsed.alunos) parsed.alunos = [];
       setAssociado(parsed);
+      setLoading(false);
+    }
+
+    const token = localStorage.getItem("associado_token");
+    if (!token) {
+      if (!stored) {
+        navigate({ to: "/associado", replace: true });
+      }
+      return;
     }
 
     getAssociado()
@@ -85,11 +88,11 @@ function PainelAssociado() {
         }
       })
       .catch(() => {
-        localStorage.removeItem("associado_token");
-        localStorage.removeItem("associado_data");
-        navigate({ to: "/associado", replace: true });
+        console.warn("Falha ao atualizar dados do associado, usando cache");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!stored) setLoading(false);
+      });
   }, [navigate]);
 
   const handleLogout = () => {
