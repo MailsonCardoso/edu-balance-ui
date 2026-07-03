@@ -67,7 +67,9 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
 
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
         {nav.map((item) => {
-          const active = pathname.startsWith(item.to);
+          const sorted = [...nav].sort((a, b) => b.to.length - a.to.length);
+          const best = sorted.find((i) => pathname === i.to || pathname.startsWith(i.to + "/"));
+          const active = best?.to === item.to;
           const Icon = item.icon;
           return (
             <Link
