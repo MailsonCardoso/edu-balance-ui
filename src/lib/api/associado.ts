@@ -56,3 +56,27 @@ export async function updateAssociado(
   const { data } = await api.put<AssociadoResponse>("/associado", payload);
   return data;
 }
+
+export interface AssociadoListItem {
+  id: number;
+  nome: string;
+  cpf: string;
+  email: string;
+  telefone: string;
+  nome_aluno: string | null;
+  aluno_nome: string | null;
+  status: string;
+  created_at: string;
+}
+
+export async function fetchAssociados(): Promise<AssociadoListItem[]> {
+  const { data } = await api.get<{ data: AssociadoListItem[] }>("/associados");
+  return data.data;
+}
+
+export async function deleteAssociado(
+  id: number
+): Promise<{ success: boolean; message: string }> {
+  const { data } = await api.delete(`/associados/${id}`);
+  return data;
+}

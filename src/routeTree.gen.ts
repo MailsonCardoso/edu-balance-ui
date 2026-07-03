@@ -20,6 +20,7 @@ import { Route as GestaoInventarioRouteImport } from './routes/gestao-inventario
 import { Route as GestaoEstatutoRouteImport } from './routes/gestao-estatuto'
 import { Route as GestaoDocumentosRouteImport } from './routes/gestao-documentos'
 import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
+import { Route as GestaoAssociadosRouteImport } from './routes/gestao-associados'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AlunosRouteImport } from './routes/alunos'
@@ -95,6 +96,11 @@ const GestaoDocumentosRoute = GestaoDocumentosRouteImport.update({
 const GestaoCategoriasRoute = GestaoCategoriasRouteImport.update({
   id: '/gestao-categorias',
   path: '/gestao-categorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoAssociadosRoute = GestaoAssociadosRouteImport.update({
+  id: '/gestao-associados',
+  path: '/gestao-associados',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceiroRoute = FinanceiroRouteImport.update({
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
+  '/gestao-associados': typeof GestaoAssociadosRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
+  '/gestao-associados': typeof GestaoAssociadosRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -272,6 +280,7 @@ export interface FileRoutesById {
   '/alunos': typeof AlunosRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
+  '/gestao-associados': typeof GestaoAssociadosRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-associados'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/dashboard'
+    | '/gestao-associados'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -371,6 +382,7 @@ export interface FileRouteTypes {
     | '/alunos'
     | '/dashboard'
     | '/financeiro'
+    | '/gestao-associados'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   AlunosRoute: typeof AlunosRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   FinanceiroRoute: typeof FinanceiroRouteWithChildren
+  GestaoAssociadosRoute: typeof GestaoAssociadosRoute
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
@@ -497,6 +510,13 @@ declare module '@tanstack/react-router' {
       path: '/gestao-categorias'
       fullPath: '/gestao-categorias'
       preLoaderRoute: typeof GestaoCategoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-associados': {
+      id: '/gestao-associados'
+      path: '/gestao-associados'
+      fullPath: '/gestao-associados'
+      preLoaderRoute: typeof GestaoAssociadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financeiro': {
@@ -723,6 +743,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlunosRoute: AlunosRouteWithChildren,
   DashboardRoute: DashboardRoute,
   FinanceiroRoute: FinanceiroRouteWithChildren,
+  GestaoAssociadosRoute: GestaoAssociadosRoute,
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,

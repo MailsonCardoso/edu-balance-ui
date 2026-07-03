@@ -165,6 +165,42 @@ class AssociadoController extends Controller
         return response()->json(['success' => true, 'data' => $mensalidades]);
     }
 
+    public function listAll(): JsonResponse
+    {
+        $associados = Associado::with('aluno:id,nome')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(fn ($a) => [
+                'id' => $a->id,
+                'nome' => $a->nome,
+                'cpf' => $a->cpf,
+                'email' => $a->email,
+                'telefone' => $a->telefone,
+                'nome_aluno' => $a->nome_aluno,
+                'aluno_nome' => $a->aluno?->nome,
+                'status' => $a->status,
+                'created_at' => $a->created_at->format('d/m/Y'),
+            ]);
+
+        return response()->json(['data' => $associados]);
+    }
+
+    public function destroy($id): JsonResponse
+    {
+        $associado = Associado::find($id);
+
+        if (!$associado) {
+            return response()->json(['success' => false, 'message' => 'Associado não encontrado.'], 404);
+        }
+
+        $associado->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Associado excluído com sucesso.',
+        ]);
+    }
+
     private function getAuthenticated(Request $request): ?Associado
     {
         $token = $request->bearerToken();

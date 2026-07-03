@@ -48,4 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/documentos', [App\Http\Controllers\DocumentoController::class, 'store']);
     Route::post('/documentos/{documento}', [App\Http\Controllers\DocumentoController::class, 'update']);
     Route::delete('/documentos/{documento}', [App\Http\Controllers\DocumentoController::class, 'destroy']);
+    Route::get('/associados', [App\Http\Controllers\AssociadoController::class, 'listAll']);
+    Route::delete('/associados/{id}', [App\Http\Controllers\AssociadoController::class, 'destroy']);
 });
