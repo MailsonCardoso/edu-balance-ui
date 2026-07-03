@@ -127,27 +127,17 @@ function GestaoAssociados() {
                     <td className="px-4 py-3 text-muted-foreground">{a.email}</td>
                     <td className="px-4 py-3 text-muted-foreground">{a.telefone}</td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {a.alunos.length > 0 ? (
-                        <>
-                          <button
-                            onClick={() => setAlunosDialog(a)}
-                            className="md:hidden text-primary underline-offset-2 hover:underline cursor-pointer"
-                          >
-                            {a.alunos.length} {a.alunos.length === 1 ? "aluno" : "alunos"}
-                          </button>
-                          <div className="hidden md:flex flex-wrap gap-1">
-                            {a.alunos.map((al, i) => (
-                              <span
-                                key={i}
-                                className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium"
-                              >
-                                {al.nome}
-                              </span>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
+                      {a.alunos.length === 0 ? (
                         "-"
+                      ) : a.alunos.length === 1 ? (
+                        a.alunos[0].nome
+                      ) : (
+                        <button
+                          onClick={() => setAlunosDialog(a)}
+                          className="text-primary underline-offset-2 hover:underline cursor-pointer"
+                        >
+                          {a.alunos.length} alunos
+                        </button>
                       )}
                     </td>
                     <td className="px-4 py-3">
