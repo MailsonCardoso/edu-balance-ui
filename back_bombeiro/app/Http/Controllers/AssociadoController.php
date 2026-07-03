@@ -65,6 +65,13 @@ class AssociadoController extends Controller
             ], 401);
         }
 
+        if (!$associado->aluno_id) {
+            $aluno = Aluno::where('cpf_responsavel', $associado->cpf)->first();
+            if ($aluno) {
+                $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
+            }
+        }
+
         $token = Str::random(60);
         $associado->forceFill(['api_token' => $token])->save();
 
@@ -93,6 +100,13 @@ class AssociadoController extends Controller
             return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
         }
 
+        if (!$associado->aluno_id) {
+            $aluno = Aluno::where('cpf_responsavel', $associado->cpf)->first();
+            if ($aluno) {
+                $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
+            }
+        }
+
         return response()->json([
             'success' => true,
             'associado' => [
@@ -102,6 +116,7 @@ class AssociadoController extends Controller
                 'telefone' => $associado->telefone,
                 'cpf' => $associado->cpf,
                 'nome_aluno' => $associado->nome_aluno,
+                'aluno_nome' => $associado->aluno?->nome,
                 'status' => $associado->status,
                 'created_at' => $associado->created_at->format('d/m/Y'),
             ],
