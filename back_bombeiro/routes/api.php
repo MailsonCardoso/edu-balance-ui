@@ -6,13 +6,11 @@ use App\Http\Controllers\MensalidadeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinancialCategoryController;
 use App\Http\Controllers\PatrimonioController;
-use App\Http\Controllers\ResponsavelController;
 use App\Http\Controllers\RevenueController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/responsavel/login', [ResponsavelController::class, 'login']);
 Route::get('/alunos/check-cpf/{cpf}', [AlunoController::class, 'checkCpf']);
 Route::get('/noticias/publicas', [App\Http\Controllers\NoticiaController::class, 'publicas']);
 Route::get('/ouvidoria', [App\Http\Controllers\OuvidoriaController::class, 'index']);

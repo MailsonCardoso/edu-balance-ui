@@ -195,16 +195,15 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
     return { pendentes, vencidas, pagas, totalValor, pagoValor, adimplencia };
   }, [mensalidades]);
 
-  const recentes = useMemo(
-    () => [...mensalidades].sort((a, b) => {
-      const parse = (d: string) => {
-        const [dd, mm, yyyy] = d.split("/").map(Number);
-        return new Date(yyyy, mm - 1, dd).getTime();
-      };
-      return parse(b.dataVencimento) - parse(a.dataVencimento);
-    }).slice(0, 5),
-    [mensalidades]
-  );
+  const mensalidadesPorAluno = useMemo(() => {
+    const grupos: Record<string, Mensalidade[]> = {};
+    for (const m of mensalidades) {
+      const nome = m.alunoNome || "Sem nome";
+      if (!grupos[nome]) grupos[nome] = [];
+      grupos[nome].push(m);
+    }
+    return grupos;
+  }, [mensalidades]);
 
   return (
     <div className="space-y-6">
@@ -239,15 +238,6 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
               </div>
             ))}
           </div>
-          {associado.nome_aluno && (
-            <div className="mt-4 bg-white rounded-xl p-4 shadow-sm border border-gray-50">
-              <div className="flex items-center gap-2 text-gray-400 mb-1.5">
-                <User className="size-3.5" />
-                <span className="text-xs">Aluno vinculado</span>
-              </div>
-              <p className="text-sm font-medium text-gray-900">{associado.nome_aluno}</p>
-            </div>
-          )}
         </div>
       </div>
 
@@ -318,42 +308,90 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
         </div>
       </div>
 
-      {!loading && recentes.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-50">
-            <h3 className="text-sm font-semibold text-gray-900">Mensalidades Recentes</h3>
-          </div>
-          <div>
-            {recentes.map((m, idx) => {
-              const StatusIcon = m.status === "pago" ? CheckCircle2 : m.status === "atrasado" ? AlertCircle : Clock;
-              const statusColor = m.status === "pago" ? "text-emerald-500" : m.status === "atrasado" ? "text-red-500" : "text-amber-500";
-              const bgColor = m.status === "pago" ? "bg-emerald-50" : m.status === "atrasado" ? "bg-red-50" : "bg-amber-50";
-              return (
-                <div key={m.id} className={`flex items-center gap-4 px-6 py-3.5 hover:bg-gray-50/50 transition-colors ${idx < recentes.length - 1 ? "border-b border-gray-50" : ""}`}>
-                  <div className={`size-9 rounded-lg ${bgColor} grid place-items-center`}>
-                    <StatusIcon className={`size-4 ${statusColor}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{m.mesReferencia}</p>
-                    <p className="text-xs text-gray-400">{m.status === "pago" ? `Pago em ${m.dataPagamento}` : `Vence ${m.dataVencimento}`}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-900">{brl(m.valor)}</p>
-                    <p className={`text-xs font-medium ${statusColor}`}>
-                      {m.status === "pago" ? "Pago" : m.status === "atrasado" ? "Atrasado" : "Pendente"}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {loading && (
+      {loading ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 flex items-center justify-center">
           <Loader2 className="size-6 animate-spin text-[#D62828]" />
         </div>
+      ) : (
+        Object.entries(mensalidadesPorAluno).map(([alunoNome, ms]) => {
+          const pendentes = ms.filter((m) => m.status === "pendente" || m.status === "atrasado");
+          const totalDevido = pendentes.reduce((s, m) => s + m.valor, 0);
+
+          return (
+            <div key={alunoNome} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent px-6 py-5 border-b border-gray-50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="size-12 rounded-xl bg-[#D62828]/5 grid place-items-center">
+                      <User className="size-6 text-[#D62828]" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-gray-900">{alunoNome}</h3>
+                      <p className="text-xs text-gray-400">{ms.length} mensalidade{ms.length !== 1 ? "s" : ""}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-px bg-gray-50">
+                <div className="bg-white p-5 text-center">
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Mensalidades</p>
+                  <p className="text-xl font-bold text-gray-900">{ms.length}</p>
+                </div>
+                <div className="bg-white p-5 text-center">
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Em aberto</p>
+                  <p className={`text-xl font-bold ${pendentes.length > 0 ? "text-amber-500" : "text-emerald-500"}`}>
+                    {pendentes.length}
+                  </p>
+                </div>
+                <div className="bg-white p-5 text-center">
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Valor devido</p>
+                  <p className={`text-xl font-bold ${totalDevido > 0 ? "text-red-500" : "text-emerald-500"}`}>
+                    {totalDevido > 0 ? brl(totalDevido) : "—"}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <div className="px-6 py-3 border-b border-gray-50 bg-gray-50/30">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mensalidades</p>
+                </div>
+                {ms.map((m, idx) => {
+                  const StatusIcon = m.status === "pago" ? CheckCircle2 : m.status === "atrasado" ? AlertCircle : Clock;
+                  const statusColor = m.status === "pago" ? "text-emerald-500" : m.status === "atrasado" ? "text-red-500" : "text-amber-500";
+                  const bgColor = m.status === "pago" ? "bg-emerald-50" : m.status === "atrasado" ? "bg-red-50" : "bg-amber-50";
+                  return (
+                    <div key={m.id} className={`flex items-center gap-4 px-6 py-4 hover:bg-gray-50/50 transition-colors ${idx < ms.length - 1 ? "border-b border-gray-50" : ""}`}>
+                      <div className={`size-10 rounded-lg ${bgColor} grid place-items-center flex-shrink-0`}>
+                        <StatusIcon className={`size-5 ${statusColor}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className={`text-xs font-medium ${statusColor}`}>
+                                {m.status === "pago" ? "Pago" : m.status === "atrasado" ? "Atrasado" : "Pendente"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className={`text-sm font-bold ${statusColor}`}>
+                              {brl(m.valor)}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {m.status === "pago" ? `Pago em ${m.dataPagamento}` : `Vence ${m.dataVencimento}`}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })
       )}
     </div>
   );
@@ -806,12 +844,18 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
           </div>
         </div>
 
-        {associado.nome_aluno && (
+        {associado.alunos.length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-50">
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Aluno vinculado</label>
-            <div className="h-11 flex items-center px-4 bg-gradient-to-r from-[#D62828]/5 to-transparent rounded-xl text-sm font-medium text-gray-900">
-              <User className="size-4 text-[#D62828] mr-2 flex-shrink-0" />
-              {associado.nome_aluno}
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              {associado.alunos.length === 1 ? "Aluno vinculado" : "Alunos vinculados"}
+            </label>
+            <div className="space-y-2">
+              {associado.alunos.map((al) => (
+                <div key={al.id} className="h-11 flex items-center px-4 bg-gradient-to-r from-[#D62828]/5 to-transparent rounded-xl text-sm font-medium text-gray-900">
+                  <User className="size-4 text-[#D62828] mr-2 flex-shrink-0" />
+                  {al.nome}
+                </div>
+              ))}
             </div>
           </div>
         )}

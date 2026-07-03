@@ -9,6 +9,11 @@ export interface CadastroPayload {
   password: string;
 }
 
+export interface AssociadoAluno {
+  id: number;
+  nome: string;
+}
+
 export interface AssociadoData {
   id: number;
   nome: string;
@@ -16,7 +21,7 @@ export interface AssociadoData {
   telefone: string;
   cpf: string;
   nome_aluno: string | null;
-  aluno_nome: string | null;
+  alunos: AssociadoAluno[];
   status: string;
   created_at: string;
 }
@@ -56,10 +61,6 @@ export async function updateAssociado(
 ): Promise<AssociadoResponse> {
   const { data } = await api.put<AssociadoResponse>("/associado", payload);
   return data;
-}
-
-export interface AssociadoAluno {
-  nome: string;
 }
 
 export interface AssociadoListItem {

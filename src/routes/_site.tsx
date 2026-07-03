@@ -69,13 +69,6 @@ function SiteLayout() {
                 Seja Sócio
               </Link>
 
-              <Link
-                to="/responsavel"
-                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-lg border border-[#D62828] text-[#D62828] text-sm font-medium hover:bg-[#D62828]/5 transition-colors"
-              >
-                Responsável
-              </Link>
-
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="lg:hidden p-2 text-gray-600 hover:text-[#D62828]"
@@ -104,15 +97,6 @@ function SiteLayout() {
                   </Link>
                 );
               })}
-              <div className="pt-3 flex items-center gap-4 px-3">
-                <Link
-                  to="/responsavel"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-2.5 px-3 rounded-lg bg-white text-[#D62828] border border-[#D62828] text-sm font-medium"
-                >
-                  Responsável
-                </Link>
-              </div>
               <div className="pt-3 flex items-center gap-4 px-3">
                 <Link
                   to="/associado"

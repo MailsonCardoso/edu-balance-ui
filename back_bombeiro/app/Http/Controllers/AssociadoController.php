@@ -101,13 +101,7 @@ class AssociadoController extends Controller
             return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
         }
 
-        if (!$associado->aluno_id) {
-            $aluno = $this->buscarAlunoPorCpf($associado->cpf);
-            if ($aluno) {
-                $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
-                $associado->refresh();
-            }
-        }
+        $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
 
         return response()->json([
             'success' => true,
@@ -118,7 +112,7 @@ class AssociadoController extends Controller
                 'telefone' => $associado->telefone,
                 'cpf' => $associado->cpf,
                 'nome_aluno' => $associado->nome_aluno,
-                'aluno_nome' => $associado->aluno?->nome,
+                'alunos' => $alunos->map(fn ($al) => ['nome' => $al->nome, 'id' => $al->id])->values()->toArray(),
                 'status' => $associado->status,
                 'created_at' => $associado->created_at->format('d/m/Y'),
             ],
@@ -156,35 +150,33 @@ class AssociadoController extends Controller
             return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
         }
 
-        $query = Mensalidade::with('aluno')->orderBy('data_vencimento', 'desc');
+        $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
 
-        // If associado has a linked aluno_id, use it
-        if ($associado->aluno_id) {
-            $query->where('aluno_id', $associado->aluno_id);
-        } elseif ($associado->nome_aluno) {
-            // Fallback: match by aluno name
-            $query->whereHas('aluno', function ($q) use ($associado) {
-                $q->where('nome', $associado->nome_aluno);
-            });
-        } else {
+        if ($alunos->isEmpty()) {
             return response()->json(['success' => true, 'data' => []]);
         }
 
-        $mensalidades = $query->get()->map(function ($m) {
-            return [
-                'id' => $m->id,
-                'aluno_id' => $m->aluno_id,
-                'mes_referencia' => $m->mes_referencia,
-                'valor' => $m->valor,
-                'data_vencimento' => $m->data_vencimento->format('d/m/Y'),
-                'data_pagamento' => $m->data_pagamento?->format('d/m/Y'),
-                'status' => $m->status,
-                'forma_pagamento' => $m->forma_pagamento,
-                'origem' => $m->origem,
-                'aluno_nome' => $m->aluno?->nome,
-                'created_at' => $m->created_at->format('d/m/Y H:i'),
-            ];
-        });
+        $alunoIds = $alunos->pluck('id')->toArray();
+
+        $mensalidades = Mensalidade::with('aluno')
+            ->whereIn('aluno_id', $alunoIds)
+            ->orderBy('data_vencimento', 'desc')
+            ->get()
+            ->map(function ($m) {
+                return [
+                    'id' => $m->id,
+                    'aluno_id' => $m->aluno_id,
+                    'mes_referencia' => $m->mes_referencia,
+                    'valor' => $m->valor,
+                    'data_vencimento' => $m->data_vencimento->format('d/m/Y'),
+                    'data_pagamento' => $m->data_pagamento?->format('d/m/Y'),
+                    'status' => $m->status,
+                    'forma_pagamento' => $m->forma_pagamento,
+                    'origem' => $m->origem,
+                    'aluno_nome' => $m->aluno?->nome,
+                    'created_at' => $m->created_at->format('d/m/Y H:i'),
+                ];
+            });
 
         return response()->json(['success' => true, 'data' => $mensalidades]);
     }
@@ -251,6 +243,15 @@ class AssociadoController extends Controller
         return Aluno::where('cpf_responsavel', $cpfLimpo)
             ->orWhere('cpf_responsavel', $cpfFormatado)
             ->first();
+    }
+
+    private function buscarTodosAlunosPorCpf(string $cpf): \Illuminate\Support\Collection
+    {
+        $cpfLimpo = preg_replace('/\D/', '', $cpf);
+        $cpfFormatado = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpfLimpo);
+        return Aluno::where('cpf_responsavel', $cpfLimpo)
+            ->orWhere('cpf_responsavel', $cpfFormatado)
+            ->get();
     }
 
     private function formatarNomesAlunos(Aluno $aluno): string

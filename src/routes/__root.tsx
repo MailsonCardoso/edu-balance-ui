@@ -24,27 +24,19 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
   const isSiteRoute = sitePaths.includes(pathname);
   const isAssociadoRoute = pathname.startsWith("/associado");
-  const isPublicRoute = ["/login", "/responsavel"].includes(pathname) || isSiteRoute || isAssociadoRoute;
-  const isResponsavelRoute = pathname.startsWith("/responsavel");
-  const hasResponsavelData = localStorage.getItem("responsavel_data");
+  const isPublicRoute = ["/login"].includes(pathname) || isSiteRoute || isAssociadoRoute;
 
   useEffect(() => {
     if (loading) return;
     if (isPublicRoute) return;
 
-    if (isResponsavelRoute && !hasResponsavelData) {
-      navigate({ to: "/responsavel", replace: true });
-      return;
-    }
-
     if (!user) {
       navigate({ to: "/login", replace: true });
     }
-  }, [user, loading, pathname, isPublicRoute, isResponsavelRoute, hasResponsavelData, navigate]);
+  }, [user, loading, pathname, isPublicRoute, navigate]);
 
   if (loading) return null;
   if (isPublicRoute) return <>{children}</>;
-  if (isResponsavelRoute && !hasResponsavelData) return null;
   if (!user) return null;
   return <>{children}</>;
 }
@@ -54,7 +46,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
   const isSiteRoute = sitePaths.includes(pathname);
-  const isAuthRoute = pathname === "/login" || pathname.startsWith("/responsavel") || pathname.startsWith("/associado") || isSiteRoute;
+  const isAuthRoute = pathname === "/login" || pathname.startsWith("/associado") || isSiteRoute;
 
   return (
     <QueryClientProvider client={queryClient}>
