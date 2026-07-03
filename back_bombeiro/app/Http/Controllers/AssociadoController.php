@@ -195,12 +195,17 @@ class AssociadoController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $cpfs = $associados->pluck('cpf')
-            ->map(fn ($c) => preg_replace('/\D/', '', $c))
-            ->unique()
-            ->toArray();
+        $cpfVariations = [];
+        $cpfMap = [];
+        foreach ($associados as $a) {
+            $clean = preg_replace('/\D/', '', $a->cpf);
+            $formatted = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $clean);
+            $cpfVariations[$clean] = true;
+            $cpfVariations[$formatted] = true;
+            $cpfMap[$a->cpf] = ['clean' => $clean, 'formatted' => $formatted];
+        }
 
-        $allAlunos = Aluno::whereIn('cpf_responsavel', $cpfs)
+        $allAlunos = Aluno::whereIn('cpf_responsavel', array_keys($cpfVariations))
             ->get()
             ->groupBy('cpf_responsavel');
 
@@ -212,7 +217,7 @@ class AssociadoController extends Controller
             'telefone' => $a->telefone,
             'nome_aluno' => $a->nome_aluno,
             'aluno_nome' => $a->aluno?->nome,
-            'alunos' => ($allAlunos[preg_replace('/\D/', '', $a->cpf)] ?? collect())
+            'alunos' => ($allAlunos[$cpfMap[$a->cpf]['clean']] ?? $allAlunos[$cpfMap[$a->cpf]['formatted']] ?? collect())
                 ->map(fn ($al) => ['nome' => $al->nome])
                 ->values()
                 ->toArray(),
