@@ -41,7 +41,8 @@ export function mensalidadeFromApi(raw: AssociadoMensalidade): Mensalidade {
 }
 
 export async function fetchAssociadoMensalidades(): Promise<Mensalidade[]> {
-  const { data } = await api.get<AssociadoMensalidadesResponse>("/associado/mensalidades");
+  const token = localStorage.getItem("associado_token") || localStorage.getItem("edu_token");
+  const { data } = await api.get<AssociadoMensalidadesResponse>(`/associado/mensalidades?token=${token || ""}`);
   if (!data.success) return [];
   return data.data.map(mensalidadeFromApi);
 }
