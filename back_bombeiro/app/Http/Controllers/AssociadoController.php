@@ -26,7 +26,7 @@ class AssociadoController extends Controller
         $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = 'ativo';
 
-        $aluno = Aluno::where('cpf_responsavel', $validated['cpf'])->first();
+        $aluno = $this->buscarAlunoPorCpf($validated['cpf']);
         if ($aluno) {
             $validated['aluno_id'] = $aluno->id;
             $validated['nome_aluno'] ??= $aluno->nome;
@@ -66,9 +66,10 @@ class AssociadoController extends Controller
         }
 
         if (!$associado->aluno_id) {
-            $aluno = Aluno::where('cpf_responsavel', $associado->cpf)->first();
+            $aluno = $this->buscarAlunoPorCpf($associado->cpf);
             if ($aluno) {
                 $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
+                $associado->refresh();
             }
         }
 
@@ -101,9 +102,10 @@ class AssociadoController extends Controller
         }
 
         if (!$associado->aluno_id) {
-            $aluno = Aluno::where('cpf_responsavel', $associado->cpf)->first();
+            $aluno = $this->buscarAlunoPorCpf($associado->cpf);
             if ($aluno) {
                 $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
+                $associado->refresh();
             }
         }
 
@@ -221,6 +223,15 @@ class AssociadoController extends Controller
             'success' => true,
             'message' => 'Associado excluído com sucesso.',
         ]);
+    }
+
+    private function buscarAlunoPorCpf(string $cpf): ?Aluno
+    {
+        $cpfLimpo = preg_replace('/\D/', '', $cpf);
+        $cpfFormatado = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpfLimpo);
+        return Aluno::where('cpf_responsavel', $cpfLimpo)
+            ->orWhere('cpf_responsavel', $cpfFormatado)
+            ->first();
     }
 
     private function getAuthenticated(Request $request): ?Associado
