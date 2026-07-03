@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trash2, Users, Loader2, Search } from "lucide-react";
+import { Trash2, Users, Loader2, Search, GraduationCap } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
   fetchAssociados,
   deleteAssociado,
   type AssociadoListItem,
@@ -29,6 +36,7 @@ export const Route = createFileRoute("/gestao-associados")({
 function GestaoAssociados() {
   const [q, setQ] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<AssociadoListItem | null>(null);
+  const [alunosDialog, setAlunosDialog] = useState<AssociadoListItem | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -119,7 +127,28 @@ function GestaoAssociados() {
                     <td className="px-4 py-3 text-muted-foreground">{a.email}</td>
                     <td className="px-4 py-3 text-muted-foreground">{a.telefone}</td>
                     <td className="px-4 py-3 text-muted-foreground">
-                      {a.aluno_nome || a.nome_aluno || "-"}
+                      {a.alunos.length > 0 ? (
+                        <>
+                          <button
+                            onClick={() => setAlunosDialog(a)}
+                            className="md:hidden text-primary underline-offset-2 hover:underline cursor-pointer"
+                          >
+                            {a.alunos.length} {a.alunos.length === 1 ? "aluno" : "alunos"}
+                          </button>
+                          <div className="hidden md:flex flex-wrap gap-1">
+                            {a.alunos.map((al, i) => (
+                              <span
+                                key={i}
+                                className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium"
+                              >
+                                {al.nome}
+                              </span>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -177,6 +206,25 @@ function GestaoAssociados() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!alunosDialog} onOpenChange={(open) => { if (!open) setAlunosDialog(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alunos de {alunosDialog?.nome}</DialogTitle>
+            <DialogDescription>
+              Alunos vinculados a este associado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {alunosDialog?.alunos.map((al, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-lg border p-3">
+                <GraduationCap className="size-5 text-muted-foreground shrink-0" />
+                <span className="font-medium">{al.nome}</span>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

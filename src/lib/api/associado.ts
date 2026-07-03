@@ -16,6 +16,7 @@ export interface AssociadoData {
   telefone: string;
   cpf: string;
   nome_aluno: string | null;
+  aluno_nome: string | null;
   status: string;
   created_at: string;
 }
@@ -57,6 +58,10 @@ export async function updateAssociado(
   return data;
 }
 
+export interface AssociadoAluno {
+  nome: string;
+}
+
 export interface AssociadoListItem {
   id: number;
   nome: string;
@@ -65,6 +70,7 @@ export interface AssociadoListItem {
   telefone: string;
   nome_aluno: string | null;
   aluno_nome: string | null;
+  alunos: AssociadoAluno[];
   status: string;
   created_at: string;
 }

@@ -29,7 +29,7 @@ class AssociadoController extends Controller
         $aluno = $this->buscarAlunoPorCpf($validated['cpf']);
         if ($aluno) {
             $validated['aluno_id'] = $aluno->id;
-            $validated['nome_aluno'] ??= $aluno->nome;
+            $validated['nome_aluno'] ??= $this->formatarNomesAlunos($aluno);
         }
 
         $associado = Associado::create($validated);
@@ -68,7 +68,7 @@ class AssociadoController extends Controller
         if (!$associado->aluno_id) {
             $aluno = $this->buscarAlunoPorCpf($associado->cpf);
             if ($aluno) {
-                $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $aluno->nome])->save();
+                $associado->forceFill(['aluno_id' => $aluno->id, 'nome_aluno' => $this->formatarNomesAlunos($aluno)])->save();
                 $associado->refresh();
             }
         }
@@ -193,20 +193,34 @@ class AssociadoController extends Controller
     {
         $associados = Associado::with('aluno:id,nome')
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($a) => [
-                'id' => $a->id,
-                'nome' => $a->nome,
-                'cpf' => $a->cpf,
-                'email' => $a->email,
-                'telefone' => $a->telefone,
-                'nome_aluno' => $a->nome_aluno,
-                'aluno_nome' => $a->aluno?->nome,
-                'status' => $a->status,
-                'created_at' => $a->created_at->format('d/m/Y'),
-            ]);
+            ->get();
 
-        return response()->json(['data' => $associados]);
+        $cpfs = $associados->pluck('cpf')
+            ->map(fn ($c) => preg_replace('/\D/', '', $c))
+            ->unique()
+            ->toArray();
+
+        $allAlunos = Aluno::whereIn('cpf_responsavel', $cpfs)
+            ->get()
+            ->groupBy('cpf_responsavel');
+
+        $result = $associados->map(fn ($a) => [
+            'id' => $a->id,
+            'nome' => $a->nome,
+            'cpf' => $a->cpf,
+            'email' => $a->email,
+            'telefone' => $a->telefone,
+            'nome_aluno' => $a->nome_aluno,
+            'aluno_nome' => $a->aluno?->nome,
+            'alunos' => ($allAlunos[preg_replace('/\D/', '', $a->cpf)] ?? collect())
+                ->map(fn ($al) => ['nome' => $al->nome])
+                ->values()
+                ->toArray(),
+            'status' => $a->status,
+            'created_at' => $a->created_at->format('d/m/Y'),
+        ]);
+
+        return response()->json(['data' => $result]);
     }
 
     public function destroy($id): JsonResponse
@@ -232,6 +246,16 @@ class AssociadoController extends Controller
         return Aluno::where('cpf_responsavel', $cpfLimpo)
             ->orWhere('cpf_responsavel', $cpfFormatado)
             ->first();
+    }
+
+    private function formatarNomesAlunos(Aluno $aluno): string
+    {
+        $cpfLimpo = preg_replace('/\D/', '', $aluno->cpf_responsavel);
+        $cpfFormatado = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpfLimpo);
+        $alunos = Aluno::where('cpf_responsavel', $cpfLimpo)
+            ->orWhere('cpf_responsavel', $cpfFormatado)
+            ->get();
+        return $alunos->map(fn ($a) => explode(' ', trim($a->nome))[0])->implode(' / ');
     }
 
     private function getAuthenticated(Request $request): ?Associado
