@@ -109,7 +109,18 @@ class AssociadoController extends Controller
         $associado = $this->getAuthenticated($request);
 
         if (!$associado) {
-            return response()->json(['success' => false, 'message' => 'Não autorizado.'], 401);
+            $token = $request->bearerToken() ?: '(none)';
+            $header = $request->header('Authorization') ?: '(none)';
+            $authHeaderRaw = $request->headers->get('Authorization', '(none)');
+            return response()->json([
+                'success' => false,
+                'message' => 'Não autorizado.',
+                'debug' => [
+                    'bearer_token' => $token,
+                    'auth_header' => $header,
+                    'auth_header_raw' => $authHeaderRaw,
+                ],
+            ], 401);
         }
 
         $alunos = $this->buscarTodosAlunosPorCpf($associado->cpf);
@@ -278,6 +289,9 @@ class AssociadoController extends Controller
     private function getAuthenticated(Request $request): ?Associado
     {
         $token = $request->bearerToken();
+        if (!$token) {
+            $token = $request->query('token') ?: $request->header('X-Auth-Token');
+        }
         if (!$token) return null;
         return Associado::where('api_token', $token)->first();
     }
