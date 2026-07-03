@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aluno;
 use App\Models\Associado;
 use App\Models\Mensalidade;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +25,12 @@ class AssociadoController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = 'ativo';
+
+        $aluno = Aluno::where('cpf_responsavel', $validated['cpf'])->first();
+        if ($aluno) {
+            $validated['aluno_id'] = $aluno->id;
+            $validated['nome_aluno'] ??= $aluno->nome;
+        }
 
         $associado = Associado::create($validated);
 
