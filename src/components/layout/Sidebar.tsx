@@ -16,7 +16,6 @@ import {
   ScrollText,
   Package,
   TrendingUp,
-  UserCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +28,7 @@ const nav = [
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
   { to: "/perfil", label: "Perfil", icon: UserCircle },
   { to: "/gestao-inventario", label: "Inventário", icon: Package },
-  { to: "/gestao-associados", label: "Associados", icon: UsersCircle },
+  { to: "/gestao-associados", label: "Associados", icon: Users },
   { to: "/gestao-categorias", label: "Categorias", icon: Tags },
   { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
   { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
