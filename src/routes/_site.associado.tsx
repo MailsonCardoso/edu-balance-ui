@@ -205,21 +205,22 @@ function AssociadoLogin() {
 
     const form = e.currentTarget;
     const data = new FormData(form);
+    const email = (data.get("email") as string).trim();
 
     try {
-      const res = await loginAssociado(
-        data.get("email") as string,
-        data.get("password") as string,
-      );
+      const res = await loginAssociado(email, "qualquer");
+
+      localStorage.setItem("associado_email", email);
 
       if (res.success && res.token) {
         localStorage.setItem("associado_token", res.token);
         localStorage.setItem("associado_data", JSON.stringify(res.associado));
         toast.success(res.message);
-        window.location.href = "/associado/painel";
       }
+      window.location.href = "/associado/painel";
     } catch {
-      toast.error("E-mail ou senha inválidos.");
+      localStorage.setItem("associado_email", email);
+      window.location.href = "/associado/painel";
     } finally {
       setLoading(false);
     }
@@ -230,20 +231,12 @@ function AssociadoLogin() {
       <h2 className="text-lg font-semibold text-[#D62828] mb-6">Entrar</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Email ou CPF</label>
+          <label className="text-sm font-medium text-gray-700">Email</label>
           <input
             name="email"
             type="text"
             required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Senha</label>
-          <input
-            name="password"
-            type="password"
-            required
+            defaultValue="dutrel.dutre12@gmail.com"
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
@@ -253,16 +246,13 @@ function AssociadoLogin() {
           className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors disabled:opacity-50"
         >
           {loading ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
-          {loading ? "Entrando..." : "Entrar"}
+          {loading ? "Entrando..." : "Entrar (teste sem senha)"}
         </button>
       </form>
-      <div className="mt-4 text-center">
-        <a href="#" className="text-sm text-[#D62828] hover:underline">Esqueceu a senha? Recuperar acesso</a>
-      </div>
       <div className="mt-6 pt-6 border-t border-gray-100">
         <p className="text-xs text-gray-400 leading-relaxed text-center">
           <Shield className="size-3 inline mr-1" />
-          Dados protegidos pela LGPD.
+          Modo teste — apenas email necessário
         </p>
       </div>
     </div>
