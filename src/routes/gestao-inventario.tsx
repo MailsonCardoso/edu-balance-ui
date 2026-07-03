@@ -3,12 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   DollarSign,
-  Wrench,
-  AlertTriangle,
   Search,
   Plus,
   FileSpreadsheet,
-  ClipboardCheck,
   Eye,
   ArrowUpDown,
   Printer,
@@ -54,6 +51,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 import { brl, fmtDate, maskCurrency, parseCurrency, toDateInput } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
@@ -138,15 +136,8 @@ function GestaoInventario() {
 
   const kpis = useMemo(() => {
     const total = data.length;
-    const valorTotal = data.reduce((s, i) => s + i.valorDepreciado, 0);
-    const emManutencao = data.filter((i) => i.status === "em_manutencao").length;
-    const alertas = data.filter((i) => {
-      if (i.status === "baixado") return false;
-      if (!i.dataUltimaAuditoria) return true;
-      const umAno = 365 * 24 * 60 * 60 * 1000;
-      return Date.now() - new Date(i.dataUltimaAuditoria).getTime() > umAno;
-    }).length;
-    return { total, valorTotal, emManutencao, alertas };
+    const valorTotal = data.reduce((s, i) => s + (Number(i.valorCompra) || 0), 0);
+    return { total, valorTotal };
   }, [data]);
 
   useEffect(() => {
@@ -169,6 +160,29 @@ function GestaoInventario() {
       else next.add(id);
       return next;
     });
+  };
+
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      data.map((i) => ({
+        Tag: i.tag,
+        Nome: i.nome,
+        "Nº Série": i.numeroSerie,
+        Categoria: i.categoria,
+        Localização: i.localizacao,
+        Responsável: i.responsavel,
+        Setor: i.setor,
+        "Valor de Compra": i.valorCompra,
+        "Data de Compra": i.dataCompra,
+        "Última Auditoria": i.dataUltimaAuditoria ?? "",
+        Status: i.status,
+        Observação: i.observacao ?? "",
+      })),
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Patrimônios");
+    XLSX.writeFile(wb, `inventario-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast.success("Relatório exportado com sucesso!");
   };
 
   const handleSave = async (item: Patrimonio) => {
@@ -250,11 +264,8 @@ function GestaoInventario() {
         description="Controle de patrimônio e ativos da organização"
         actions={
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => toast.success("Relatório exportado com sucesso!")}>
+            <Button variant="outline" onClick={exportToExcel}>
               <FileSpreadsheet className="size-4" /> Exportar
-            </Button>
-            <Button variant="secondary" onClick={() => toast.success("Auditoria iniciada!")}>
-              <ClipboardCheck className="size-4" /> Iniciar Auditoria
             </Button>
             <Button onClick={openCreate}>
               <Plus className="size-4" /> Cadastrar Ativo
@@ -263,7 +274,7 @@ function GestaoInventario() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <StatCard
           label="Total de Itens"
           value={kpis.total}
@@ -276,27 +287,6 @@ function GestaoInventario() {
           icon={<DollarSign className="size-5" />}
           tone="success"
         />
-        <StatCard
-          label="Em Manutenção"
-          value={kpis.emManutencao}
-          icon={<Wrench className="size-5" />}
-          tone="warning"
-        />
-        <div
-          className="bg-card rounded-xl border border-border p-5 hover:shadow-lg hover:border-destructive/30 transition-all duration-300 animate-in cursor-pointer"
-          onClick={() => setStatusFilter("all")}
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Alertas Críticos</p>
-              <p className="text-2xl font-semibold mt-2 tracking-tight text-destructive">{kpis.alertas}</p>
-              <p className="text-xs text-muted-foreground mt-1">Itens sem auditoria recente</p>
-            </div>
-            <div className="size-10 rounded-lg bg-destructive/10 text-destructive grid place-items-center">
-              <AlertTriangle className="size-5" />
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="bg-card rounded-xl border border-border">
