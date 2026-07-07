@@ -48,7 +48,7 @@ function StatusIcon({ status }: { status: string }) {
 }
 
 function GestaoAuditoria() {
-  const [filters, setFilters] = useState<AuditoriaFilters>({ page: 1, per_page: 50 });
+  const [filters, setFilters] = useState<AuditoriaFilters>({ page: 1, per_page: 50, status: "approved" });
   const [searchInput, setSearchInput] = useState("");
 
   const { data, isLoading } = useQuery({
@@ -169,7 +169,7 @@ function GestaoAuditoria() {
               <option value="ticket">Boleto</option>
             </select>
             <Button variant="outline" size="sm" className="h-9" onClick={() => {
-              setFilters({ page: 1, per_page: 50 });
+              setFilters({ page: 1, per_page: 50, status: "approved" });
               setSearchInput("");
             }}>
               Limpar
