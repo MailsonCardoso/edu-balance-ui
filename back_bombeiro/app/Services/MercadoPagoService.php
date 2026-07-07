@@ -34,35 +34,17 @@ class MercadoPagoService
     public function criarCobranca(GerarCobrancaDTO $dto): array
     {
         $payload = [
+            'transaction_amount' => $dto->valor,
+            'description' => $dto->titulo,
+            'payment_method_id' => 'pix',
             'external_reference' => $dto->externalReference,
             'notification_url' => $dto->notificationUrl,
-            'statement_descriptor' => 'ESCOLA BOMBEIRO',
-            'description' => $dto->titulo,
-            'date_of_expiration' => $this->formatExpiration($dto->vencimento),
             'payer' => [
                 'email' => $dto->emailPagador,
                 'first_name' => $dto->nomePagador,
                 'identification' => [
                     'type' => 'CPF',
                     'number' => $dto->cpfPagador,
-                ],
-            ],
-            'payment_methods' => [
-                'excluded_payment_types' => [
-                    ['id' => 'credit_card'],
-                    ['id' => 'debit_card'],
-                    ['id' => 'ticket'],
-                ],
-                'installments' => 1,
-            ],
-            'items' => [
-                [
-                    'id' => (string) $dto->mensalidadeId,
-                    'title' => $dto->titulo,
-                    'description' => $dto->titulo,
-                    'quantity' => 1,
-                    'unit_price' => $dto->valor,
-                    'currency_id' => 'BRL',
                 ],
             ],
         ];

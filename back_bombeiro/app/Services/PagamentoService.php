@@ -45,17 +45,21 @@ class PagamentoService
             config('services.mercadopago.notification_url', ''),
         );
 
-        $preference = $this->mercadopago->criarPreference($dto);
+        $pagamento = $this->mercadopago->criarCobranca($dto);
 
-        return DB::transaction(function () use ($mensalidade, $dto, $preference) {
+        return DB::transaction(function () use ($mensalidade, $dto, $pagamento) {
+            $paymentUrl = $pagamento['point_of_interaction']['transaction_data']['ticket_url']
+                ?? $pagamento['transaction_details']['external_resource_url']
+                ?? null;
+
             $transacao = PagamentoTransacao::create([
                 'mensalidade_id' => $mensalidade->id,
-                'preference_id' => $preference['id'] ?? null,
+                'payment_id' => $pagamento['id'] ?? null,
                 'external_reference' => $dto->externalReference,
                 'origem' => PagamentoOrigem::MercadoPago->value,
-                'status' => MercadoPagoStatus::Pending->value,
-                'payment_url' => $preference['init_point'] ?? null,
-                'payload_request' => $preference,
+                'status' => $pagamento['status'] ?? MercadoPagoStatus::Pending->value,
+                'payment_url' => $paymentUrl,
+                'payload_request' => $pagamento,
                 'notification_url' => $dto->notificationUrl,
             ]);
 
@@ -63,10 +67,10 @@ class PagamentoService
                 'origem' => PagamentoOrigem::MercadoPago->value,
             ]);
 
-            Log::info('Pagamento: Cobranca gerada', [
+            Log::info('Pagamento: Cobranca gerada (PIX)', [
                 'mensalidade_id' => $mensalidade->id,
                 'transacao_id' => $transacao->id,
-                'preference_id' => $preference['id'] ?? null,
+                'payment_id' => $pagamento['id'] ?? null,
                 'external_reference' => $dto->externalReference,
             ]);
 
