@@ -23,8 +23,10 @@ class GerarCobrancaRequest extends FormRequest
             return false;
         }
 
-        $alunos = \App\Models\Aluno::where('cpf_responsavel', preg_replace('/\D/', '', $associado->cpf))
-            ->orWhere('cpf_responsavel', $associado->cpf)
+        $cpfLimpo = preg_replace('/\D/', '', $associado->cpf);
+        $cpfFormatado = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpfLimpo);
+        $alunos = \App\Models\Aluno::where('cpf_responsavel', $cpfLimpo)
+            ->orWhere('cpf_responsavel', $cpfFormatado)
             ->pluck('id')
             ->toArray();
 
