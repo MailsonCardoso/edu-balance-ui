@@ -33,21 +33,19 @@ class MercadoPagoService
 
     public function criarCobranca(GerarCobrancaDTO $dto): array
     {
-        $payer = [
-            'email' => $dto->emailPagador,
-            'first_name' => $dto->nomePagador,
-        ];
-
-        if (!empty($dto->cpfPagador) && strlen($dto->cpfPagador) === 11) {
-            $payer['identification'] = [
-                'type' => 'CPF',
-                'number' => $dto->cpfPagador,
-            ];
-        }
-
         if ($dto->formaPagamento === 'bolbradesco' && empty($dto->cpfPagador)) {
             throw new \RuntimeException('CPF do responsável é obrigatório para gerar boleto.');
         }
+
+        $parts = explode(' ', trim($dto->nomePagador), 2);
+        $firstName = $parts[0] ?: $dto->nomePagador;
+        $lastName = $parts[1] ?? $firstName;
+
+        $payer = [
+            'email' => $dto->emailPagador,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+        ];
 
         if (!empty($dto->cpfPagador)) {
             $payer['identification'] = [
