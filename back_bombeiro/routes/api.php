@@ -31,7 +31,7 @@ Route::get('/associado/mensalidades', [App\Http\Controllers\AssociadoController:
 Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class);
 
 // Cobrança Mercado Pago (usando token do associado)
-Route::match(['GET', 'POST'], '/mensalidades/{mensalidade}/gerar-cobranca', [CobrancaController::class, 'gerar']);
+Route::post('/mensalidades/{mensalidade}/gerar-cobranca', [CobrancaController::class, 'gerar']);
 Route::get('/mensalidades/{mensalidade}/status-pagamento', [CobrancaController::class, 'status']);
 
 // Rotas protegidas
