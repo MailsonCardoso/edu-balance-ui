@@ -16,9 +16,10 @@ final readonly class GerarCobrancaDTO
         public string $emailPagador,
         public string $cpfPagador,
         public string $notificationUrl,
+        public string $formaPagamento = 'pix',
     ) {}
 
-    public static function fromMensalidade(Mensalidade $mensalidade, string $notificationUrl): self
+    public static function fromMensalidade(Mensalidade $mensalidade, string $notificationUrl, string $formaPagamento = 'pix'): self
     {
         $aluno = $mensalidade->aluno;
 
@@ -36,6 +37,7 @@ final readonly class GerarCobrancaDTO
             emailPagador: $aluno->email ?? '',
             cpfPagador: preg_replace('/\D/', '', $aluno->cpf_responsavel ?? ''),
             notificationUrl: $notificationUrl,
+            formaPagamento: $formaPagamento,
         );
     }
 

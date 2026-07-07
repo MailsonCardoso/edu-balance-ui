@@ -35,6 +35,8 @@ class GerarCobrancaRequest extends FormRequest
 
     public function rules(): array
     {
-        return [];
+        return [
+            'forma_pagamento' => 'sometimes|in:pix,bolbradesco',
+        ];
     }
 }

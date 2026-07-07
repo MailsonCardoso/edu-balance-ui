@@ -190,6 +190,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   const [loading, setLoading] = useState(true);
   const [pagandoId, setPagandoId] = useState<string | null>(null);
   const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
+  const [boletoModal, setBoletoModal] = useState<{ url: string; vencimento: string } | null>(null);
 
   const handlePagar = async (m: Mensalidade) => {
     if (pagandoId) return;
@@ -217,6 +218,27 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
 
   const fecharPix = () => {
     setPixModal(null);
+    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+  };
+
+  const handleBoleto = async (m: Mensalidade) => {
+    try {
+      const result = await gerarCobrancaMensalidade(m.id, "bolbradesco");
+      if (result.success && result.data?.boleto_url) {
+        setBoletoModal({
+          url: result.data.boleto_url,
+          vencimento: result.data.data_vencimento || "—",
+        });
+      } else {
+        toast.error(result.message || "Erro ao gerar boleto");
+      }
+    } catch {
+      toast.error("Erro ao conectar com Mercado Pago");
+    }
+  };
+
+  const fecharBoleto = () => {
+    setBoletoModal(null);
     fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
   };
 
@@ -442,18 +464,27 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                         </div>
                       </div>
                       {(m.status === "pendente" || m.status === "atrasado") && (
-                        <button
-                          onClick={() => handlePagar(m)}
-                          disabled={pagandoId === m.id}
-                          className="flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {pagandoId === m.id ? (
-                            <Loader2 className="size-3.5 animate-spin" />
-                          ) : (
-                            <ExternalLink className="size-3.5" />
-                          )}
-                          {pagandoId === m.id ? "Gerando..." : "Pagar"}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handlePagar(m)}
+                            disabled={pagandoId === m.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {pagandoId === m.id ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <ExternalLink className="size-3.5" />
+                            )}
+                            {pagandoId === m.id ? "Gerando..." : "Pix"}
+                          </button>
+                          <button
+                            onClick={() => handleBoleto(m)}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                          >
+                            <Receipt className="size-3.5" />
+                            Boleto
+                          </button>
+                        </div>
                       )}
                     </div>
                   );
@@ -506,6 +537,38 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           </div>
         </div>
       )}
+
+      {boletoModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+            <div className="size-12 rounded-full bg-blue-50 grid place-items-center mx-auto mb-4">
+              <Receipt className="size-6 text-blue-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Boleto Bancário</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Vencimento: {new Date(boletoModal.vencimento).toLocaleDateString("pt-BR")}
+            </p>
+            <a
+              href={boletoModal.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+            >
+              <ExternalLink className="size-4" />
+              Baixar Boleto
+            </a>
+            <p className="text-xs text-gray-400 mt-4">
+              A confirmação pode levar até 3 dias úteis após o pagamento.
+            </p>
+            <button
+              onClick={fecharBoleto}
+              className="mt-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -531,6 +594,7 @@ function PagamentosTab() {
   const [filter, setFilter] = useState<string>("todas");
   const [pagandoId, setPagandoId] = useState<string | null>(null);
   const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
+  const [boletoModal, setBoletoModal] = useState<{ url: string; vencimento: string } | null>(null);
 
   useEffect(() => {
     fetchAssociadoMensalidades()
@@ -583,6 +647,27 @@ function PagamentosTab() {
 
   const fecharPix = () => {
     setPixModal(null);
+    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+  };
+
+  const handleBoleto = async (m: Mensalidade) => {
+    try {
+      const result = await gerarCobrancaMensalidade(m.id, "bolbradesco");
+      if (result.success && result.data?.boleto_url) {
+        setBoletoModal({
+          url: result.data.boleto_url,
+          vencimento: result.data.data_vencimento || "—",
+        });
+      } else {
+        toast.error(result.message || "Erro ao gerar boleto");
+      }
+    } catch {
+      toast.error("Erro ao conectar com Mercado Pago");
+    }
+  };
+
+  const fecharBoleto = () => {
+    setBoletoModal(null);
     fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
   };
 
@@ -743,18 +828,27 @@ function PagamentosTab() {
                       <td className="py-4 px-4">
                         <div className="flex justify-center">
                           {m.status === "pendente" || m.status === "atrasado" ? (
-                            <button
-                              onClick={() => handlePagar(m)}
-                              disabled={pagandoId === m.id}
-                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {pagandoId === m.id ? (
-                                <Loader2 className="size-3.5 animate-spin" />
-                              ) : (
-                                <ExternalLink className="size-3.5" />
-                              )}
-                              {pagandoId === m.id ? "Gerando..." : "Pagar agora"}
-                            </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handlePagar(m)}
+                                disabled={pagandoId === m.id}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {pagandoId === m.id ? (
+                                  <Loader2 className="size-3.5 animate-spin" />
+                                ) : (
+                                  <ExternalLink className="size-3.5" />
+                                )}
+                                {pagandoId === m.id ? "Gerando..." : "Pix"}
+                              </button>
+                              <button
+                                onClick={() => handleBoleto(m)}
+                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                              >
+                                <Receipt className="size-3.5" />
+                                Boleto
+                              </button>
+                            </div>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">
                               <CheckCircle2 className="size-3.5" />
@@ -811,6 +905,38 @@ function PagamentosTab() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {boletoModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+            <div className="size-12 rounded-full bg-blue-50 grid place-items-center mx-auto mb-4">
+              <Receipt className="size-6 text-blue-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Boleto Bancário</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Vencimento: {new Date(boletoModal.vencimento).toLocaleDateString("pt-BR")}
+            </p>
+            <a
+              href={boletoModal.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+            >
+              <ExternalLink className="size-4" />
+              Baixar Boleto
+            </a>
+            <p className="text-xs text-gray-400 mt-4">
+              A confirmação pode levar até 3 dias úteis após o pagamento.
+            </p>
+            <button
+              onClick={fecharBoleto}
+              className="mt-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}

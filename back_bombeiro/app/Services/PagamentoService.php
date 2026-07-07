@@ -18,7 +18,7 @@ class PagamentoService
         private readonly MercadoPagoService $mercadopago,
     ) {}
 
-    public function gerarCobranca(Mensalidade $mensalidade): PagamentoTransacao
+    public function gerarCobranca(Mensalidade $mensalidade, string $formaPagamento = 'pix'): PagamentoTransacao
     {
         if ($mensalidade->isPago()) {
             throw new \RuntimeException('Mensalidade já está paga.');
@@ -27,6 +27,7 @@ class PagamentoService
         $dto = GerarCobrancaDTO::fromMensalidade(
             $mensalidade,
             config('services.mercadopago.notification_url', ''),
+            $formaPagamento,
         );
 
         $pagamento = $this->mercadopago->criarCobranca($dto);

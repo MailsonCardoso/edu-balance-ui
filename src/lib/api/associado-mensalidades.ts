@@ -53,15 +53,19 @@ export interface GerarCobrancaResponse {
     payment_url: string;
     external_reference: string;
     status: string;
+    forma_pagamento: string;
     pix_qr_code?: string;
     pix_qr_code_base64?: string;
+    boleto_url?: string;
+    data_vencimento?: string;
   };
   message?: string;
 }
 
-export async function gerarCobrancaMensalidade(mensalidadeId: string): Promise<GerarCobrancaResponse> {
+export async function gerarCobrancaMensalidade(mensalidadeId: string, formaPagamento: string = "pix"): Promise<GerarCobrancaResponse> {
   const { data } = await api.post<GerarCobrancaResponse>(
-    `/mensalidades/${mensalidadeId}/gerar-cobranca`
+    `/mensalidades/${mensalidadeId}/gerar-cobranca`,
+    { forma_pagamento: formaPagamento }
   );
   return data;
 }

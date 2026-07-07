@@ -15,21 +15,32 @@ class CobrancaController extends Controller
 
     public function gerar(Mensalidade $mensalidade, GerarCobrancaRequest $request): JsonResponse
     {
+        $formaPagamento = $request->input('forma_pagamento', 'pix');
+
         try {
-            $transacao = $this->pagamentoService->gerarCobranca($mensalidade);
+            $transacao = $this->pagamentoService->gerarCobranca($mensalidade, $formaPagamento);
 
             $payloadRequest = $transacao->payload_request ?? [];
 
+            $data = [
+                'id' => $transacao->id,
+                'payment_url' => $transacao->payment_url,
+                'external_reference' => $transacao->external_reference,
+                'status' => $transacao->status,
+                'forma_pagamento' => $formaPagamento,
+            ];
+
+            if ($formaPagamento === 'pix') {
+                $data['pix_qr_code'] = $payloadRequest['point_of_interaction']['transaction_data']['qr_code'] ?? null;
+                $data['pix_qr_code_base64'] = $payloadRequest['point_of_interaction']['transaction_data']['qr_code_base64'] ?? null;
+            } else {
+                $data['boleto_url'] = $transacao->payment_url;
+                $data['data_vencimento'] = now()->addDays(3)->format('Y-m-d');
+            }
+
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'id' => $transacao->id,
-                    'payment_url' => $transacao->payment_url,
-                    'external_reference' => $transacao->external_reference,
-                    'status' => $transacao->status,
-                    'pix_qr_code' => $payloadRequest['point_of_interaction']['transaction_data']['qr_code'] ?? null,
-                    'pix_qr_code_base64' => $payloadRequest['point_of_interaction']['transaction_data']['qr_code_base64'] ?? null,
-                ],
+                'data' => $data,
                 'message' => 'Cobrança gerada com sucesso.',
             ]);
         } catch (\RuntimeException $e) {

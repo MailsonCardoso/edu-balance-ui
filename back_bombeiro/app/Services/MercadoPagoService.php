@@ -48,11 +48,15 @@ class MercadoPagoService
         $payload = [
             'transaction_amount' => $dto->valor,
             'description' => $dto->titulo,
-            'payment_method_id' => 'pix',
+            'payment_method_id' => $dto->formaPagamento,
             'external_reference' => $dto->externalReference,
             'notification_url' => $dto->notificationUrl,
             'payer' => $payer,
         ];
+
+        if ($dto->formaPagamento === 'bolbradesco') {
+            $payload['date_of_expiration'] = now()->addDays(3)->format('Y-m-d\TH:i:s.v\Z');
+        }
 
         Log::info('MercadoPago: Criando cobranca', [
             'external_reference' => $dto->externalReference,
