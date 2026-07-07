@@ -33,20 +33,25 @@ class MercadoPagoService
 
     public function criarCobranca(GerarCobrancaDTO $dto): array
     {
+        $payer = [
+            'email' => $dto->emailPagador,
+            'first_name' => $dto->nomePagador,
+        ];
+
+        if (!empty($dto->cpfPagador) && strlen($dto->cpfPagador) === 11) {
+            $payer['identification'] = [
+                'type' => 'CPF',
+                'number' => $dto->cpfPagador,
+            ];
+        }
+
         $payload = [
             'transaction_amount' => $dto->valor,
             'description' => $dto->titulo,
             'payment_method_id' => 'pix',
             'external_reference' => $dto->externalReference,
             'notification_url' => $dto->notificationUrl,
-            'payer' => [
-                'email' => $dto->emailPagador,
-                'first_name' => $dto->nomePagador,
-                'identification' => [
-                    'type' => 'CPF',
-                    'number' => $dto->cpfPagador,
-                ],
-            ],
+            'payer' => $payer,
         ];
 
         Log::info('MercadoPago: Criando cobranca', [

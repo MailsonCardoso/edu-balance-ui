@@ -18,14 +18,17 @@ class CobrancaController extends Controller
         try {
             $transacao = $this->pagamentoService->gerarCobranca($mensalidade);
 
+            $payloadRequest = $transacao->payload_request ?? [];
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'id' => $transacao->id,
                     'payment_url' => $transacao->payment_url,
                     'external_reference' => $transacao->external_reference,
-                    'preference_id' => $transacao->preference_id,
                     'status' => $transacao->status,
+                    'pix_qr_code' => $payloadRequest['point_of_interaction']['transaction_data']['qr_code'] ?? null,
+                    'pix_qr_code_base64' => $payloadRequest['point_of_interaction']['transaction_data']['qr_code_base64'] ?? null,
                 ],
                 'message' => 'Cobrança gerada com sucesso.',
             ]);

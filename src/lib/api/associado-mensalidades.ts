@@ -52,8 +52,9 @@ export interface GerarCobrancaResponse {
     id: string;
     payment_url: string;
     external_reference: string;
-    preference_id: string;
     status: string;
+    pix_qr_code?: string;
+    pix_qr_code_base64?: string;
   };
   message?: string;
 }
