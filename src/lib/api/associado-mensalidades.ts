@@ -45,3 +45,27 @@ export async function fetchAssociadoMensalidades(): Promise<Mensalidade[]> {
   if (!data.success) return [];
   return data.data.map(mensalidadeFromApi);
 }
+
+export interface GerarCobrancaResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    payment_url: string;
+    external_reference: string;
+    preference_id: string;
+    status: string;
+  };
+  message?: string;
+}
+
+export async function gerarCobrancaMensalidade(mensalidadeId: string): Promise<GerarCobrancaResponse> {
+  const { data } = await api.post<GerarCobrancaResponse>(
+    `/mensalidades/${mensalidadeId}/gerar-cobranca`
+  );
+  return data;
+}
+
+export async function consultarStatusPagamento(mensalidadeId: string) {
+  const { data } = await api.get(`/mensalidades/${mensalidadeId}/status-pagamento`);
+  return data;
+}

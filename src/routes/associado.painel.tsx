@@ -39,6 +39,7 @@ import {
 } from "@/lib/api/associado";
 import {
   fetchAssociadoMensalidades,
+  gerarCobrancaMensalidade,
 } from "@/lib/api/associado-mensalidades";
 import type { Mensalidade, OrigemPagamento } from "@/lib/mock-data";
 
@@ -186,6 +187,24 @@ function PainelAssociado() {
 function PainelTab({ associado }: { associado: AssociadoData }) {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pagandoId, setPagandoId] = useState<string | null>(null);
+
+  const handlePagar = async (m: Mensalidade) => {
+    if (pagandoId) return;
+    setPagandoId(m.id);
+    try {
+      const result = await gerarCobrancaMensalidade(m.id);
+      if (result.success && result.data?.payment_url) {
+        window.location.href = result.data.payment_url;
+      } else {
+        toast.error(result.message || "Erro ao gerar cobrança");
+      }
+    } catch {
+      toast.error("Erro ao conectar com Mercado Pago");
+    } finally {
+      setPagandoId(null);
+    }
+  };
 
   useEffect(() => {
     fetchAssociadoMensalidades()
@@ -394,6 +413,20 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                           </div>
                         </div>
                       </div>
+                      {(m.status === "pendente" || m.status === "atrasado") && (
+                        <button
+                          onClick={() => handlePagar(m)}
+                          disabled={pagandoId === m.id}
+                          className="flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {pagandoId === m.id ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <ExternalLink className="size-3.5" />
+                          )}
+                          {pagandoId === m.id ? "Gerando..." : "Pagar"}
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -451,8 +484,23 @@ function PagamentosTab() {
     [mensalidades]
   );
 
-  const handlePagar = (m: Mensalidade) => {
-    toast.info("Integração com Mercado Pago em breve!");
+  const [pagandoId, setPagandoId] = useState<string | null>(null);
+
+  const handlePagar = async (m: Mensalidade) => {
+    if (pagandoId) return;
+    setPagandoId(m.id);
+    try {
+      const result = await gerarCobrancaMensalidade(m.id);
+      if (result.success && result.data?.payment_url) {
+        window.location.href = result.data.payment_url;
+      } else {
+        toast.error(result.message || "Erro ao gerar cobrança");
+      }
+    } catch {
+      toast.error("Erro ao conectar com Mercado Pago");
+    } finally {
+      setPagandoId(null);
+    }
   };
 
   if (loading) {
@@ -600,10 +648,15 @@ function PagamentosTab() {
                           {m.status === "pendente" || m.status === "atrasado" ? (
                             <button
                               onClick={() => handlePagar(m)}
-                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                              disabled={pagandoId === m.id}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              Pagar agora
-                              <ExternalLink className="size-3.5" />
+                              {pagandoId === m.id ? (
+                                <Loader2 className="size-3.5 animate-spin" />
+                              ) : (
+                                <ExternalLink className="size-3.5" />
+                              )}
+                              {pagandoId === m.id ? "Gerando..." : "Pagar agora"}
                             </button>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">

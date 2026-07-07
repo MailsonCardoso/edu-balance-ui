@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CobrancaController;
 use App\Http\Controllers\MensalidadeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinancialCategoryController;
+use App\Http\Controllers\MercadoPagoWebhookController;
 use App\Http\Controllers\PatrimonioController;
 use App\Http\Controllers\RevenueController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,13 @@ Route::post('/associado/login', [App\Http\Controllers\AssociadoController::class
 Route::get('/associado', [App\Http\Controllers\AssociadoController::class, 'show']);
 Route::put('/associado', [App\Http\Controllers\AssociadoController::class, 'update']);
 Route::get('/associado/mensalidades', [App\Http\Controllers\AssociadoController::class, 'mensalidades']);
+
+// Webhook Mercado Pago (público)
+Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class);
+
+// Cobrança Mercado Pago (usando token do associado)
+Route::post('/mensalidades/{mensalidade}/gerar-cobranca', [CobrancaController::class, 'gerar']);
+Route::get('/mensalidades/{mensalidade}/status-pagamento', [CobrancaController::class, 'status']);
 
 // Rotas protegidas
 Route::middleware('auth:sanctum')->group(function () {

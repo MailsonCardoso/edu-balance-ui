@@ -1,0 +1,45 @@
+<?php
+
+namespace App\DTOs;
+
+use App\Models\Mensalidade;
+
+final readonly class GerarCobrancaDTO
+{
+    public function __construct(
+        public int $mensalidadeId,
+        public string $externalReference,
+        public string $titulo,
+        public float $valor,
+        public string $vencimento,
+        public string $nomePagador,
+        public string $emailPagador,
+        public string $cpfPagador,
+        public string $notificationUrl,
+    ) {}
+
+    public static function fromMensalidade(Mensalidade $mensalidade, string $notificationUrl): self
+    {
+        $aluno = $mensalidade->aluno;
+
+        return new self(
+            mensalidadeId: $mensalidade->id,
+            externalReference: self::gerarExternalReference($mensalidade),
+            titulo: "Mensalidade {$mensalidade->mes_referencia} - {$aluno->nome}",
+            valor: (float) $mensalidade->valor,
+            vencimento: $mensalidade->data_vencimento->format('Y-m-d'),
+            nomePagador: $aluno->responsavel,
+            emailPagador: $aluno->email ?? '',
+            cpfPagador: preg_replace('/\D/', '', $aluno->cpf_responsavel ?? ''),
+            notificationUrl: $notificationUrl,
+        );
+    }
+
+    private static function gerarExternalReference(Mensalidade $mensalidade): string
+    {
+        $aluno = $mensalidade->aluno;
+        $mes = str_replace('/', '_', $mensalidade->mes_referencia);
+
+        return "MENSALIDADE_{$mensalidade->id}_{$mes}";
+    }
+}
