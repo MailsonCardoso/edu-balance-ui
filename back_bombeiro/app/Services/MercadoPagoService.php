@@ -45,6 +45,17 @@ class MercadoPagoService
             ];
         }
 
+        if ($dto->formaPagamento === 'bolbradesco' && empty($dto->cpfPagador)) {
+            throw new \RuntimeException('CPF do responsável é obrigatório para gerar boleto.');
+        }
+
+        if (!empty($dto->cpfPagador)) {
+            $payer['identification'] = [
+                'type' => 'CPF',
+                'number' => $dto->cpfPagador,
+            ];
+        }
+
         $payload = [
             'transaction_amount' => $dto->valor,
             'description' => $dto->titulo,
