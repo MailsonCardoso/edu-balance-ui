@@ -36,7 +36,12 @@ const schema = z.object({
   dataNascimento: z.string().min(1, "Obrigatório"),
   telefone: z.string().min(10, "Telefone inválido").max(20),
   email: z.string().email("E-mail inválido"),
-  endereco: z.string().min(3, "Endereço obrigatório").max(200),
+  cep: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido (00000-000)"),
+  logradouro: z.string().min(2, "Rua obrigatória").max(255),
+  numero: z.string().min(1, "Número obrigatório").max(20),
+  bairro: z.string().min(2, "Bairro obrigatório").max(255),
+  cidade: z.string().min(2, "Cidade obrigatória").max(255),
+  uf: z.string().regex(/^[A-Z]{2}$/, "UF inválida (ex: SP)"),
   responsavel: z.string().min(3, "Nome do responsável obrigatório"),
   cpfResponsavel: z
     .string()
@@ -84,7 +89,12 @@ const emptyAluno: Aluno = {
   dataNascimento: "",
   telefone: "",
   email: "",
-  endereco: "",
+  cep: "",
+  logradouro: "",
+  numero: "",
+  bairro: "",
+  cidade: "",
+  uf: "",
   responsavel: "",
   cpfResponsavel: "",
   telefoneResponsavel: "",
@@ -263,15 +273,65 @@ export function AlunoSheet({
                   <p className={viewCls}>{current.telefone}</p>
                 )}
               </Field>
-              <Field label="Endereço" error={errors.endereco?.message} className="sm:col-span-2">
+              <Field label="CEP" error={errors.cep?.message}>
                 {editing ? (
                   <Input
                     className="h-10"
-                    placeholder="Rua, número, bairro"
-                    {...register("endereco")}
+                    placeholder="00000-000"
+                    {...register("cep")}
+                    onChange={(e) => {
+                      const masked = e.target.value.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+                      e.target.value = masked;
+                      setValue("cep", masked, { shouldValidate: true });
+                    }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.endereco}</p>
+                  <p className={viewCls}>{current.cep}</p>
+                )}
+              </Field>
+              <Field label="UF" error={errors.uf?.message}>
+                {editing ? (
+                  <Input
+                    className="h-10 uppercase"
+                    placeholder="SP"
+                    maxLength={2}
+                    {...register("uf")}
+                    onChange={(e) => {
+                      const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
+                      e.target.value = v;
+                      setValue("uf", v, { shouldValidate: true });
+                    }}
+                  />
+                ) : (
+                  <p className={viewCls}>{current.uf}</p>
+                )}
+              </Field>
+              <Field label="Logradouro (rua/avenida)" error={errors.logradouro?.message} className="sm:col-span-2">
+                {editing ? (
+                  <Input className="h-10" {...register("logradouro")} />
+                ) : (
+                  <p className={viewCls}>{current.logradouro}</p>
+                )}
+              </Field>
+              <Field label="Número" error={errors.numero?.message}>
+                {editing ? (
+                  <Input className="h-10" {...register("numero")} />
+                ) : (
+                  <p className={viewCls}>{current.numero}</p>
+                )}
+              </Field>
+              <Field label="Bairro" error={errors.bairro?.message}>
+                {editing ? (
+                  <Input className="h-10" {...register("bairro")} />
+                ) : (
+                  <p className={viewCls}>{current.bairro}</p>
+                )}
+              </Field>
+              <Field label="Cidade" error={errors.cidade?.message} className="sm:col-span-2">
+                {editing ? (
+                  <Input className="h-10" {...register("cidade")} />
+                ) : (
+                  <p className={viewCls}>{current.cidade}</p>
                 )}
               </Field>
             </div>

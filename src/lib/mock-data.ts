@@ -12,7 +12,12 @@ export interface Aluno {
   dataNascimento: string;
   telefone: string;
   email: string;
-  endereco: string;
+  cep: string;
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
   responsavel: string;
   cpfResponsavel: string;
   telefoneResponsavel: string;

@@ -37,6 +37,12 @@ class MercadoPagoService
             throw new \RuntimeException('CPF do responsável é obrigatório para gerar boleto.');
         }
 
+        if ($dto->formaPagamento === 'bolbradesco' && empty($dto->cep)) {
+            throw new \RuntimeException(
+                'Endereço completo do aluno é obrigatório para gerar boleto (CEP, rua, número, bairro, cidade e UF).'
+            );
+        }
+
         $parts = explode(' ', trim($dto->nomePagador), 2);
         $firstName = $parts[0] ?: $dto->nomePagador;
         $lastName = $parts[1] ?? $firstName;
@@ -51,6 +57,17 @@ class MercadoPagoService
             $payer['identification'] = [
                 'type' => 'CPF',
                 'number' => $dto->cpfPagador,
+            ];
+        }
+
+        if ($dto->formaPagamento === 'bolbradesco') {
+            $payer['address'] = [
+                'zip_code' => $dto->cep,
+                'street_name' => $dto->logradouro,
+                'street_number' => $dto->numero,
+                'neighborhood' => $dto->bairro,
+                'city' => $dto->cidade,
+                'federal_unit' => strtoupper($dto->uf ?? ''),
             ];
         }
 
