@@ -100,3 +100,35 @@ export const fmtDateFull = (dateStr: string): string => {
   const d = new Date(dateStr);
   return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
 };
+
+export const formatarCep = (cep: string): string => {
+  const limpo = cep.replace(/\D/g, "");
+  if (limpo.length <= 5) return limpo;
+  return `${limpo.slice(0, 5)}-${limpo.slice(5, 8)}`;
+};
+
+export const buscarCep = async (cep: string): Promise<{
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  ibge: string;
+  gia: string;
+  ddd: string;
+  siafi: string;
+  erro?: boolean;
+} | null> => {
+  const cepLimpo = cep.replace(/\D/g, "");
+  if (cepLimpo.length !== 8) return null;
+
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+    const data = await response.json();
+    if (data.erro) return null;
+    return data;
+  } catch {
+    return null;
+  }
+};

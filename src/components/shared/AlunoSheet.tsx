@@ -23,6 +23,7 @@ import { StatusBadge } from "@/components/shared/Primitives";
 import type { Aluno } from "@/lib/mock-data";
 import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
 import { checkCpfExists } from "@/lib/api/alunos";
+import { buscarCep, formatarCep } from "@/lib/format";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -163,6 +164,19 @@ export function AlunoSheet({
     }
   };
 
+const handleCepBlur = async (value: string) => {
+    const cepFormatado = formatarCep(value);
+    if (cepFormatado.length !== 9) return;
+
+    const endereco = await buscarCep(cepFormatado);
+    if (endereco) {
+      setValue("uf", endereco.uf.toUpperCase(), { shouldValidate: true });
+      setValue("cidade", endereco.localidade, { shouldValidate: true });
+      setValue("bairro", endereco.bairro, { shouldValidate: true });
+      setValue("logradouro", endereco.logradouro, { shouldValidate: true });
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
@@ -280,10 +294,11 @@ export function AlunoSheet({
                     placeholder="00000-000"
                     {...register("cep")}
                     onChange={(e) => {
-                      const masked = e.target.value.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+                      const masked = formatarCep(e.target.value);
                       e.target.value = masked;
                       setValue("cep", masked, { shouldValidate: true });
                     }}
+                    onBlur={(e) => handleCepBlur(e.target.value)}
                   />
                 ) : (
                   <p className={viewCls}>{current.cep}</p>

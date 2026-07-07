@@ -22,7 +22,7 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskDate, maskPhone, fmtDate, brl, maskCurrency, parseCurrency } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate, brl, maskCurrency, parseCurrency, formatarCep, buscarCep } from "@/lib/format";
 import { fetchAluno, updateAluno, deleteAluno, checkCpfExists } from "@/lib/api/alunos";
 import api from "@/lib/api";
 
@@ -150,6 +150,19 @@ function AlunoDetalhe() {
       navigate({ to: "/alunos" });
     } catch {
       toast.error("Erro ao excluir aluno");
+    }
+  };
+
+  const handleCepBlur = async (value: string) => {
+    const cepFormatado = formatarCep(value);
+    if (cepFormatado.length !== 9) return;
+
+    const endereco = await buscarCep(cepFormatado);
+    if (endereco) {
+      setValue("uf", endereco.uf.toUpperCase(), { shouldValidate: true });
+      setValue("cidade", endereco.localidade, { shouldValidate: true });
+      setValue("bairro", endereco.bairro, { shouldValidate: true });
+      setValue("logradouro", endereco.logradouro, { shouldValidate: true });
     }
   };
 
@@ -316,10 +329,11 @@ function AlunoDetalhe() {
                   placeholder="00000-000"
                   {...register("cep")}
                   onChange={(e) => {
-                    const masked = e.target.value.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+                    const masked = formatarCep(e.target.value);
                     e.target.value = masked;
                     setValue("cep", masked, { shouldValidate: true });
                   }}
+                  onBlur={(e) => handleCepBlur(e.target.value)}
                 />
               ) : (
                 <p className="text-sm py-2.5">{aluno.cep}</p>

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskPhone, maskCurrency, parseCurrency } from "@/lib/format";
+import { maskCPF, maskPhone, maskCurrency, parseCurrency, formatarCep, buscarCep } from "@/lib/format";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 
 const schema = z.object({
@@ -86,6 +86,19 @@ function NovoAluno() {
       const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } };
       const msg = apiErr.response?.data?.errors?.cpf?.[0] || "Erro ao cadastrar aluno";
       toast.error(msg);
+    }
+  };
+
+  const handleCepBlur = async (value: string) => {
+    const cepFormatado = formatarCep(value);
+    if (cepFormatado.length !== 9) return;
+
+    const endereco = await buscarCep(cepFormatado);
+    if (endereco) {
+      setValue("uf", endereco.uf.toUpperCase(), { shouldValidate: true });
+      setValue("cidade", endereco.localidade, { shouldValidate: true });
+      setValue("bairro", endereco.bairro, { shouldValidate: true });
+      setValue("logradouro", endereco.logradouro, { shouldValidate: true });
     }
   };
 
@@ -167,10 +180,11 @@ function NovoAluno() {
                 placeholder="00000-000"
                 {...register("cep")}
                 onChange={(e) => {
-                  const masked = e.target.value.replace(/\D/g, "").slice(0, 8).replace(/(\d{5})(\d)/, "$1-$2");
+                  const masked = formatarCep(e.target.value);
                   e.target.value = masked;
                   setValue("cep", masked, { shouldValidate: true });
                 }}
+                onBlur={(e) => handleCepBlur(e.target.value)}
               />
             </Field>
             <Field label="UF" error={errors.uf?.message}>
