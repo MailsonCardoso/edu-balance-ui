@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskPhone } from "@/lib/format";
+import { maskCPF, maskPhone, maskCurrency, parseCurrency } from "@/lib/format";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 import { createMensalidade } from "@/lib/api/mensalidades";
 
@@ -64,6 +64,7 @@ function NovoAluno() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors, isSubmitting },
     setError,
     clearErrors,
@@ -243,13 +244,21 @@ function NovoAluno() {
             </Field>
 
             <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
-              <Input
-                className="h-10"
-                placeholder="0,00"
-                type="number"
-                step="0.01"
-                min="0"
-                {...register("valorMensalidade", { valueAsNumber: true })}
+              <Controller
+                name="valorMensalidade"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    className="h-10"
+                    placeholder="0,00"
+                    value={field.value ? maskCurrency(String(Math.round(field.value * 100))) : ""}
+                    onChange={(e) => {
+                      const masked = maskCurrency(e.target.value);
+                      e.target.value = masked;
+                      field.onChange(parseCurrency(masked));
+                    }}
+                  />
+                )}
               />
             </Field>
             <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
