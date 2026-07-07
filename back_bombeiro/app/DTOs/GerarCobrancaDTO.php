@@ -33,6 +33,18 @@ final readonly class GerarCobrancaDTO
             throw new \RuntimeException('Mensalidade sem aluno vinculado.');
         }
 
+        if ($formaPagamento === 'bolbradesco') {
+            $cpf = preg_replace('/\D/', '', $aluno->cpf_responsavel ?? '');
+            if (strlen($cpf) !== 11) {
+                throw new \RuntimeException('CPF do responsável é obrigatório e deve ter 11 dígitos para gerar boleto.');
+            }
+            foreach (['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'uf'] as $campo) {
+                if (empty($aluno->$campo)) {
+                    throw new \RuntimeException("O campo {$campo} do aluno é obrigatório para gerar boleto.");
+                }
+            }
+        }
+
         return new self(
             mensalidadeId: $mensalidade->id,
             externalReference: self::gerarExternalReference($mensalidade),

@@ -200,9 +200,19 @@ class MercadoPagoService
             return false;
         }
 
-        $signature = $headers['x-signature'] ?? $headers['X-Signature'] ?? '';
-        if (empty($signature)) {
+        $signatureRaw = $headers['x-signature'] ?? $headers['X-Signature'] ?? '';
+        if (is_array($signatureRaw)) {
+            $signatureRaw = implode(',', $signatureRaw);
+        }
+        if (empty($signatureRaw)) {
             Log::warning('MercadoPago: Webhook sem assinatura');
+            return false;
+        }
+
+        preg_match('/v1=([a-f0-9]+)/i', $signatureRaw, $m);
+        $signature = $m[1] ?? '';
+        if (empty($signature)) {
+            Log::warning('MercadoPago: Assinatura do webhook sem hash v1');
             return false;
         }
 

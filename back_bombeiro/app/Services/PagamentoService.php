@@ -44,6 +44,11 @@ class PagamentoService
                 ?? null;
         }
 
+        if (($pagamento['status'] ?? '') === 'rejected') {
+            $detail = $pagamento['status_detail'] ?? 'rejected_by_bank';
+            throw new \RuntimeException("Boleto rejeitado pelo banco ({$detail}). Verifique os dados do pagador.");
+        }
+
         return DB::transaction(function () use ($mensalidade, $dto, $pagamento, $paymentUrl) {
             $transacao = PagamentoTransacao::create([
                 'mensalidade_id' => $mensalidade->id,
