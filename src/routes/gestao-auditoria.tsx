@@ -73,7 +73,7 @@ function GestaoAuditoria() {
       formatMoney(item.valor),
       statusBadge[item.status]?.label || item.status,
       item.payment_method || "-",
-      item.issuer_id || "-",
+      item.banco_nome || item.issuer_id || "-",
       item.e2e_id || "-",
       formatDate(item.data_criacao),
       item.data_aprovacao ? formatDate(item.data_aprovacao) : "-",
@@ -205,7 +205,7 @@ function GestaoAuditoria() {
                     <th className="text-right py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Valor</th>
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Status</th>
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Método</th>
-                    <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Banco</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Banco</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">ID Pix</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Criação</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Aprovação</th>
@@ -238,8 +238,8 @@ function GestaoAuditoria() {
                             </span>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono text-xs text-muted-foreground">
-                          {item.issuer_id || "-"}
+                        <td className="py-3 px-3 text-xs text-muted-foreground">
+                          {item.banco_nome || item.issuer_id || "-"}
                         </td>
                         <td className="py-3 px-3 font-mono text-xs text-muted-foreground max-w-[200px] truncate" title={item.e2e_id || ""}>
                           {item.e2e_id || "-"}

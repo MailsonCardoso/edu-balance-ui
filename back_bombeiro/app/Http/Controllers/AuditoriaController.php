@@ -58,6 +58,7 @@ class AuditoriaController extends Controller
                 'data_criacao' => $t->created_at,
                 'data_aprovacao' => $t->data_aprovacao,
                 'issuer_id' => $issuerId,
+                'banco_nome' => self::getNomeBanco($issuerId),
                 'e2e_id' => $e2eId,
                 'aluno_nome' => $t->mensalidade?->aluno?->nome,
                 'aluno_cpf' => $t->mensalidade?->aluno?->cpf,
@@ -70,5 +71,34 @@ class AuditoriaController extends Controller
         });
 
         return response()->json($pagamentos);
+    }
+
+    private static function getNomeBanco(?string $issuerId): ?string
+    {
+        $bancos = [
+            '12501' => 'NU Pagamentos (Nubank)',
+            '105'   => 'Banco do Brasil',
+            '104'   => 'Caixa Econômica Federal',
+            '341'   => 'Itaú Unibanco',
+            '237'   => 'Bradesco',
+            '33'    => 'Santander',
+            '260'   => 'Nubank',
+            '212'   => 'Banco Inter',
+            '77'    => 'Banco Inter',
+            '336'   => 'C6 Bank',
+            '655'   => 'Neon',
+            '208'   => 'PicPay',
+            '290'   => 'PagBank',
+            '117'   => 'PagBank',
+            '323'   => 'Mercado Pago',
+            '756'   => 'Sicoob',
+            '748'   => 'Sicredi',
+            '422'   => 'Safra',
+            '389'   => 'Banco do Nordeste',
+            '707'   => 'Banco Digital',
+            '1'     => 'Mercado Pago',
+        ];
+
+        return $bancos[$issuerId] ?? "Código {$issuerId}";
     }
 }

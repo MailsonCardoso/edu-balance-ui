@@ -10,6 +10,7 @@ export interface AuditoriaItem {
   data_criacao: string;
   data_aprovacao: string | null;
   issuer_id: string | null;
+  banco_nome: string | null;
   e2e_id: string | null;
   aluno_nome: string | null;
   aluno_cpf: string | null;
