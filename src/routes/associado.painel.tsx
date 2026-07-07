@@ -40,6 +40,7 @@ import {
 import {
   fetchAssociadoMensalidades,
   gerarCobrancaMensalidade,
+  consultarStatusPagamento,
 } from "@/lib/api/associado-mensalidades";
 import type { Mensalidade, OrigemPagamento } from "@/lib/mock-data";
 
@@ -217,6 +218,20 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
     setPixModal(null);
     fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
   };
+
+  useEffect(() => {
+    if (!pixModal) return;
+    const id = setInterval(async () => {
+      try {
+        const res = await consultarStatusPagamento(pixModal.mensalidadeId);
+        if (res.data?.status === "pago") {
+          toast.success("Pagamento confirmado!");
+          fecharPix();
+        }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(id);
+  }, [pixModal]);
 
   useEffect(() => {
     fetchAssociadoMensalidades()
@@ -558,6 +573,20 @@ function PagamentosTab() {
     setPixModal(null);
     fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
   };
+
+  useEffect(() => {
+    if (!pixModal) return;
+    const id = setInterval(async () => {
+      try {
+        const res = await consultarStatusPagamento(pixModal.mensalidadeId);
+        if (res.data?.status === "pago") {
+          toast.success("Pagamento confirmado!");
+          fecharPix();
+        }
+      } catch {}
+    }, 5000);
+    return () => clearInterval(id);
+  }, [pixModal]);
 
   if (loading) {
     return (
