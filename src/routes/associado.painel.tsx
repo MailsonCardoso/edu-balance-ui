@@ -232,8 +232,9 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
       } else {
         toast.error(result.message || "Erro ao gerar boleto");
       }
-    } catch {
-      toast.error("Erro ao conectar com Mercado Pago");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao gerar boleto";
+      toast.error(msg);
     }
   };
 
@@ -661,8 +662,9 @@ function PagamentosTab() {
       } else {
         toast.error(result.message || "Erro ao gerar boleto");
       }
-    } catch {
-      toast.error("Erro ao conectar com Mercado Pago");
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao gerar boleto";
+      toast.error(msg);
     }
   };
 
