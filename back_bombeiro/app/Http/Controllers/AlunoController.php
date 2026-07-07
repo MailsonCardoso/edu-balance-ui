@@ -3,11 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Mensalidade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AlunoController extends Controller
 {
+    private array $meses = [
+        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Marco', 4 => 'Abril',
+        5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
+        9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro',
+    ];
+
     public function checkCpf(string $cpf, Request $request): JsonResponse
     {
         $query = Aluno::where('cpf', $cpf);
@@ -42,7 +51,48 @@ class AlunoController extends Controller
             'dia_vencimento' => 'nullable|integer|min:1|max:31',
         ]);
 
-        return Aluno::create($validated);
+        $aluno = DB::transaction(function () use ($validated) {
+            $aluno = Aluno::create($validated);
+
+            if (($validated['valor_mensalidade'] ?? 0) > 0) {
+                $this->criarMensalidadeInicial($aluno);
+            }
+
+            return $aluno;
+        });
+
+        return $aluno->load('mensalidades');
+    }
+
+    private function criarMensalidadeInicial(Aluno $aluno): void
+    {
+        $agora = now();
+        $mesNum = (int) $agora->format('n');
+        $ano = $agora->year;
+        $dia = $aluno->dia_vencimento ?? 10;
+
+        $mesRef = $this->meses[$mesNum] . '/' . $ano;
+
+        $jaExiste = Mensalidade::where('aluno_id', $aluno->id)
+            ->where('mes_referencia', $mesRef)
+            ->exists();
+
+        if ($jaExiste) {
+            return;
+        }
+
+        Mensalidade::create([
+            'aluno_id' => $aluno->id,
+            'mes_referencia' => $mesRef,
+            'valor' => $aluno->valor_mensalidade,
+            'data_vencimento' => sprintf('%d-%02d-%02d', $ano, $mesNum, $dia),
+            'status' => 'pendente',
+        ]);
+
+        Log::info('Aluno: Mensalidade inicial criada', [
+            'aluno_id' => $aluno->id,
+            'mes_referencia' => $mesRef,
+        ]);
     }
 
     public function show(Aluno $aluno)

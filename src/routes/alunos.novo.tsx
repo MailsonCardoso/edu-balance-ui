@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { maskCPF, maskPhone, maskCurrency, parseCurrency } from "@/lib/format";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
-import { createMensalidade } from "@/lib/api/mensalidades";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -75,25 +74,7 @@ function NovoAluno() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const created = await createAluno({ ...data, situacao: "em_dia" });
-      if (data.valorMensalidade > 0) {
-        try {
-          const hoje = new Date();
-          const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
-          const mesRef = mes.charAt(0).toUpperCase() + mes.slice(1) + "/" + hoje.getFullYear();
-          const dia = String(data.diaVencimento || 10).padStart(2, "0");
-          const mesNum = String(hoje.getMonth() + 1).padStart(2, "0");
-          await createMensalidade({
-            alunoId: created.id,
-            mesReferencia: mesRef,
-            valor: data.valorMensalidade,
-            dataVencimento: `${hoje.getFullYear()}-${mesNum}-${dia}`,
-            status: "pendente",
-          });
-        } catch {
-          toast.error("Erro ao criar mensalidade inicial");
-        }
-      }
+      await createAluno({ ...data, situacao: "em_dia" });
       toast.success("Aluno cadastrado com sucesso!");
       navigate({ to: "/alunos" });
     } catch (err: unknown) {
