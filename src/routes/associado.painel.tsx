@@ -189,7 +189,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagandoId, setPagandoId] = useState<string | null>(null);
-  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string } | null>(null);
+  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
 
   const handlePagar = async (m: Mensalidade) => {
     if (pagandoId) return;
@@ -201,6 +201,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           qrCode: result.data.pix_qr_code,
           qrCodeBase64: result.data.pix_qr_code_base64,
           mensalidadeId: m.id,
+          status: 'waiting',
         });
       } else if (result.success && result.data?.payment_url) {
         window.location.href = result.data.payment_url;
@@ -220,16 +221,16 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   };
 
   useEffect(() => {
-    if (!pixModal) return;
+    if (!pixModal || pixModal.status === 'confirmed') return;
     const id = setInterval(async () => {
       try {
         const res = await consultarStatusPagamento(pixModal.mensalidadeId);
         if (res.data?.status === "pago") {
-          toast.success("Pagamento confirmado!");
-          fecharPix();
+          setPixModal((prev) => prev ? { ...prev, status: 'confirmed' } : null);
+          setTimeout(fecharPix, 2000);
         }
       } catch {}
-    }, 5000);
+    }, 3000);
     return () => clearInterval(id);
   }, [pixModal]);
 
@@ -464,34 +465,44 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
       )}
 
       {pixModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={fecharPix}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="size-12 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4">
-              <Smartphone className="size-6 text-emerald-500" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
-            <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
-            {pixModal.qrCodeBase64 && (
-              <img
-                src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
-                alt="QR Code PIX"
-                className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
-              />
-            )}
-            {pixModal.qrCode && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+            {pixModal.status === 'confirmed' ? (
               <>
-                <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
-                <div className="bg-gray-50 rounded-xl p-3 mb-6">
-                  <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                <div className="size-16 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4 animate-bounce">
+                  <CheckCircle2 className="size-8 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-bold text-emerald-600 mb-1">Pagamento confirmado!</h3>
+                <p className="text-sm text-gray-500">Redirecionando...</p>
+              </>
+            ) : (
+              <>
+                <div className="size-12 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4">
+                  <Smartphone className="size-6 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
+                <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
+                {pixModal.qrCodeBase64 && (
+                  <img
+                    src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
+                    alt="QR Code PIX"
+                    className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
+                  />
+                )}
+                {pixModal.qrCode && (
+                  <>
+                    <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
+                    <div className="bg-gray-50 rounded-xl p-3 mb-6">
+                      <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                  <Loader2 className="size-4 animate-spin" />
+                  <span>Aguardando pagamento...</span>
                 </div>
               </>
             )}
-            <button
-              onClick={fecharPix}
-              className="w-full h-11 rounded-xl bg-[#D62828] text-white text-sm font-semibold hover:bg-[#B01E1E] transition-all"
-            >
-              Já paguei, verificar
-            </button>
           </div>
         </div>
       )}
@@ -519,7 +530,7 @@ function PagamentosTab() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("todas");
   const [pagandoId, setPagandoId] = useState<string | null>(null);
-  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string } | null>(null);
+  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
 
   useEffect(() => {
     fetchAssociadoMensalidades()
@@ -556,6 +567,7 @@ function PagamentosTab() {
           qrCode: result.data.pix_qr_code,
           qrCodeBase64: result.data.pix_qr_code_base64,
           mensalidadeId: m.id,
+          status: 'waiting',
         });
       } else if (result.success && result.data?.payment_url) {
         window.location.href = result.data.payment_url;
@@ -575,16 +587,16 @@ function PagamentosTab() {
   };
 
   useEffect(() => {
-    if (!pixModal) return;
+    if (!pixModal || pixModal.status === 'confirmed') return;
     const id = setInterval(async () => {
       try {
         const res = await consultarStatusPagamento(pixModal.mensalidadeId);
         if (res.data?.status === "pago") {
-          toast.success("Pagamento confirmado!");
-          fecharPix();
+          setPixModal((prev) => prev ? { ...prev, status: 'confirmed' } : null);
+          setTimeout(fecharPix, 2000);
         }
       } catch {}
-    }, 5000);
+    }, 3000);
     return () => clearInterval(id);
   }, [pixModal]);
 
@@ -761,34 +773,44 @@ function PagamentosTab() {
       </div>
 
       {pixModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={fecharPix}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="size-12 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4">
-              <Smartphone className="size-6 text-emerald-500" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
-            <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
-            {pixModal.qrCodeBase64 && (
-              <img
-                src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
-                alt="QR Code PIX"
-                className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
-              />
-            )}
-            {pixModal.qrCode && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+            {pixModal.status === 'confirmed' ? (
               <>
-                <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
-                <div className="bg-gray-50 rounded-xl p-3 mb-6">
-                  <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                <div className="size-16 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4 animate-bounce">
+                  <CheckCircle2 className="size-8 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-bold text-emerald-600 mb-1">Pagamento confirmado!</h3>
+                <p className="text-sm text-gray-500">Redirecionando...</p>
+              </>
+            ) : (
+              <>
+                <div className="size-12 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4">
+                  <Smartphone className="size-6 text-emerald-500" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
+                <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
+                {pixModal.qrCodeBase64 && (
+                  <img
+                    src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
+                    alt="QR Code PIX"
+                    className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
+                  />
+                )}
+                {pixModal.qrCode && (
+                  <>
+                    <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
+                    <div className="bg-gray-50 rounded-xl p-3 mb-6">
+                      <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                  <Loader2 className="size-4 animate-spin" />
+                  <span>Aguardando pagamento...</span>
                 </div>
               </>
             )}
-            <button
-              onClick={fecharPix}
-              className="w-full h-11 rounded-xl bg-[#D62828] text-white text-sm font-semibold hover:bg-[#B01E1E] transition-all"
-            >
-              Já paguei, verificar
-            </button>
           </div>
         </div>
       )}
