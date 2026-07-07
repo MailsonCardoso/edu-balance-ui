@@ -18,7 +18,7 @@ class GerarCobrancaRequest extends FormRequest
             return false;
         }
 
-        $mensalidade = \App\Models\Mensalidade::with('aluno')->find($this->route('mensalidade'));
+        $mensalidade = $this->route('mensalidade');
         if (!$mensalidade) {
             return false;
         }

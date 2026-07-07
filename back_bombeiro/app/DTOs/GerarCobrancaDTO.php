@@ -22,6 +22,10 @@ final readonly class GerarCobrancaDTO
     {
         $aluno = $mensalidade->aluno;
 
+        if (!$aluno) {
+            throw new \RuntimeException('Mensalidade sem aluno vinculado.');
+        }
+
         return new self(
             mensalidadeId: $mensalidade->id,
             externalReference: self::gerarExternalReference($mensalidade),
