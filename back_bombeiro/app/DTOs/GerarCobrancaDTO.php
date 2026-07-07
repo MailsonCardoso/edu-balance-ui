@@ -43,6 +43,9 @@ final readonly class GerarCobrancaDTO
                     throw new \RuntimeException("O campo {$campo} do aluno é obrigatório para gerar boleto.");
                 }
             }
+            if ((float) $mensalidade->valor < 2) {
+                throw new \RuntimeException('O valor mínimo para gerar boleto é R$ 2,00.');
+            }
         }
 
         return new self(
