@@ -32,11 +32,19 @@ class PagamentoService
 
         $pagamento = $this->mercadopago->criarCobranca($dto);
 
-        return DB::transaction(function () use ($mensalidade, $dto, $pagamento) {
-            $paymentUrl = $pagamento['point_of_interaction']['transaction_data']['ticket_url']
-                ?? $pagamento['transaction_details']['external_resource_url']
-                ?? null;
+        $paymentId = $pagamento['id'] ?? null;
+        $paymentUrl = $pagamento['point_of_interaction']['transaction_data']['ticket_url']
+            ?? $pagamento['transaction_details']['external_resource_url']
+            ?? null;
 
+        if (empty($paymentUrl) && $paymentId) {
+            $pagamento = $this->mercadopago->consultarPagamento((string) $paymentId);
+            $paymentUrl = $pagamento['transaction_details']['external_resource_url']
+                ?? $pagamento['point_of_interaction']['transaction_data']['ticket_url']
+                ?? null;
+        }
+
+        return DB::transaction(function () use ($mensalidade, $dto, $pagamento, $paymentUrl) {
             $transacao = PagamentoTransacao::create([
                 'mensalidade_id' => $mensalidade->id,
                 'payment_id' => $pagamento['id'] ?? null,

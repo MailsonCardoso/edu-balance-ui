@@ -224,10 +224,10 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   const handleBoleto = async (m: Mensalidade) => {
     try {
       const result = await gerarCobrancaMensalidade(m.id, "bolbradesco");
-      if (result.success && result.data?.boleto_url) {
+      if (result.success) {
         setBoletoModal({
-          url: result.data.boleto_url,
-          vencimento: result.data.data_vencimento || "—",
+          url: result.data?.boleto_url || "",
+          vencimento: result.data?.data_vencimento || "—",
         });
       } else {
         toast.error(result.message || "Erro ao gerar boleto");
@@ -549,15 +549,22 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
             <p className="text-sm text-gray-500 mb-6">
               Vencimento: {new Date(boletoModal.vencimento).toLocaleDateString("pt-BR")}
             </p>
-            <a
-              href={boletoModal.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-            >
-              <ExternalLink className="size-4" />
-              Baixar Boleto
-            </a>
+            {boletoModal.url ? (
+              <a
+                href={boletoModal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+              >
+                <ExternalLink className="size-4" />
+                Baixar Boleto
+              </a>
+            ) : (
+              <p className="text-sm text-amber-600 bg-amber-50 rounded-xl px-4 py-3 mb-2">
+                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível.
+                Ela aparecerá em alguns instantes na lista de boletos do associado.
+              </p>
+            )}
             <p className="text-xs text-gray-400 mt-4">
               A confirmação pode levar até 3 dias úteis após o pagamento.
             </p>
@@ -654,10 +661,10 @@ function PagamentosTab() {
   const handleBoleto = async (m: Mensalidade) => {
     try {
       const result = await gerarCobrancaMensalidade(m.id, "bolbradesco");
-      if (result.success && result.data?.boleto_url) {
+      if (result.success) {
         setBoletoModal({
-          url: result.data.boleto_url,
-          vencimento: result.data.data_vencimento || "—",
+          url: result.data?.boleto_url || "",
+          vencimento: result.data?.data_vencimento || "—",
         });
       } else {
         toast.error(result.message || "Erro ao gerar boleto");
@@ -921,15 +928,22 @@ function PagamentosTab() {
             <p className="text-sm text-gray-500 mb-6">
               Vencimento: {new Date(boletoModal.vencimento).toLocaleDateString("pt-BR")}
             </p>
-            <a
-              href={boletoModal.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-            >
-              <ExternalLink className="size-4" />
-              Baixar Boleto
-            </a>
+            {boletoModal.url ? (
+              <a
+                href={boletoModal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+              >
+                <ExternalLink className="size-4" />
+                Baixar Boleto
+              </a>
+            ) : (
+              <p className="text-sm text-amber-600 bg-amber-50 rounded-xl px-4 py-3 mb-2">
+                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível.
+                Ela aparecerá em alguns instantes na lista de boletos do associado.
+              </p>
+            )}
             <p className="text-xs text-gray-400 mt-4">
               A confirmação pode levar até 3 dias úteis após o pagamento.
             </p>
