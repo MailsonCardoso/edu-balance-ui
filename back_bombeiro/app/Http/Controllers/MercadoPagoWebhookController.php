@@ -8,7 +8,6 @@ use App\Jobs\ProcessMercadoPagoWebhookJob;
 use App\Services\MercadoPagoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class MercadoPagoWebhookController extends Controller
@@ -42,16 +41,6 @@ class MercadoPagoWebhookController extends Controller
             Log::warning('Webhook: payment_id vazio');
             return response()->json(['status' => 'ignored']);
         }
-
-        $cacheKey = "webhook_processed_{$paymentId}";
-        if (Cache::has($cacheKey)) {
-            Log::info('Webhook: Notificacao ja processada (idempotencia)', [
-                'payment_id' => $paymentId,
-            ]);
-            return response()->json(['status' => 'duplicated']);
-        }
-
-        Cache::put($cacheKey, true, now()->addHours(24));
 
         if (config('services.mercadopago.webhook_secret')) {
             $isValid = $this->mercadopago->validarWebhook($headers, $body);
