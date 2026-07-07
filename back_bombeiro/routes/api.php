@@ -7,6 +7,7 @@ use App\Http\Controllers\MensalidadeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinancialCategoryController;
 use App\Http\Controllers\MercadoPagoWebhookController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\PatrimonioController;
 use App\Http\Controllers\RevenueController;
 use Illuminate\Support\Facades\Route;
@@ -57,4 +58,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/documentos/{documento}', [App\Http\Controllers\DocumentoController::class, 'destroy']);
     Route::get('/associados', [App\Http\Controllers\AssociadoController::class, 'listAll']);
     Route::delete('/associados/{id}', [App\Http\Controllers\AssociadoController::class, 'destroy']);
+    Route::get('/admin/auditoria/pagamentos', [AuditoriaController::class, 'pagamentos']);
 });

@@ -19,6 +19,7 @@ import { Route as GestaoInventarioRouteImport } from './routes/gestao-inventario
 import { Route as GestaoEstatutoRouteImport } from './routes/gestao-estatuto'
 import { Route as GestaoDocumentosRouteImport } from './routes/gestao-documentos'
 import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
+import { Route as GestaoAuditoriaRouteImport } from './routes/gestao-auditoria'
 import { Route as GestaoAssociadosRouteImport } from './routes/gestao-associados'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -88,6 +89,11 @@ const GestaoDocumentosRoute = GestaoDocumentosRouteImport.update({
 const GestaoCategoriasRoute = GestaoCategoriasRouteImport.update({
   id: '/gestao-categorias',
   path: '/gestao-categorias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoAuditoriaRoute = GestaoAuditoriaRouteImport.update({
+  id: '/gestao-auditoria',
+  path: '/gestao-auditoria',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestaoAssociadosRoute = GestaoAssociadosRouteImport.update({
@@ -197,6 +203,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-associados': typeof GestaoAssociadosRoute
+  '/gestao-auditoria': typeof GestaoAuditoriaRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/gestao-associados': typeof GestaoAssociadosRoute
+  '/gestao-auditoria': typeof GestaoAuditoriaRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -258,6 +266,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/financeiro': typeof FinanceiroRouteWithChildren
   '/gestao-associados': typeof GestaoAssociadosRoute
+  '/gestao-auditoria': typeof GestaoAuditoriaRoute
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/gestao-associados'
+    | '/gestao-auditoria'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
   to:
     | '/dashboard'
     | '/gestao-associados'
+    | '/gestao-auditoria'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/gestao-associados'
+    | '/gestao-auditoria'
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
@@ -385,6 +397,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FinanceiroRoute: typeof FinanceiroRouteWithChildren
   GestaoAssociadosRoute: typeof GestaoAssociadosRoute
+  GestaoAuditoriaRoute: typeof GestaoAuditoriaRoute
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
@@ -468,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/gestao-categorias'
       fullPath: '/gestao-categorias'
       preLoaderRoute: typeof GestaoCategoriasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-auditoria': {
+      id: '/gestao-auditoria'
+      path: '/gestao-auditoria'
+      fullPath: '/gestao-auditoria'
+      preLoaderRoute: typeof GestaoAuditoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestao-associados': {
@@ -674,6 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FinanceiroRoute: FinanceiroRouteWithChildren,
   GestaoAssociadosRoute: GestaoAssociadosRoute,
+  GestaoAuditoriaRoute: GestaoAuditoriaRoute,
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,

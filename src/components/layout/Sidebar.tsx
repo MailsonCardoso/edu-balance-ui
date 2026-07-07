@@ -16,6 +16,7 @@ import {
   ScrollText,
   Package,
   TrendingUp,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +35,7 @@ const nav = [
   { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
   { to: "/gestao-documentos", label: "Documentos", icon: FileText },
   { to: "/gestao-estatuto", label: "Estatuto", icon: ScrollText },
+  { to: "/gestao-auditoria", label: "Auditoria", icon: ShieldCheck },
 ] as const;
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {

@@ -1,0 +1,74 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\PagamentoTransacao;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class AuditoriaController extends Controller
+{
+    public function pagamentos(Request $request): JsonResponse
+    {
+        $query = PagamentoTransacao::with([
+            'mensalidade.aluno:id,nome,cpf,responsavel,cpf_responsavel',
+        ])->orderBy('created_at', 'desc');
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('created_at', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('created_at', '<=', $request->data_fim);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('mensalidade.aluno', function ($q) use ($search) {
+                $q->where('nome', 'like', "%{$search}%")
+                  ->orWhere('cpf', 'like', "%{$search}%")
+                  ->orWhere('responsavel', 'like', "%{$search}%")
+                  ->orWhere('cpf_responsavel', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = min((int) $request->per_page ?: 50, 200);
+        $pagamentos = $query->paginate($perPage);
+
+        $pagamentos->getCollection()->transform(function ($t) {
+            $payload = $t->payload_response ?? $t->payload_request ?? [];
+            $e2eId = $payload['point_of_interaction']['transaction_data']['e2e_id'] ?? null;
+            $issuerId = $payload['payment_method']['issuer_id'] ?? null;
+
+            return [
+                'id' => $t->id,
+                'payment_id' => $t->payment_id,
+                'external_reference' => $t->external_reference,
+                'status' => $t->status,
+                'payment_method' => $t->payment_method,
+                'payer_email' => $t->payer_email,
+                'data_criacao' => $t->created_at,
+                'data_aprovacao' => $t->data_aprovacao,
+                'issuer_id' => $issuerId,
+                'e2e_id' => $e2eId,
+                'aluno_nome' => $t->mensalidade?->aluno?->nome,
+                'aluno_cpf' => $t->mensalidade?->aluno?->cpf,
+                'responsavel' => $t->mensalidade?->aluno?->responsavel,
+                'cpf_responsavel' => $t->mensalidade?->aluno?->cpf_responsavel,
+                'mes_referencia' => $t->mensalidade?->mes_referencia,
+                'valor' => $t->mensalidade?->valor,
+                'mensalidade_status' => $t->mensalidade?->status,
+            ];
+        });
+
+        return response()->json($pagamentos);
+    }
+}
