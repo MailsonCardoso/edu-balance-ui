@@ -74,6 +74,7 @@ function GestaoAuditoria() {
       statusBadge[item.status]?.label || item.status,
       item.payment_method || "-",
       item.banco_nome || item.issuer_id || "-",
+      item.payment_id || "-",
       item.e2e_id || "-",
       formatDate(item.data_criacao),
       item.data_aprovacao ? formatDate(item.data_aprovacao) : "-",
@@ -93,21 +94,22 @@ function GestaoAuditoria() {
 
     autoTable(doc, {
       startY: 33,
-      head: [["Aluno", "CPF", "Mês", "Valor", "Status", "Método", "Banco", "ID Pix", "Criação", "Aprovação"]],
+      head: [["Aluno", "CPF", "Mês", "Valor", "Status", "Método", "Banco", "ID Transação", "ID Pix", "Criação", "Aprovação"]],
       body: rows,
       styles: { fontSize: 7 },
       headStyles: { fillColor: [214, 40, 40] },
       columnStyles: {
-        0: { cellWidth: 45 },
-        1: { cellWidth: 20 },
-        2: { cellWidth: 18 },
-        3: { cellWidth: 22, halign: "right" },
-        4: { cellWidth: 18 },
-        5: { cellWidth: 18 },
+        0: { cellWidth: 42 },
+        1: { cellWidth: 18 },
+        2: { cellWidth: 16 },
+        3: { cellWidth: 20, halign: "right" },
+        4: { cellWidth: 16 },
+        5: { cellWidth: 16 },
         6: { cellWidth: 14 },
-        7: { cellWidth: 60 },
-        8: { cellWidth: 28 },
-        9: { cellWidth: 28 },
+        7: { cellWidth: 28 },
+        8: { cellWidth: 56 },
+        9: { cellWidth: 26 },
+        10: { cellWidth: 26 },
       },
     });
 
@@ -206,6 +208,7 @@ function GestaoAuditoria() {
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Status</th>
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Método</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Banco</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">ID Transação</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">ID Pix</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Criação</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Aprovação</th>
@@ -240,6 +243,9 @@ function GestaoAuditoria() {
                         </td>
                         <td className="py-3 px-3 text-xs text-muted-foreground">
                           {item.banco_nome || item.issuer_id || "-"}
+                        </td>
+                        <td className="py-3 px-3 font-mono text-xs text-muted-foreground" title={item.payment_id || ""}>
+                          {item.payment_id || "-"}
                         </td>
                         <td className="py-3 px-3 font-mono text-xs text-muted-foreground max-w-[200px] truncate" title={item.e2e_id || ""}>
                           {item.e2e_id || "-"}
