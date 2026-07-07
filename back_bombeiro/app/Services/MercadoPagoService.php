@@ -121,7 +121,6 @@ class MercadoPagoService
             'external_reference' => $dto->externalReference,
             'notification_url' => $dto->notificationUrl,
             'statement_descriptor' => 'ESCOLA BOMBEIRO',
-            'purpose' => 'wallet_purchase',
             'payer' => [
                 'email' => $dto->emailPagador,
                 'name' => $dto->nomePagador,
