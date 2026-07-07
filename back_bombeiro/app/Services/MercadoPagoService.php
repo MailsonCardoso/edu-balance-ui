@@ -90,6 +90,8 @@ class MercadoPagoService
             'valor' => $dto->valor,
         ]);
 
+        Log::info('MercadoPago: Payload enviado', ['payload' => $payload]);
+
         $response = Http::withHeaders($this->headers())
             ->post("{$this->baseUrl}/payments", $payload);
 
