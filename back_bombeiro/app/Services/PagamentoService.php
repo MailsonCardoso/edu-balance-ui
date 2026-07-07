@@ -71,7 +71,7 @@ class PagamentoService
         $dadosAtuais = $this->mercadopago->consultarPagamento($paymentId);
         $dto = AtualizarStatusDTO::fromMercadoPagoResponse($dadosAtuais);
 
-        DB::transaction(function () use ($dto, $payloadWebhook, $paymentId) {
+        DB::transaction(function () use ($dto, $dadosAtuais, $payloadWebhook, $paymentId) {
             $transacao = PagamentoTransacao::where('payment_id', $paymentId)
                 ->orWhere('external_reference', $dadosAtuais['external_reference'] ?? '')
                 ->first();
