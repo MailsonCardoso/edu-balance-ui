@@ -251,7 +251,7 @@ function NovoAluno() {
                   <Input
                     className="h-10"
                     placeholder="0,00"
-                    value={field.value ? maskCurrency(String(Math.round(field.value * 100))) : ""}
+                    value={maskCurrency(String(Math.round((field.value || 0) * 100)))}
                     onChange={(e) => {
                       const masked = maskCurrency(e.target.value);
                       e.target.value = masked;

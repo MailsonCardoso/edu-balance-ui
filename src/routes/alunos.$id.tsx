@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ArrowLeft, Loader2, Pencil, Save, Trash2, X } from "lucide-react";
@@ -22,7 +22,7 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskDate, maskPhone, fmtDate, brl } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate, brl, maskCurrency, parseCurrency } from "@/lib/format";
 import { fetchAluno, updateAluno, deleteAluno, checkCpfExists } from "@/lib/api/alunos";
 import api from "@/lib/api";
 
@@ -43,6 +43,8 @@ const schema = z.object({
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
   turma: z.string().min(1, "Selecione uma turma"),
   status: z.enum(["ativo", "inativo"]),
+  valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
+  diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -85,6 +87,7 @@ function AlunoDetalhe() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors, isSubmitting },
     setError,
     clearErrors,
@@ -97,6 +100,8 @@ function AlunoDetalhe() {
           dataNascimento: aluno.dataNascimento?.includes("/")
             ? aluno.dataNascimento
             : fmtDate(aluno.dataNascimento),
+          valorMensalidade: aluno.valorMensalidade ?? 0,
+          diaVencimento: aluno.diaVencimento ?? 10,
         }
       : undefined,
   });
@@ -394,6 +399,49 @@ function AlunoDetalhe() {
             </Field>
             <Field label="Situação financeira">
               <StatusBadge status={aluno.situacao} />
+            </Field>
+            <Field label="Valor mensalidade (R$)" error={errors.valorMensalidade?.message}>
+              {editing ? (
+                <Controller
+                  name="valorMensalidade"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      className="h-10"
+                      placeholder="0,00"
+                      value={maskCurrency(String(Math.round((field.value || 0) * 100)))}
+                      onChange={(e) => {
+                        const masked = maskCurrency(e.target.value);
+                        e.target.value = masked;
+                        field.onChange(parseCurrency(masked));
+                      }}
+                    />
+                  )}
+                />
+              ) : (
+                <p className="text-sm py-2.5">{brl(aluno.valorMensalidade || 0)}</p>
+              )}
+            </Field>
+            <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
+              {editing ? (
+                <Controller
+                  name="diaVencimento"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="number"
+                      min="1"
+                      max="31"
+                      className="h-10"
+                      placeholder="10"
+                      value={field.value || ""}
+                      onChange={(e) => field.onChange(Number(e.target.value) || 10)}
+                    />
+                  )}
+                />
+              ) : (
+                <p className="text-sm py-2.5">{aluno.diaVencimento || 10}</p>
+              )}
             </Field>
           </div>
         </section>
