@@ -45,7 +45,9 @@ class AuditoriaController extends Controller
 
         $pagamentos->getCollection()->transform(function ($t) {
             $payload = $t->payload_response ?? $t->payload_request ?? [];
-            $e2eId = $payload['point_of_interaction']['transaction_data']['e2e_id'] ?? null;
+            $e2eId = data_get($t->payload_request, 'point_of_interaction.transaction_data.e2e_id')
+                ?? data_get($t->payload_response, 'point_of_interaction.transaction_data.e2e_id')
+                ?? null;
             $issuerId = $payload['payment_method']['issuer_id'] ?? null;
 
             return [
