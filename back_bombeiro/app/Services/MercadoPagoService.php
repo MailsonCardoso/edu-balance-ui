@@ -147,11 +147,10 @@ class MercadoPagoService
                     'currency_id' => 'BRL',
                 ],
             ],
-            'auto_return' => 'approved',
             'back_urls' => [
-                'success' => config('app.url') . '/associado/painel?tab=pagamentos',
-                'failure' => config('app.url') . '/associado/painel?tab=pagamentos',
-                'pending' => config('app.url') . '/associado/painel?tab=pagamentos',
+                'success' => 'https://api5.platformx.com.br/associado/painel?tab=pagamentos',
+                'failure' => 'https://api5.platformx.com.br/associado/painel?tab=pagamentos',
+                'pending' => 'https://api5.platformx.com.br/associado/painel?tab=pagamentos',
             ],
         ];
 
