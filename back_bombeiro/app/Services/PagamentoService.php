@@ -24,22 +24,6 @@ class PagamentoService
             throw new \RuntimeException('Mensalidade já está paga.');
         }
 
-        $transacaoExistente = PagamentoTransacao::where('mensalidade_id', $mensalidade->id)
-            ->whereIn('status', [
-                MercadoPagoStatus::Pending->value,
-                MercadoPagoStatus::InProcess->value,
-                MercadoPagoStatus::Authorized->value,
-            ])
-            ->first();
-
-        if ($transacaoExistente && $transacaoExistente->payment_url) {
-            Log::info('Pagamento: Reutilizando transacao pendente existente', [
-                'mensalidade_id' => $mensalidade->id,
-                'transacao_id' => $transacaoExistente->id,
-            ]);
-            return $transacaoExistente;
-        }
-
         $dto = GerarCobrancaDTO::fromMensalidade(
             $mensalidade,
             config('services.mercadopago.notification_url', ''),
