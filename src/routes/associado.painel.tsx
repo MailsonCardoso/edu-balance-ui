@@ -850,13 +850,6 @@ function PagamentosTab() {
                                 )}
                                 {pagandoId === m.id ? "Gerando..." : "Pix"}
                               </button>
-                              <button
-                                onClick={() => handleBoleto(m)}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
-                              >
-                                <Receipt className="size-3.5" />
-                                Boleto
-                              </button>
                             </div>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">
