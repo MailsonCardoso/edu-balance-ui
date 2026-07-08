@@ -537,9 +537,18 @@ function AlunoDetalhe() {
   );
 }
 
+interface MensalidadeExtrato {
+  id: string;
+  mes_referencia: string;
+  data_vencimento: string;
+  valor: number | string;
+  status: string;
+  data_pagamento?: string;
+}
+
 function ExtratoFinanceiro({ alunoId }: { alunoId: string }) {
   const [data, setData] = useState<{
-    mensalidades: any[];
+    mensalidades: MensalidadeExtrato[];
     total_pago: number;
     total_pendente: number;
     qtd_pagas: number;
@@ -600,7 +609,7 @@ function ExtratoFinanceiro({ alunoId }: { alunoId: string }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {data.mensalidades.map((m: any) => (
+            {data.mensalidades.map((m) => (
               <tr key={m.id} className="hover:bg-muted/30">
                 <td className="px-4 py-3 font-medium">{m.mes_referencia}</td>
                 <td className="px-4 py-3 text-muted-foreground">{fmtDate(m.data_vencimento)}</td>
