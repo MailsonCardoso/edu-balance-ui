@@ -23,7 +23,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  ChevronRight,
   TrendingUp,
   Receipt,
   AlertTriangle,
@@ -112,42 +111,35 @@ function PainelAssociado() {
 
   if (!associado) return null;
 
-  const bottomNavItems = menuItems.slice(0, 5);
-  const hasMore = menuItems.length > 5;
-
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="bg-gradient-to-br from-[#D62828] to-[#B01E1E] text-white sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="size-11 sm:size-14 rounded-full bg-white/20 grid place-items-center backdrop-blur-sm ring-2 ring-white/30">
-              <span className="text-lg sm:text-xl font-bold text-white">
-                {associado?.nome?.charAt(0)?.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-base sm:text-xl font-bold truncate">
-                Olá, {associado.nome.split(" ")[0]}!
-              </h1>
-              <p className="text-xs sm:text-sm text-white/70 truncate">
-                Bem-vindo ao seu painel de associado
-              </p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm text-white/80 flex-shrink-0"
-            >
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">Sair</span>
-            </button>
+    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-20 flex items-center gap-3">
+          <div className="size-9 sm:size-11 rounded-full bg-gradient-to-br from-[#D62828] to-[#B01E1E] grid place-items-center flex-shrink-0">
+            <span className="text-sm sm:text-lg font-bold text-white">
+              {associado?.nome?.charAt(0)?.toUpperCase()}
+            </span>
           </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm sm:text-lg font-semibold text-gray-900 truncate">
+              Olá, {associado.nome.split(" ")[0]}
+            </h1>
+            <p className="text-[11px] sm:text-xs text-gray-400 truncate">Painel do associado</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors text-xs sm:text-sm flex-shrink-0"
+          >
+            <LogOut className="size-4" />
+            <span className="hidden sm:inline">Sair</span>
+          </button>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 lg:pb-8 -mt-4 sm:-mt-4">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 lg:pb-10 pt-4 sm:pt-6">
         <div className="grid lg:grid-cols-4 gap-6">
-          <div className="hidden lg:block lg:col-span-1">
-            <nav className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 space-y-1 sticky top-24">
+          <aside className="hidden lg:block lg:col-span-1">
+            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-1 sticky top-28">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = tab === item.id;
@@ -155,28 +147,21 @@ function PainelAssociado() {
                   <button
                     key={item.id}
                     onClick={() => setTab(item.id)}
-                    className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                    className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
                       isActive
-                        ? "bg-gradient-to-r from-[#D62828]/10 to-transparent text-[#D62828] shadow-sm"
+                        ? "bg-[#D62828] text-white shadow-sm"
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    <div
-                      className={`size-8 rounded-lg grid place-items-center transition-colors ${
-                        isActive ? "bg-[#D62828] text-white" : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      <Icon className="size-4" />
-                    </div>
-                    <span className="flex-1">{item.label}</span>
-                    {isActive && <ChevronRight className="size-4 text-[#D62828]" />}
+                    <Icon className="size-4 flex-shrink-0" />
+                    <span className="flex-1 truncate">{item.label}</span>
                   </button>
                 );
               })}
             </nav>
-          </div>
+          </aside>
 
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 min-w-0">
             {tab === "painel" && <PainelTab associado={associado} />}
             {tab === "pagamentos" && <PagamentosTab />}
             {tab === "historico" && <HistoricoTab />}
@@ -185,41 +170,31 @@ function PainelAssociado() {
             {tab === "comunidade" && <ComunidadeTab />}
           </div>
         </div>
-      </div>
+      </main>
 
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
-        <div className="grid grid-cols-5">
-          {bottomNavItems.map((item) => {
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-6">
+          {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = tab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setTab(item.id)}
-                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
+                className={`relative flex flex-col items-center justify-center gap-1 py-2.5 text-[9px] font-medium transition-colors ${
                   isActive ? "text-[#D62828]" : "text-gray-400"
                 }`}
               >
-                <Icon className={`size-5 ${isActive ? "text-[#D62828]" : "text-gray-400"}`} />
+                <Icon className={`size-[18px] ${isActive ? "text-[#D62828]" : "text-gray-400"}`} />
                 <span className="px-0.5 text-center leading-tight truncate w-full">
-                  {item.label}
+                  {item.label.split(" ")[0]}
                 </span>
+                {isActive && (
+                  <span className="absolute top-0 h-0.5 w-7 rounded-full bg-[#D62828]" />
+                )}
               </button>
             );
           })}
-          {hasMore && (
-            <button
-              onClick={() => setTab("comunidade")}
-              className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
-                tab === "comunidade" ? "text-[#D62828]" : "text-gray-400"
-              }`}
-            >
-              <Users
-                className={`size-5 ${tab === "comunidade" ? "text-[#D62828]" : "text-gray-400"}`}
-              />
-              <span className="px-0.5 text-center leading-tight truncate w-full">Comunidade</span>
-            </button>
-          )}
         </div>
       </nav>
     </div>
@@ -339,64 +314,59 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   }, [mensalidades]);
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent p-4 sm:p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Informações do Sócio</h2>
-              <p className="text-sm text-gray-500 mt-1">Dados da sua associação</p>
-            </div>
-            <div
-              className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-                associado.status === "ativo"
-                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                  : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
-              }`}
-            >
-              {associado.status === "ativo" ? "Ativo" : associado.status}
-            </div>
+    <div className="space-y-4">
+      <section className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-gray-50">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Informações do Sócio</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Dados da sua associação</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-            {[
-              { icon: User, label: "Nome", value: associado.nome },
-              { icon: Mail, label: "E-mail", value: associado.email },
-              { icon: Phone, label: "Telefone", value: associado.telefone },
-              { icon: Calendar, label: "Sócio desde", value: associado.created_at },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="bg-white rounded-xl p-4 shadow-sm border border-gray-50"
-              >
-                <div className="flex items-center gap-2 text-gray-400 mb-1.5">
-                  <item.icon className="size-3.5" />
-                  <span className="text-xs">{item.label}</span>
-                </div>
-                <p className="text-sm font-medium text-gray-900 truncate">{item.value}</p>
-              </div>
-            ))}
+          <div
+            className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+              associado.status === "ativo"
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {associado.status === "ativo" ? "Ativo" : associado.status}
           </div>
         </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Total Pago</p>
-            <div className="size-9 rounded-lg bg-emerald-50 grid place-items-center">
-              <CheckCheck className="size-4 text-emerald-500" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-50">
+          {[
+            { icon: User, label: "Nome", value: associado.nome },
+            { icon: Mail, label: "E-mail", value: associado.email },
+            { icon: Phone, label: "Telefone", value: associado.telefone },
+            { icon: Calendar, label: "Sócio desde", value: associado.created_at },
+          ].map((item) => (
+            <div key={item.label} className="p-4">
+              <div className="flex items-center gap-1.5 text-gray-400 mb-1">
+                <item.icon className="size-3.5" />
+                <span className="text-[11px]">{item.label}</span>
+              </div>
+              <p className="text-sm font-medium text-gray-900 truncate">{item.value}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+              Total Pago
+            </p>
+            <CheckCheck className="size-4 text-emerald-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">{brl(stats.pagoValor)}</p>
+          <p className="text-xl font-bold text-gray-900">{brl(stats.pagoValor)}</p>
           {stats.adimplencia > 0 && (
             <div className="mt-2">
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+              <div className="flex items-center justify-between text-[11px] text-gray-400 mb-1">
                 <span>Adimplência</span>
                 <span>{stats.adimplencia}%</span>
               </div>
               <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-700"
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-700"
                   style={{ width: `${stats.adimplencia}%` }}
                 />
               </div>
@@ -404,45 +374,43 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Pendentes</p>
-            <div className="size-9 rounded-lg bg-amber-50 grid place-items-center">
-              <Clock className="size-4 text-amber-500" />
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+              Pendentes
+            </p>
+            <Clock className="size-4 text-amber-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.pendentes.length}</p>
+          <p className="text-xl font-bold text-gray-900">{stats.pendentes.length}</p>
           {stats.pendentes.length > 0 && (
-            <p className="text-xs text-amber-600 mt-2">
-              Total: {brl(stats.pendentes.reduce((a, m) => a + m.valor, 0))}
+            <p className="text-[11px] text-amber-600 mt-1.5">
+              {brl(stats.pendentes.reduce((a, m) => a + m.valor, 0))}
             </p>
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Vencidas</p>
-            <div className="size-9 rounded-lg bg-red-50 grid place-items-center">
-              <AlertTriangle className="size-4 text-red-500" />
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+              Vencidas
+            </p>
+            <AlertTriangle className="size-4 text-red-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.vencidas.length}</p>
+          <p className="text-xl font-bold text-gray-900">{stats.vencidas.length}</p>
           {stats.vencidas.length > 0 && (
-            <p className="text-xs text-red-600 mt-2">
-              Total: {brl(stats.vencidas.reduce((a, m) => a + m.valor, 0))}
+            <p className="text-[11px] text-red-600 mt-1.5">
+              {brl(stats.vencidas.reduce((a, m) => a + m.valor, 0))}
             </p>
           )}
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Pagas</p>
-            <div className="size-9 rounded-lg bg-blue-50 grid place-items-center">
-              <TrendingUp className="size-4 text-blue-500" />
-            </div>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Pagas</p>
+            <TrendingUp className="size-4 text-blue-500" />
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.pagas.length}</p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xl font-bold text-gray-900">{stats.pagas.length}</p>
+          <p className="text-[11px] text-gray-400 mt-1.5">
             {stats.totalValor > 0
               ? `${Math.round((stats.pagas.length / mensalidades.length) * 100)}% do total`
               : "—"}
@@ -462,60 +430,33 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           return (
             <div
               key={alunoNome}
-              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+              className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
             >
-              <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="size-12 rounded-xl bg-[#D62828]/5 grid place-items-center">
-                      <User className="size-6 text-[#D62828]" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-900">{alunoNome}</h3>
-                      <p className="text-xs text-gray-400">
-                        {ms.length} mensalidade{ms.length !== 1 ? "s" : ""}
-                      </p>
-                    </div>
+              <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5 border-b border-gray-50">
+                <div className="size-10 rounded-full bg-[#D62828]/5 grid place-items-center flex-shrink-0">
+                  <User className="size-5 text-[#D62828]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900 truncate">{alunoNome}</h3>
+                  <p className="text-xs text-gray-400">
+                    {ms.length} mensalidade{ms.length !== 1 ? "s" : ""}
+                  </p>
+                </div>
+                {totalDevido > 0 && (
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-[11px] text-gray-400">Devido</p>
+                    <p className="text-sm font-bold text-red-500">{brl(totalDevido)}</p>
                   </div>
-                </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-3 gap-px bg-gray-50 text-xs sm:text-sm">
-                <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
-                    Mensalidades
-                  </p>
-                  <p className="text-xl font-bold text-gray-900">{ms.length}</p>
-                </div>
-                <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
-                    Em aberto
-                  </p>
-                  <p
-                    className={`text-xl font-bold ${pendentes.length > 0 ? "text-amber-500" : "text-emerald-500"}`}
-                  >
-                    {pendentes.length}
-                  </p>
-                </div>
-                <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
-                    Valor devido
-                  </p>
-                  <p
-                    className={`text-xl font-bold ${totalDevido > 0 ? "text-red-500" : "text-emerald-500"}`}
-                  >
-                    {totalDevido > 0 ? brl(totalDevido) : "—"}
-                  </p>
-                </div>
+              <div className="px-4 sm:px-5 py-2.5 border-b border-gray-50 bg-gray-50/40">
+                <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+                  Mensalidades
+                </p>
               </div>
-
-              <div>
-                <div className="px-4 sm:px-6 py-3 border-b border-gray-50 bg-gray-50/30">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Mensalidades
-                  </p>
-                </div>
-                {ms.map((m, idx) => {
+              <div className="divide-y divide-gray-50">
+                {ms.map((m) => {
                   const StatusIcon =
                     m.status === "pago"
                       ? CheckCircle2
@@ -528,45 +469,32 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                       : m.status === "atrasado"
                         ? "text-red-500"
                         : "text-amber-500";
-                  const bgColor =
+                  const dotColor =
                     m.status === "pago"
-                      ? "bg-emerald-50"
+                      ? "bg-emerald-500"
                       : m.status === "atrasado"
-                        ? "bg-red-50"
-                        : "bg-amber-50";
+                        ? "bg-red-500"
+                        : "bg-amber-500";
                   return (
-                    <div
-                      key={m.id}
-                      className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50/50 transition-colors ${idx < ms.length - 1 ? "border-b border-gray-50" : ""}`}
-                    >
-                      <div
-                        className={`size-10 rounded-lg ${bgColor} grid place-items-center flex-shrink-0`}
-                      >
-                        <StatusIcon className={`size-5 ${statusColor}`} />
-                      </div>
+                    <div key={m.id} className="flex items-center gap-3 px-4 sm:px-5 py-3.5">
+                      <span className={`size-2 rounded-full ${dotColor} flex-shrink-0`} />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-4">
-                          <div>
-                            <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className={`text-xs font-medium ${statusColor}`}>
-                                {m.status === "pago"
-                                  ? "Pago"
-                                  : m.status === "atrasado"
-                                    ? "Atrasado"
-                                    : "Pendente"}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-right flex-shrink-0">
-                            <p className={`text-sm font-bold ${statusColor}`}>{brl(m.valor)}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">
-                              {m.status === "pago"
-                                ? `Pago em ${m.dataPagamento}`
-                                : `Vence ${m.dataVencimento}`}
-                            </p>
-                          </div>
-                        </div>
+                        <p className="text-sm font-medium text-gray-900">{m.mesReferencia}</p>
+                        <p className={`text-xs font-medium ${statusColor}`}>
+                          {m.status === "pago"
+                            ? "Pago"
+                            : m.status === "atrasado"
+                              ? "Atrasado"
+                              : "Pendente"}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-semibold text-gray-900">{brl(m.valor)}</p>
+                        <p className="text-[11px] text-gray-400 mt-0.5">
+                          {m.status === "pago"
+                            ? `Pago ${m.dataPagamento}`
+                            : `Vence ${m.dataVencimento}`}
+                        </p>
                       </div>
                     </div>
                   );
@@ -601,7 +529,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                   <img
                     src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
                     alt="QR Code PIX"
-                    className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
+                    className="size-48 sm:size-56 mx-auto mb-6 rounded-xl border border-gray-100"
                   />
                 )}
                 {pixModal.qrCode && (
@@ -830,67 +758,50 @@ function PagamentosTab() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 size-24 bg-amber-50 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                Pendentes
-              </p>
-              <div className="size-9 rounded-lg bg-amber-50 grid place-items-center">
-                <Clock className="size-4 text-amber-500" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{pendentes.length}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {pendentes.length > 0
-                ? `Total: ${brl(pendentes.reduce((a, m) => a + m.valor, 0))}`
-                : "Nenhuma pendente"}
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+              Pendentes
             </p>
+            <Clock className="size-4 text-amber-500" />
           </div>
+          <p className="text-xl font-bold text-gray-900">{pendentes.length}</p>
+          <p className="text-[11px] text-gray-400 mt-1">
+            {pendentes.length > 0 ? brl(pendentes.reduce((a, m) => a + m.valor, 0)) : "—"}
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 size-24 bg-red-50 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Vencidas</p>
-              <div className="size-9 rounded-lg bg-red-50 grid place-items-center">
-                <AlertCircle className="size-4 text-red-500" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{vencidas.length}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {vencidas.length > 0
-                ? `Total: ${brl(vencidas.reduce((a, m) => a + m.valor, 0))}`
-                : "Nenhuma vencida"}
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">
+              Vencidas
             </p>
+            <AlertCircle className="size-4 text-red-500" />
           </div>
+          <p className="text-xl font-bold text-gray-900">{vencidas.length}</p>
+          <p className="text-[11px] text-gray-400 mt-1">
+            {vencidas.length > 0 ? brl(vencidas.reduce((a, m) => a + m.valor, 0)) : "—"}
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 size-24 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Pagas</p>
-              <div className="size-9 rounded-lg bg-emerald-50 grid place-items-center">
-                <CheckCircle2 className="size-4 text-emerald-500" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{pagas.length}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Total: {brl(pagas.reduce((a, m) => a + m.valor, 0))}
-            </p>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] text-gray-400 font-medium uppercase tracking-wide">Pagas</p>
+            <CheckCircle2 className="size-4 text-emerald-500" />
           </div>
+          <p className="text-xl font-bold text-gray-900">{pagas.length}</p>
+          <p className="text-[11px] text-gray-400 mt-1">
+            {brl(pagas.reduce((a, m) => a + m.valor, 0))}
+          </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-50 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="px-4 sm:px-5 py-3.5 border-b border-gray-50 flex flex-wrap items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-gray-900">Mensalidades</h3>
-          <div className="flex items-center gap-1.5 bg-gray-50 rounded-xl p-1">
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
             {[
               { key: "todas", label: "Todas" },
               { key: "pendente", label: "Pendentes" },
@@ -900,10 +811,10 @@ function PagamentosTab() {
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   filter === f.key
-                    ? "bg-[#D62828] text-white shadow-sm"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                    ? "bg-white text-[#D62828] shadow-sm"
+                    : "text-gray-500 hover:text-gray-700"
                 }`}
               >
                 {f.label}
@@ -927,29 +838,38 @@ function PagamentosTab() {
                 const StatusIcon = statusConfig[m.status]?.icon || Clock;
                 const origem = m.origem ? origemConfig[m.origem] : null;
                 const OrigemIcon = origem?.icon || Shield;
+                const dotColor =
+                  m.status === "pago"
+                    ? "bg-emerald-500"
+                    : m.status === "atrasado"
+                      ? "bg-red-500"
+                      : "bg-amber-500";
                 return (
                   <div key={m.id} className="p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
+                    <div className="flex items-center gap-3">
+                      <span className={`size-2 rounded-full ${dotColor} flex-shrink-0`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{m.mesReferencia}</p>
                         <p className="text-xs text-gray-400 mt-0.5">
                           {m.status === "pago"
                             ? `Pago em ${m.dataPagamento}`
                             : `Vence ${m.dataVencimento}`}
                         </p>
                       </div>
-                      <p className="text-sm font-bold text-gray-900">{brl(m.valor)}</p>
+                      <p className="text-sm font-semibold text-gray-900 flex-shrink-0">
+                        {brl(m.valor)}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <div className="flex items-center gap-2 mt-2 flex-wrap pl-5">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusConfig[m.status]?.color}`}
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${statusConfig[m.status]?.color}`}
                       >
                         <StatusIcon className="size-3" />
                         {statusConfig[m.status]?.label}
                       </span>
                       {origem && (
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${origem.color}`}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${origem.color}`}
                         >
                           <OrigemIcon className="size-3" />
                           {origem.label}
@@ -970,7 +890,7 @@ function PagamentosTab() {
                         {pagandoId === m.id ? "Gerando..." : "Pagar com PIX"}
                       </button>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium mt-3">
+                      <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium mt-3 pl-5">
                         <CheckCircle2 className="size-3.5" />
                         Quitado
                       </span>
@@ -1104,7 +1024,7 @@ function PagamentosTab() {
                   <img
                     src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
                     alt="QR Code PIX"
-                    className="size-56 mx-auto mb-6 rounded-xl border border-gray-100"
+                    className="size-48 sm:size-56 mx-auto mb-6 rounded-xl border border-gray-100"
                   />
                 )}
                 {pixModal.qrCode && (
