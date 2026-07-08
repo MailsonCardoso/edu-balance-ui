@@ -45,9 +45,9 @@ const menuItems = [
   { id: "painel", label: "Painel", icon: User },
   { id: "pagamentos", label: "Pagamentos", icon: CreditCard },
   { id: "historico", label: "Histórico", icon: History },
-  { id: "dados", label: "Dados", icon: Settings },
   { id: "beneficios", label: "Benefícios", icon: Gift },
   { id: "comunidade", label: "Comunidade", icon: Users },
+  { id: "dados", label: "Dados", icon: Settings },
 ];
 
 // referência compartilhada para refresh da lista após pagamento PIX
