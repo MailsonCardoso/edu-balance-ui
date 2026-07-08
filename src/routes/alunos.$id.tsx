@@ -22,7 +22,8 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskDate, maskPhone, fmtDate, brl, maskCurrency, parseCurrency, formatarCep, buscarCep } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, fmtDate, brl, formatarCep, buscarCep } from "@/lib/format";
+import { CurrencyInput } from "@/components/shared/CurrencyInput";
 import { fetchAluno, updateAluno, deleteAluno, checkCpfExists } from "@/lib/api/alunos";
 import api from "@/lib/api";
 
@@ -258,7 +259,11 @@ function AlunoDetalhe() {
                 </select>
               ) : (
                 <p className="text-sm py-2.5">
-                  {aluno.sexo === "feminino" ? "Feminino" : aluno.sexo === "masculino" ? "Masculino" : "—"}
+                  {aluno.sexo === "feminino"
+                    ? "Feminino"
+                    : aluno.sexo === "masculino"
+                      ? "Masculino"
+                      : "—"}
                 </p>
               )}
             </Field>
@@ -347,7 +352,10 @@ function AlunoDetalhe() {
                   maxLength={2}
                   {...register("uf")}
                   onChange={(e) => {
-                    const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
+                    const v = e.target.value
+                      .toUpperCase()
+                      .replace(/[^A-Z]/g, "")
+                      .slice(0, 2);
                     e.target.value = v;
                     setValue("uf", v, { shouldValidate: true });
                   }}
@@ -356,7 +364,11 @@ function AlunoDetalhe() {
                 <p className="text-sm py-2.5">{aluno.uf}</p>
               )}
             </Field>
-            <Field label="Logradouro (rua/avenida)" error={errors.logradouro?.message} className="md:col-span-2">
+            <Field
+              label="Logradouro (rua/avenida)"
+              error={errors.logradouro?.message}
+              className="md:col-span-2"
+            >
               {editing ? (
                 <Input className="h-10" {...register("logradouro")} />
               ) : (
@@ -430,7 +442,12 @@ function AlunoDetalhe() {
             </Field>
             <Field label="E-mail do responsável" error={errors.email?.message}>
               {editing ? (
-                <Input type="email" className="h-10" placeholder="usado para login no portal" {...register("email")} />
+                <Input
+                  type="email"
+                  className="h-10"
+                  placeholder="usado para login no portal"
+                  {...register("email")}
+                />
               ) : (
                 <p className="text-sm py-2.5">{aluno.email}</p>
               )}
@@ -479,15 +496,10 @@ function AlunoDetalhe() {
                   name="valorMensalidade"
                   control={control}
                   render={({ field }) => (
-                    <Input
+                    <CurrencyInput
                       className="h-10"
-                      placeholder="0,00"
-                      value={maskCurrency(String(Math.round((field.value || 0) * 100)))}
-                      onChange={(e) => {
-                        const masked = maskCurrency(e.target.value);
-                        e.target.value = masked;
-                        field.onChange(parseCurrency(masked));
-                      }}
+                      value={field.value ?? 0}
+                      onChange={field.onChange}
                     />
                   )}
                 />
@@ -526,29 +538,66 @@ function AlunoDetalhe() {
 }
 
 function ExtratoFinanceiro({ alunoId }: { alunoId: string }) {
-  const [data, setData] = useState<{ mensalidades: any[]; total_pago: number; total_pendente: number; qtd_pagas: number; qtd_pendentes: number } | null>(null);
+  const [data, setData] = useState<{
+    mensalidades: any[];
+    total_pago: number;
+    total_pendente: number;
+    qtd_pagas: number;
+    qtd_pendentes: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get(`/alunos/${alunoId}/extrato`).then((r) => { setData(r.data); setLoading(false); }).catch(() => { setLoading(false); });
+    api
+      .get(`/alunos/${alunoId}/extrato`)
+      .then((r) => {
+        setData(r.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   }, [alunoId]);
 
-  if (loading) return <div className="flex items-center justify-center py-8"><Loader2 className="size-5 animate-spin text-muted-foreground" /></div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+      </div>
+    );
   if (!data) return null;
 
   return (
     <section className="mt-8">
       <h2 className="text-lg font-semibold mb-4">Extrato financeiro</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Total pago</p><p className="text-lg font-semibold mt-1 text-success">{brl(data.total_pago)}</p></div>
-        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Total pendente</p><p className="text-lg font-semibold mt-1 text-warning">{brl(data.total_pendente)}</p></div>
-        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Pagas</p><p className="text-lg font-semibold mt-1">{data.qtd_pagas}</p></div>
-        <div className="bg-card border border-border rounded-xl p-4"><p className="text-xs text-muted-foreground uppercase tracking-wide">Pendentes</p><p className="text-lg font-semibold mt-1">{data.qtd_pendentes}</p></div>
+        <div className="bg-card border border-border rounded-xl p-4">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Total pago</p>
+          <p className="text-lg font-semibold mt-1 text-success">{brl(data.total_pago)}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Total pendente</p>
+          <p className="text-lg font-semibold mt-1 text-warning">{brl(data.total_pendente)}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Pagas</p>
+          <p className="text-lg font-semibold mt-1">{data.qtd_pagas}</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4">
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">Pendentes</p>
+          <p className="text-lg font-semibold mt-1">{data.qtd_pendentes}</p>
+        </div>
       </div>
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <tr><th className="px-4 py-3 font-medium">Mês</th><th className="px-4 py-3 font-medium">Vencimento</th><th className="px-4 py-3 font-medium">Valor</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 font-medium">Pagamento</th></tr>
+            <tr>
+              <th className="px-4 py-3 font-medium">Mês</th>
+              <th className="px-4 py-3 font-medium">Vencimento</th>
+              <th className="px-4 py-3 font-medium">Valor</th>
+              <th className="px-4 py-3 font-medium">Status</th>
+              <th className="px-4 py-3 font-medium">Pagamento</th>
+            </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {data.mensalidades.map((m: any) => (
@@ -556,8 +605,12 @@ function ExtratoFinanceiro({ alunoId }: { alunoId: string }) {
                 <td className="px-4 py-3 font-medium">{m.mes_referencia}</td>
                 <td className="px-4 py-3 text-muted-foreground">{fmtDate(m.data_vencimento)}</td>
                 <td className="px-4 py-3">{brl(Number(m.valor))}</td>
-                <td className="px-4 py-3"><StatusBadge status={m.status} /></td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">{m.data_pagamento ? fmtDate(m.data_pagamento) : "—"}</td>
+                <td className="px-4 py-3">
+                  <StatusBadge status={m.status} />
+                </td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  {m.data_pagamento ? fmtDate(m.data_pagamento) : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

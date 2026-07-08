@@ -2,7 +2,13 @@ export type AlunoStatus = "ativo" | "inativo";
 export type SituacaoFinanceira = "em_dia" | "em_atraso" | "inadimplente";
 export type MensalidadeStatus = "pendente" | "pago" | "atrasado";
 export type FormaPagamento = "pix" | "debito" | "credito";
-export type OrigemPagamento = "mercadopago" | "caixa" | "admin" | "pix_manual" | "dinheiro" | "transferencia";
+export type OrigemPagamento =
+  | "mercadopago"
+  | "caixa"
+  | "admin"
+  | "pix_manual"
+  | "dinheiro"
+  | "transferencia";
 
 export interface Aluno {
   id: string;
@@ -43,12 +49,9 @@ export interface Mensalidade {
   alunoSexo?: string;
 }
 
-export const turmas = [
-  "1º Ano A",
-  "1º Ano B",
-  "2º Ano A",
-  "3º Ano A",
-  "5º Ano B",
-  "6º Ano A",
-  "9º Ano A",
-];
+const romanos = ["1º", "2º", "3º", "4º", "5º", "6º", "7º", "8º", "9º"];
+const letrasTurma = ["A", "B", "C"];
+
+export const turmas: string[] = romanos.flatMap((romano) =>
+  letrasTurma.map((letra) => `${romano} Ano ${letra}`),
+);

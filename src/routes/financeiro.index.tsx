@@ -1,6 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, FileText, History, Loader2, MessageCircle, MoreVertical, Plus, Pencil, Printer, Search, Trash2, X, TrendingUp, AlertTriangle, Users, DollarSign } from "lucide-react";
+import {
+  CheckCircle2,
+  FileText,
+  History,
+  Loader2,
+  MessageCircle,
+  MoreVertical,
+  Plus,
+  Pencil,
+  Printer,
+  Search,
+  Trash2,
+  X,
+  Users,
+} from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
 import { Input } from "@/components/ui/input";
@@ -34,7 +48,12 @@ import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
-import { fetchMensalidades, createMensalidade, updateMensalidade, deleteMensalidade } from "@/lib/api/mensalidades";
+import {
+  fetchMensalidades,
+  createMensalidade,
+  updateMensalidade,
+  deleteMensalidade,
+} from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 
 export const Route = createFileRoute("/financeiro/")({
@@ -74,7 +93,11 @@ function Financeiro() {
 
   const carregar = async () => {
     try {
-      const [m, a, d] = await Promise.all([fetchMensalidades(), fetchAlunos(), fetchDashboardFinanceiro()]);
+      const [m, a, d] = await Promise.all([
+        fetchMensalidades(),
+        fetchAlunos(),
+        fetchDashboardFinanceiro(),
+      ]);
       setData(m);
       setAlunos(a);
       setDashboard(d);
@@ -104,9 +127,7 @@ function Financeiro() {
   const totals = useMemo(
     () => ({
       pago: filtered.filter((m) => m.status === "pago").reduce((s, m) => s + m.valor, 0),
-      pendente: filtered
-        .filter((m) => m.status === "pendente")
-        .reduce((s, m) => s + m.valor, 0),
+      pendente: filtered.filter((m) => m.status === "pendente").reduce((s, m) => s + m.valor, 0),
       vencido: filtered.filter((m) => m.status === "atrasado").reduce((s, m) => s + m.valor, 0),
     }),
     [filtered],
@@ -129,7 +150,13 @@ function Financeiro() {
         formaPagamento: mensalidade.formaPagamento ?? "nenhuma",
       });
     } else {
-      setFormData({ alunoId: "", mesReferencia: mesCorrente(), valor: 0, dataVencimento: "", formaPagamento: "nenhuma" });
+      setFormData({
+        alunoId: "",
+        mesReferencia: mesCorrente(),
+        valor: 0,
+        dataVencimento: "",
+        formaPagamento: "nenhuma",
+      });
     }
     setFormOpen(true);
   };
@@ -248,7 +275,9 @@ function Financeiro() {
     y += 6;
     doc.setFont("times", "normal");
     doc.setFontSize(10);
-    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y, { align: "center" });
+    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y, {
+      align: "center",
+    });
 
     y += 8;
     doc.setDrawColor(200);
@@ -256,7 +285,12 @@ function Financeiro() {
 
     y += 8;
     doc.setFontSize(10);
-    doc.text("Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:", ml, y, { maxWidth: cw, align: "justify" });
+    doc.text(
+      "Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:",
+      ml,
+      y,
+      { maxWidth: cw, align: "justify" },
+    );
 
     y += 14;
     doc.setDrawColor(220);
@@ -286,7 +320,12 @@ function Financeiro() {
     y = iy + 8;
     doc.setFont("times", "normal");
     doc.setFontSize(10);
-    doc.text("Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.", ml, y, { maxWidth: cw, align: "justify" });
+    doc.text(
+      "Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.",
+      ml,
+      y,
+      { maxWidth: cw, align: "justify" },
+    );
 
     y += 12;
     doc.text(`Paranã, ${dataPg}.`, ml + cw / 2, y, { align: "center" });
@@ -300,12 +339,19 @@ function Financeiro() {
     doc.text("Responsável pelo Recebimento", ml + cw / 2, y + 4, { align: "center" });
     doc.setFont("times", "normal");
     doc.setFontSize(9);
-    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y + 10, { align: "center" });
+    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y + 10, {
+      align: "center",
+    });
 
     doc.setFontSize(8);
     doc.setTextColor(150);
     const agora = new Date();
-    doc.text(`Documento gerado em ${agora.toLocaleDateString("pt-BR")} às ${agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`, ml + cw / 2, 288, { align: "center" });
+    doc.text(
+      `Documento gerado em ${agora.toLocaleDateString("pt-BR")} às ${agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
+      ml + cw / 2,
+      288,
+      { align: "center" },
+    );
 
     return Promise.resolve(doc.output("blob"));
   };
@@ -360,39 +406,17 @@ function Financeiro() {
       {dashboard && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="bg-card border border-border rounded-xl p-4">
-              <div className="flex items-center gap-2 text-success mb-1">
-                <DollarSign className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">Receita do mês</span>
-              </div>
-              <p className="text-xl font-semibold">{brl(dashboard.receita_mes)}</p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4">
-              <div className="flex items-center gap-2 text-warning mb-1">
-                <TrendingUp className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">Previsto</span>
-              </div>
-              <p className="text-xl font-semibold">{brl(dashboard.receita_prevista)}</p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4">
-              <div className="flex items-center gap-2 text-destructive mb-1">
-                <AlertTriangle className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">Inadimplência</span>
-              </div>
-              <p className="text-xl font-semibold">{dashboard.perc_inadimplencia}%</p>
-              <p className="text-xs text-muted-foreground">{dashboard.alunos_inadimplentes} de {dashboard.alunos_ativos} alunos</p>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="bg-card border border-border rounded-xl p-4 md:col-span-4">
               <div className="flex items-center gap-2 text-info mb-1">
                 <Users className="size-4" />
                 <span className="text-xs font-medium uppercase tracking-wide">Mensalidades</span>
               </div>
-              <p className="text-xl font-semibold">{dashboard.qtd_pagas} / {dashboard.qtd_pendentes + dashboard.qtd_vencidas}</p>
+              <p className="text-xl font-semibold">
+                {dashboard.qtd_pagas} / {dashboard.qtd_pendentes + dashboard.qtd_vencidas}
+              </p>
               <p className="text-xs text-muted-foreground">pagas / pendentes</p>
             </div>
           </div>
-
-
         </>
       )}
 
@@ -490,7 +514,13 @@ function Financeiro() {
       </div>
 
       <ActionSheet
-        open={!!selectedMensalidade && !formOpen && !pagamentoOpen && !deleteTarget && !reciboMensalidade}
+        open={
+          !!selectedMensalidade &&
+          !formOpen &&
+          !pagamentoOpen &&
+          !deleteTarget &&
+          !reciboMensalidade
+        }
         onOpenChange={(open) => {
           if (!open) setSelectedMensalidade(null);
         }}
@@ -561,7 +591,9 @@ function Financeiro() {
       <Sheet open={formOpen} onOpenChange={setFormOpen}>
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <SheetHeader className="pr-8">
-            <SheetTitle>{formMode === "create" ? "Nova mensalidade" : "Editar mensalidade"}</SheetTitle>
+            <SheetTitle>
+              {formMode === "create" ? "Nova mensalidade" : "Editar mensalidade"}
+            </SheetTitle>
             <SheetDescription>
               {formMode === "create"
                 ? "Preencha os dados para criar uma nova mensalidade"
@@ -570,11 +602,10 @@ function Financeiro() {
           </SheetHeader>
           <div className="mt-6 space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Aluno</label>
-              <Select
-                value={formData.alunoId}
-                onValueChange={aoSelecionarAluno}
-              >
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Aluno
+              </label>
+              <Select value={formData.alunoId} onValueChange={aoSelecionarAluno}>
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="Selecione um aluno..." />
                 </SelectTrigger>
@@ -588,7 +619,9 @@ function Financeiro() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Mês referência</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Mês referência
+              </label>
               <Input
                 className="h-10"
                 placeholder="Ex: Junho/2026"
@@ -597,7 +630,9 @@ function Financeiro() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor (R$)</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Valor (R$)
+              </label>
               <Input
                 type="number"
                 step="0.01"
@@ -609,7 +644,9 @@ function Financeiro() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Data vencimento</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Data vencimento
+              </label>
               <Input
                 className="h-10"
                 placeholder="DD/MM/AAAA"
@@ -621,7 +658,9 @@ function Financeiro() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Forma de pagamento</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Forma de pagamento
+              </label>
               <Select
                 value={formData.formaPagamento}
                 onValueChange={(v) => setFormData((f) => ({ ...f, formaPagamento: v }))}
@@ -642,14 +681,17 @@ function Financeiro() {
             <Button variant="outline" onClick={() => setFormOpen(false)}>
               <X className="size-4" /> Cancelar
             </Button>
-            <Button onClick={salvarForm}>
-              {formMode === "create" ? "Criar" : "Salvar"}
-            </Button>
+            <Button onClick={salvarForm}>{formMode === "create" ? "Criar" : "Salvar"}</Button>
           </div>
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(o) => {
+          if (!o) setDeleteTarget(null);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir mensalidade</AlertDialogTitle>
@@ -661,14 +703,22 @@ function Financeiro() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmarExclusao} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={confirmarExclusao}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Sim, excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={pagamentoOpen} onOpenChange={(o) => { if (!o) setPagamentoOpen(false); }}>
+      <AlertDialog
+        open={pagamentoOpen}
+        onOpenChange={(o) => {
+          if (!o) setPagamentoOpen(false);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Registrar pagamento</AlertDialogTitle>
@@ -698,21 +748,30 @@ function Financeiro() {
                   className="size-4 accent-primary"
                 />
                 <span className="text-sm font-medium">
-                  {v === "" ? "Sem forma" : v === "pix" ? "Pix" : v === "debito" ? "Débito" : "Crédito"}
+                  {v === ""
+                    ? "Sem forma"
+                    : v === "pix"
+                      ? "Pix"
+                      : v === "debito"
+                        ? "Débito"
+                        : "Crédito"}
                 </span>
               </label>
             ))}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmarPagamento}>
-              Confirmar pagamento
-            </AlertDialogAction>
+            <AlertDialogAction onClick={confirmarPagamento}>Confirmar pagamento</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!reciboMensalidade} onOpenChange={(o) => { if (!o) setReciboMensalidade(null); }}>
+      <AlertDialog
+        open={!!reciboMensalidade}
+        onOpenChange={(o) => {
+          if (!o) setReciboMensalidade(null);
+        }}
+      >
         <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center text-base uppercase tracking-wide">
@@ -722,14 +781,19 @@ function Financeiro() {
           <div className="py-4 space-y-4 text-sm">
             <div className="text-center pb-3">
               <p className="font-bold text-base">Bombeiro Paranã</p>
-              <p className="text-muted-foreground">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+              <p className="text-muted-foreground">
+                Colégio Militar 2 de Julho – Unidade XII – Paranã
+              </p>
             </div>
             <p className="text-justify text-muted-foreground border-t border-border pt-4">
-              Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:
+              Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar
+              abaixo discriminada:
             </p>
             <div className="space-y-2 bg-muted/30 rounded-lg p-4">
               <div className="grid grid-cols-[140px_1fr] gap-x-2">
-                <span className="text-muted-foreground">{reciboMensalidade?.alunoSexo === "feminino" ? "Aluna:" : "Aluno:"}</span>
+                <span className="text-muted-foreground">
+                  {reciboMensalidade?.alunoSexo === "feminino" ? "Aluna:" : "Aluno:"}
+                </span>
                 <span className="font-medium">{reciboMensalidade?.alunoNome || "—"}</span>
                 <span className="text-muted-foreground">Responsável:</span>
                 <span className="font-medium">{reciboMensalidade?.alunoResponsavel || "—"}</span>
@@ -737,24 +801,40 @@ function Financeiro() {
                 <span className="font-medium">{reciboMensalidade?.mesReferencia}</span>
                 <span className="text-muted-foreground">Valor Pago:</span>
                 <span className="font-medium">
-                  {reciboMensalidade ? `${brl(reciboMensalidade.valor)} (${numeroExtenso(reciboMensalidade.valor)})` : "—"}
+                  {reciboMensalidade
+                    ? `${brl(reciboMensalidade.valor)} (${numeroExtenso(reciboMensalidade.valor)})`
+                    : "—"}
                 </span>
                 <span className="text-muted-foreground">Data do Pagamento:</span>
-                <span className="font-medium">{reciboMensalidade?.dataPagamento ? fmtDate(reciboMensalidade.dataPagamento) : "—"}</span>
+                <span className="font-medium">
+                  {reciboMensalidade?.dataPagamento
+                    ? fmtDate(reciboMensalidade.dataPagamento)
+                    : "—"}
+                </span>
                 <span className="text-muted-foreground">Forma de Pagamento:</span>
-                <span className="font-medium capitalize">{reciboMensalidade?.formaPagamento ? formaPagamentoLabel[reciboMensalidade.formaPagamento] : "—"}</span>
+                <span className="font-medium capitalize">
+                  {reciboMensalidade?.formaPagamento
+                    ? formaPagamentoLabel[reciboMensalidade.formaPagamento]
+                    : "—"}
+                </span>
               </div>
             </div>
             <p className="text-justify text-muted-foreground">
               Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
             </p>
             <p className="text-center font-medium">
-              Paranã, {reciboMensalidade?.dataPagamento ? fmtDateFull(reciboMensalidade.dataPagamento) : "—"}.
+              Paranã,{" "}
+              {reciboMensalidade?.dataPagamento
+                ? fmtDateFull(reciboMensalidade.dataPagamento)
+                : "—"}
+              .
             </p>
             <div className="text-center pt-4 border-t border-border">
               <div className="inline-block border-t border-foreground pt-2 px-12">
                 <p className="text-sm font-semibold">Responsável pelo Recebimento</p>
-                <p className="text-xs text-muted-foreground">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+                <p className="text-xs text-muted-foreground">
+                  Colégio Militar 2 de Julho – Unidade XII – Paranã
+                </p>
               </div>
             </div>
           </div>
@@ -764,10 +844,7 @@ function Financeiro() {
             </Button>
             {reciboMensalidade && (
               <>
-                <Button
-                  variant="outline"
-                  onClick={() => enviarPdfWhatsApp(reciboMensalidade)}
-                >
+                <Button variant="outline" onClick={() => enviarPdfWhatsApp(reciboMensalidade)}>
                   <MessageCircle className="size-4" /> Enviar WhatsApp
                 </Button>
                 <Button onClick={() => baixarPdf(reciboMensalidade)}>

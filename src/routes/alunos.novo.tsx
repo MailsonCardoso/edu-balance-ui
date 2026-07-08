@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskPhone, maskCurrency, parseCurrency, formatarCep, buscarCep } from "@/lib/format";
+import { maskCPF, maskPhone, formatarCep, buscarCep } from "@/lib/format";
+import { CurrencyInput } from "@/components/shared/CurrencyInput";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 
 const schema = z.object({
@@ -74,7 +75,12 @@ function NovoAluno() {
     clearErrors,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { status: "ativo", sexo: "masculino", valorMensalidade: 0, diaVencimento: 10 },
+    defaultValues: {
+      status: "ativo",
+      sexo: "masculino",
+      valorMensalidade: 0 as number,
+      diaVencimento: 10,
+    },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -194,13 +200,20 @@ function NovoAluno() {
                 maxLength={2}
                 {...register("uf")}
                 onChange={(e) => {
-                  const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 2);
+                  const v = e.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z]/g, "")
+                    .slice(0, 2);
                   e.target.value = v;
                   setValue("uf", v, { shouldValidate: true });
                 }}
               />
             </Field>
-            <Field label="Logradouro (rua/avenida)" error={errors.logradouro?.message} className="md:col-span-2">
+            <Field
+              label="Logradouro (rua/avenida)"
+              error={errors.logradouro?.message}
+              className="md:col-span-2"
+            >
               <Input className="h-10" {...register("logradouro")} />
             </Field>
             <Field label="Número" error={errors.numero?.message}>
@@ -246,7 +259,12 @@ function NovoAluno() {
               />
             </Field>
             <Field label="E-mail do responsável" error={errors.email?.message}>
-              <Input type="email" className="h-10" placeholder="usado para login no portal" {...register("email")} />
+              <Input
+                type="email"
+                className="h-10"
+                placeholder="usado para login no portal"
+                {...register("email")}
+              />
             </Field>
           </div>
         </section>
@@ -282,15 +300,10 @@ function NovoAluno() {
                 name="valorMensalidade"
                 control={control}
                 render={({ field }) => (
-                  <Input
+                  <CurrencyInput
                     className="h-10"
-                    placeholder="0,00"
-                    value={maskCurrency(String(Math.round((field.value || 0) * 100)))}
-                    onChange={(e) => {
-                      const masked = maskCurrency(e.target.value);
-                      e.target.value = masked;
-                      field.onChange(parseCurrency(masked));
-                    }}
+                    value={field.value ?? 0}
+                    onChange={field.onChange}
                   />
                 )}
               />
