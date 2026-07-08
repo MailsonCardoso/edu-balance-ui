@@ -72,7 +72,7 @@ function Associado() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { icon: LogIn, title: "Painel do Sócio", desc: "Acesso completo às suas contribuições, benefícios e dados cadastrais." },
-                  { icon: CheckCircle, title: "PIX e Boletos", desc: "Pague mensalidades com facilidade." },
+                  { icon: CheckCircle, title: "Pagamentos", desc: "Pague mensalidades com facilidade." },
                   { icon: ArrowRight, title: "Histórico", desc: "Todas as suas contribuições." },
                   { icon: UserPlus, title: "Dados cadastrais", desc: "Mantenha suas informações atualizadas." },
                   { icon: Shield, title: "Benefícios", desc: "Parceiros e vantagens exclusivas." },

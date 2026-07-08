@@ -32,11 +32,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { brl, maskCPF, maskPhone } from "@/lib/format";
-import {
-  getAssociado,
-  updateAssociado,
-  type AssociadoData,
-} from "@/lib/api/associado";
+import { getAssociado, updateAssociado, type AssociadoData } from "@/lib/api/associado";
 import {
   fetchAssociadoMensalidades,
   gerarCobrancaMensalidade,
@@ -50,7 +46,7 @@ export const Route = createFileRoute("/associado/painel")({
 
 const menuItems = [
   { id: "painel", label: "Painel do Sócio", icon: User },
-  { id: "pagamentos", label: "PIX e Boletos", icon: CreditCard },
+  { id: "pagamentos", label: "Pagamentos", icon: CreditCard },
   { id: "historico", label: "Histórico", icon: History },
   { id: "dados", label: "Dados cadastrais", icon: Settings },
   { id: "beneficios", label: "Benefícios", icon: Gift },
@@ -116,35 +112,42 @@ function PainelAssociado() {
 
   if (!associado) return null;
 
+  const bottomNavItems = menuItems.slice(0, 5);
+  const hasMore = menuItems.length > 5;
+
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <div className="bg-gradient-to-br from-[#D62828] to-[#B01E1E] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-4">
-            <div className="size-14 rounded-full bg-white/20 grid place-items-center backdrop-blur-sm ring-2 ring-white/30">
-              <span className="text-xl font-bold text-white">
+      <div className="bg-gradient-to-br from-[#D62828] to-[#B01E1E] text-white sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="size-11 sm:size-14 rounded-full bg-white/20 grid place-items-center backdrop-blur-sm ring-2 ring-white/30">
+              <span className="text-lg sm:text-xl font-bold text-white">
                 {associado?.nome?.charAt(0)?.toUpperCase()}
               </span>
             </div>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">Olá, {associado.nome.split(" ")[0]}!</h1>
-              <p className="text-sm text-white/70">Bem-vindo ao seu painel de associado</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-base sm:text-xl font-bold truncate">
+                Olá, {associado.nome.split(" ")[0]}!
+              </h1>
+              <p className="text-xs sm:text-sm text-white/70 truncate">
+                Bem-vindo ao seu painel de associado
+              </p>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm text-white/80"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-xs sm:text-sm text-white/80 flex-shrink-0"
             >
               <LogOut className="size-4" />
-              Sair
+              <span className="hidden sm:inline">Sair</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 -mt-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24 lg:pb-8 -mt-4 sm:-mt-4">
         <div className="grid lg:grid-cols-4 gap-6">
-          <div className="lg:col-span-1">
-            <nav className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 space-y-1">
+          <div className="hidden lg:block lg:col-span-1">
+            <nav className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 space-y-1 sticky top-24">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = tab === item.id;
@@ -158,9 +161,11 @@ function PainelAssociado() {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    <div className={`size-8 rounded-lg grid place-items-center transition-colors ${
-                      isActive ? "bg-[#D62828] text-white" : "bg-gray-100 text-gray-500"
-                    }`}>
+                    <div
+                      className={`size-8 rounded-lg grid place-items-center transition-colors ${
+                        isActive ? "bg-[#D62828] text-white" : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
                       <Icon className="size-4" />
                     </div>
                     <span className="flex-1">{item.label}</span>
@@ -181,6 +186,42 @@ function PainelAssociado() {
           </div>
         </div>
       </div>
+
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
+        <div className="grid grid-cols-5">
+          {bottomNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = tab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
+                  isActive ? "text-[#D62828]" : "text-gray-400"
+                }`}
+              >
+                <Icon className={`size-5 ${isActive ? "text-[#D62828]" : "text-gray-400"}`} />
+                <span className="px-0.5 text-center leading-tight truncate w-full">
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+          {hasMore && (
+            <button
+              onClick={() => setTab("comunidade")}
+              className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[10px] font-medium transition-colors ${
+                tab === "comunidade" ? "text-[#D62828]" : "text-gray-400"
+              }`}
+            >
+              <Users
+                className={`size-5 ${tab === "comunidade" ? "text-[#D62828]" : "text-gray-400"}`}
+              />
+              <span className="px-0.5 text-center leading-tight truncate w-full">Comunidade</span>
+            </button>
+          )}
+        </div>
+      </nav>
     </div>
   );
 }
@@ -189,7 +230,12 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
   const [pagandoId, setPagandoId] = useState<string | null>(null);
-  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
+  const [pixModal, setPixModal] = useState<{
+    qrCode?: string;
+    qrCodeBase64?: string;
+    mensalidadeId: string;
+    status: "waiting" | "confirmed";
+  } | null>(null);
   const [boletoModal, setBoletoModal] = useState<{ url: string; vencimento: string } | null>(null);
 
   const handlePagar = async (m: Mensalidade) => {
@@ -202,7 +248,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           qrCode: result.data.pix_qr_code,
           qrCodeBase64: result.data.pix_qr_code_base64,
           mensalidadeId: m.id,
-          status: 'waiting',
+          status: "waiting",
         });
       } else if (result.success && result.data?.payment_url) {
         window.location.href = result.data.payment_url;
@@ -218,7 +264,9 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
 
   const fecharPix = () => {
     setPixModal(null);
-    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => {});
   };
 
   const handleBoleto = async (m: Mensalidade) => {
@@ -233,26 +281,32 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
         toast.error(result.message || "Erro ao gerar boleto");
       }
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao gerar boleto";
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Erro ao gerar boleto";
       toast.error(msg);
     }
   };
 
   const fecharBoleto = () => {
     setBoletoModal(null);
-    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => {});
   };
 
   useEffect(() => {
-    if (!pixModal || pixModal.status === 'confirmed') return;
+    if (!pixModal || pixModal.status === "confirmed") return;
     const id = setInterval(async () => {
       try {
         const res = await consultarStatusPagamento(pixModal.mensalidadeId);
         if (res.data?.status === "pago") {
-          setPixModal((prev) => prev ? { ...prev, status: 'confirmed' } : null);
+          setPixModal((prev) => (prev ? { ...prev, status: "confirmed" } : null));
           setTimeout(fecharPix, 2000);
         }
-      } catch {}
+      } catch {
+        // erro de polling ignorado
+      }
     }, 3000);
     return () => clearInterval(id);
   }, [pixModal]);
@@ -287,17 +341,19 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent p-6">
+        <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent p-4 sm:p-6">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Informações do Sócio</h2>
               <p className="text-sm text-gray-500 mt-1">Dados da sua associação</p>
             </div>
-            <div className={`px-3 py-1.5 rounded-full text-xs font-medium ${
-              associado.status === "ativo"
-                ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
-            }`}>
+            <div
+              className={`px-3 py-1.5 rounded-full text-xs font-medium ${
+                associado.status === "ativo"
+                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                  : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
+              }`}
+            >
               {associado.status === "ativo" ? "Ativo" : associado.status}
             </div>
           </div>
@@ -308,7 +364,10 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
               { icon: Phone, label: "Telefone", value: associado.telefone },
               { icon: Calendar, label: "Sócio desde", value: associado.created_at },
             ].map((item) => (
-              <div key={item.label} className="bg-white rounded-xl p-4 shadow-sm border border-gray-50">
+              <div
+                key={item.label}
+                className="bg-white rounded-xl p-4 shadow-sm border border-gray-50"
+              >
                 <div className="flex items-center gap-2 text-gray-400 mb-1.5">
                   <item.icon className="size-3.5" />
                   <span className="text-xs">{item.label}</span>
@@ -383,7 +442,11 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.pagas.length}</p>
-          <p className="text-xs text-gray-400 mt-2">{stats.totalValor > 0 ? `${Math.round((stats.pagas.length / mensalidades.length) * 100)}% do total` : "—"}</p>
+          <p className="text-xs text-gray-400 mt-2">
+            {stats.totalValor > 0
+              ? `${Math.round((stats.pagas.length / mensalidades.length) * 100)}% do total`
+              : "—"}
+          </p>
         </div>
       </div>
 
@@ -397,8 +460,11 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
           const totalDevido = pendentes.reduce((s, m) => s + m.valor, 0);
 
           return (
-            <div key={alunoNome} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent px-6 py-5 border-b border-gray-50">
+            <div
+              key={alunoNome}
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-[#D62828]/5 via-transparent to-transparent px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="size-12 rounded-xl bg-[#D62828]/5 grid place-items-center">
@@ -406,42 +472,76 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                     </div>
                     <div>
                       <h3 className="text-base font-semibold text-gray-900">{alunoNome}</h3>
-                      <p className="text-xs text-gray-400">{ms.length} mensalidade{ms.length !== 1 ? "s" : ""}</p>
+                      <p className="text-xs text-gray-400">
+                        {ms.length} mensalidade{ms.length !== 1 ? "s" : ""}
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-px bg-gray-50">
+              <div className="grid grid-cols-3 gap-px bg-gray-50 text-xs sm:text-sm">
                 <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Mensalidades</p>
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
+                    Mensalidades
+                  </p>
                   <p className="text-xl font-bold text-gray-900">{ms.length}</p>
                 </div>
                 <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Em aberto</p>
-                  <p className={`text-xl font-bold ${pendentes.length > 0 ? "text-amber-500" : "text-emerald-500"}`}>
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
+                    Em aberto
+                  </p>
+                  <p
+                    className={`text-xl font-bold ${pendentes.length > 0 ? "text-amber-500" : "text-emerald-500"}`}
+                  >
                     {pendentes.length}
                   </p>
                 </div>
                 <div className="bg-white p-5 text-center">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">Valor devido</p>
-                  <p className={`text-xl font-bold ${totalDevido > 0 ? "text-red-500" : "text-emerald-500"}`}>
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-1">
+                    Valor devido
+                  </p>
+                  <p
+                    className={`text-xl font-bold ${totalDevido > 0 ? "text-red-500" : "text-emerald-500"}`}
+                  >
                     {totalDevido > 0 ? brl(totalDevido) : "—"}
                   </p>
                 </div>
               </div>
 
               <div>
-                <div className="px-6 py-3 border-b border-gray-50 bg-gray-50/30">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Mensalidades</p>
+                <div className="px-4 sm:px-6 py-3 border-b border-gray-50 bg-gray-50/30">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Mensalidades
+                  </p>
                 </div>
                 {ms.map((m, idx) => {
-                  const StatusIcon = m.status === "pago" ? CheckCircle2 : m.status === "atrasado" ? AlertCircle : Clock;
-                  const statusColor = m.status === "pago" ? "text-emerald-500" : m.status === "atrasado" ? "text-red-500" : "text-amber-500";
-                  const bgColor = m.status === "pago" ? "bg-emerald-50" : m.status === "atrasado" ? "bg-red-50" : "bg-amber-50";
+                  const StatusIcon =
+                    m.status === "pago"
+                      ? CheckCircle2
+                      : m.status === "atrasado"
+                        ? AlertCircle
+                        : Clock;
+                  const statusColor =
+                    m.status === "pago"
+                      ? "text-emerald-500"
+                      : m.status === "atrasado"
+                        ? "text-red-500"
+                        : "text-amber-500";
+                  const bgColor =
+                    m.status === "pago"
+                      ? "bg-emerald-50"
+                      : m.status === "atrasado"
+                        ? "bg-red-50"
+                        : "bg-amber-50";
                   return (
-                    <div key={m.id} className={`flex items-center gap-4 px-6 py-4 hover:bg-gray-50/50 transition-colors ${idx < ms.length - 1 ? "border-b border-gray-50" : ""}`}>
-                      <div className={`size-10 rounded-lg ${bgColor} grid place-items-center flex-shrink-0`}>
+                    <div
+                      key={m.id}
+                      className={`flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 hover:bg-gray-50/50 transition-colors ${idx < ms.length - 1 ? "border-b border-gray-50" : ""}`}
+                    >
+                      <div
+                        className={`size-10 rounded-lg ${bgColor} grid place-items-center flex-shrink-0`}
+                      >
                         <StatusIcon className={`size-5 ${statusColor}`} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -450,35 +550,29 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                             <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className={`text-xs font-medium ${statusColor}`}>
-                                {m.status === "pago" ? "Pago" : m.status === "atrasado" ? "Atrasado" : "Pendente"}
+                                {m.status === "pago"
+                                  ? "Pago"
+                                  : m.status === "atrasado"
+                                    ? "Atrasado"
+                                    : "Pendente"}
                               </span>
                             </div>
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <p className={`text-sm font-bold ${statusColor}`}>
-                              {brl(m.valor)}
-                            </p>
+                            <p className={`text-sm font-bold ${statusColor}`}>{brl(m.valor)}</p>
                             <p className="text-xs text-gray-400 mt-0.5">
-                              {m.status === "pago" ? `Pago em ${m.dataPagamento}` : `Vence ${m.dataVencimento}`}
+                              {m.status === "pago"
+                                ? `Pago em ${m.dataPagamento}`
+                                : `Vence ${m.dataVencimento}`}
                             </p>
                           </div>
                         </div>
                       </div>
                       {(m.status === "pendente" || m.status === "atrasado") && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handlePagar(m)}
-                            disabled={pagandoId === m.id}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {pagandoId === m.id ? (
-                              <Loader2 className="size-3.5 animate-spin" />
-                            ) : (
-                              <ExternalLink className="size-3.5" />
-                            )}
-                            {pagandoId === m.id ? "Gerando..." : "Pix"}
-                          </button>
-                        </div>
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#D62828]">
+                          <ExternalLink className="size-3.5" />
+                          Pagar na aba Pagamentos
+                        </span>
                       )}
                     </div>
                   );
@@ -492,7 +586,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
       {pixModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
-            {pixModal.status === 'confirmed' ? (
+            {pixModal.status === "confirmed" ? (
               <>
                 <div className="size-16 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4 animate-bounce">
                   <CheckCircle2 className="size-8 text-emerald-500" />
@@ -506,7 +600,9 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                   <Smartphone className="size-6 text-emerald-500" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
-                <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
+                <p className="text-sm text-gray-500 mb-6">
+                  Escaneie o QR Code abaixo com seu banco
+                </p>
                 {pixModal.qrCodeBase64 && (
                   <img
                     src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
@@ -518,7 +614,9 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                   <>
                     <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
                     <div className="bg-gray-50 rounded-xl p-3 mb-6">
-                      <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                      <p className="text-xs text-gray-600 break-all font-mono select-all">
+                        {pixModal.qrCode}
+                      </p>
                     </div>
                   </>
                 )}
@@ -554,8 +652,8 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
               </a>
             ) : (
               <p className="text-sm text-amber-600 bg-amber-50 rounded-xl px-4 py-3 mb-2">
-                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível.
-                Ela aparecerá em alguns instantes na lista de boletos do associado.
+                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível. Ela
+                aparecerá em alguns instantes na lista de boletos do associado.
               </p>
             )}
             <p className="text-xs text-gray-400 mt-4">
@@ -575,18 +673,50 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
 }
 
 const origemConfig: Record<OrigemPagamento, { label: string; color: string; icon: LucideIcon }> = {
-  mercadopago: { label: "Mercado Pago", color: "text-sky-700 bg-sky-50 ring-1 ring-sky-200", icon: ArrowUpRight },
-  caixa: { label: "Caixa Econômica", color: "text-blue-700 bg-blue-50 ring-1 ring-blue-200", icon: Building2 },
+  mercadopago: {
+    label: "Mercado Pago",
+    color: "text-sky-700 bg-sky-50 ring-1 ring-sky-200",
+    icon: ArrowUpRight,
+  },
+  caixa: {
+    label: "Caixa Econômica",
+    color: "text-blue-700 bg-blue-50 ring-1 ring-blue-200",
+    icon: Building2,
+  },
   admin: { label: "Admin", color: "text-gray-700 bg-gray-100 ring-1 ring-gray-200", icon: Shield },
-  pix_manual: { label: "PIX", color: "text-emerald-700 bg-emerald-50 ring-1 ring-emerald-200", icon: Smartphone },
-  dinheiro: { label: "Dinheiro", color: "text-amber-700 bg-amber-50 ring-1 ring-amber-200", icon: Banknote },
-  transferencia: { label: "Transferência", color: "text-purple-700 bg-purple-50 ring-1 ring-purple-200", icon: HandCoins },
+  pix_manual: {
+    label: "PIX",
+    color: "text-emerald-700 bg-emerald-50 ring-1 ring-emerald-200",
+    icon: Smartphone,
+  },
+  dinheiro: {
+    label: "Dinheiro",
+    color: "text-amber-700 bg-amber-50 ring-1 ring-amber-200",
+    icon: Banknote,
+  },
+  transferencia: {
+    label: "Transferência",
+    color: "text-purple-700 bg-purple-50 ring-1 ring-purple-200",
+    icon: HandCoins,
+  },
 };
 
 const statusConfig: Record<string, { label: string; color: string; icon: LucideIcon }> = {
-  pago: { label: "Pago", color: "text-emerald-600 bg-emerald-50 ring-1 ring-emerald-200", icon: CheckCircle2 },
-  pendente: { label: "Pendente", color: "text-amber-600 bg-amber-50 ring-1 ring-amber-200", icon: Clock },
-  atrasado: { label: "Atrasado", color: "text-red-600 bg-red-50 ring-1 ring-red-200", icon: AlertCircle },
+  pago: {
+    label: "Pago",
+    color: "text-emerald-600 bg-emerald-50 ring-1 ring-emerald-200",
+    icon: CheckCircle2,
+  },
+  pendente: {
+    label: "Pendente",
+    color: "text-amber-600 bg-amber-50 ring-1 ring-amber-200",
+    icon: Clock,
+  },
+  atrasado: {
+    label: "Atrasado",
+    color: "text-red-600 bg-red-50 ring-1 ring-red-200",
+    icon: AlertCircle,
+  },
 };
 
 function PagamentosTab() {
@@ -594,7 +724,12 @@ function PagamentosTab() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("todas");
   const [pagandoId, setPagandoId] = useState<string | null>(null);
-  const [pixModal, setPixModal] = useState<{ qrCode?: string; qrCodeBase64?: string; mensalidadeId: string; status: 'waiting' | 'confirmed' } | null>(null);
+  const [pixModal, setPixModal] = useState<{
+    qrCode?: string;
+    qrCodeBase64?: string;
+    mensalidadeId: string;
+    status: "waiting" | "confirmed";
+  } | null>(null);
   const [boletoModal, setBoletoModal] = useState<{ url: string; vencimento: string } | null>(null);
 
   useEffect(() => {
@@ -611,16 +746,13 @@ function PagamentosTab() {
 
   const pendentes = useMemo(
     () => mensalidades.filter((m) => m.status === "pendente"),
-    [mensalidades]
+    [mensalidades],
   );
   const vencidas = useMemo(
     () => mensalidades.filter((m) => m.status === "atrasado"),
-    [mensalidades]
+    [mensalidades],
   );
-  const pagas = useMemo(
-    () => mensalidades.filter((m) => m.status === "pago"),
-    [mensalidades]
-  );
+  const pagas = useMemo(() => mensalidades.filter((m) => m.status === "pago"), [mensalidades]);
 
   const handlePagar = async (m: Mensalidade) => {
     if (pagandoId) return;
@@ -632,7 +764,7 @@ function PagamentosTab() {
           qrCode: result.data.pix_qr_code,
           qrCodeBase64: result.data.pix_qr_code_base64,
           mensalidadeId: m.id,
-          status: 'waiting',
+          status: "waiting",
         });
       } else if (result.success && result.data?.payment_url) {
         window.location.href = result.data.payment_url;
@@ -648,7 +780,9 @@ function PagamentosTab() {
 
   const fecharPix = () => {
     setPixModal(null);
-    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => {});
   };
 
   const handleBoleto = async (m: Mensalidade) => {
@@ -663,26 +797,32 @@ function PagamentosTab() {
         toast.error(result.message || "Erro ao gerar boleto");
       }
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || "Erro ao gerar boleto";
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Erro ao gerar boleto";
       toast.error(msg);
     }
   };
 
   const fecharBoleto = () => {
     setBoletoModal(null);
-    fetchAssociadoMensalidades().then(setMensalidades).catch(() => {});
+    fetchAssociadoMensalidades()
+      .then(setMensalidades)
+      .catch(() => {});
   };
 
   useEffect(() => {
-    if (!pixModal || pixModal.status === 'confirmed') return;
+    if (!pixModal || pixModal.status === "confirmed") return;
     const id = setInterval(async () => {
       try {
         const res = await consultarStatusPagamento(pixModal.mensalidadeId);
         if (res.data?.status === "pago") {
-          setPixModal((prev) => prev ? { ...prev, status: 'confirmed' } : null);
+          setPixModal((prev) => (prev ? { ...prev, status: "confirmed" } : null));
           setTimeout(fecharPix, 2000);
         }
-      } catch {}
+      } catch {
+        // erro de polling ignorado
+      }
     }, 3000);
     return () => clearInterval(id);
   }, [pixModal]);
@@ -702,7 +842,9 @@ function PagamentosTab() {
           <div className="absolute top-0 right-0 size-24 bg-amber-50 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">Pendentes</p>
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+                Pendentes
+              </p>
               <div className="size-9 rounded-lg bg-amber-50 grid place-items-center">
                 <Clock className="size-4 text-amber-500" />
               </div>
@@ -752,7 +894,7 @@ function PagamentosTab() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-50 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-50 flex flex-wrap items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-gray-900">Mensalidades</h3>
           <div className="flex items-center gap-1.5 bg-gray-50 rounded-xl p-1">
             {[
@@ -780,91 +922,174 @@ function PagamentosTab() {
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
             <Receipt className="size-12 mb-4 opacity-30" />
             <p className="text-sm font-medium">Nenhuma mensalidade encontrada</p>
-            <p className="text-xs text-gray-300 mt-1">Tente alterar o filtro para ver mais resultados</p>
+            <p className="text-xs text-gray-300 mt-1">
+              Tente alterar o filtro para ver mais resultados
+            </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50/50">
-                  <th className="text-left py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Mês</th>
-                  <th className="text-left py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Vencimento</th>
-                  <th className="text-right py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Valor</th>
-                  <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Status</th>
-                  <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Origem</th>
-                  <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((m, idx) => {
-                  const StatusIcon = statusConfig[m.status]?.icon || Clock;
-                  const origem = m.origem ? origemConfig[m.origem] : null;
-                  const OrigemIcon = origem?.icon || Shield;
-                  return (
-                    <tr key={m.id} className={`hover:bg-gray-50/50 transition-colors ${idx < filtered.length - 1 ? "border-b border-gray-50" : ""}`}>
-                      <td className="py-4 px-4">
-                        <span className="font-medium text-gray-900">{m.mesReferencia}</span>
-                      </td>
-                      <td className="py-4 px-4 text-gray-500">{m.dataVencimento}</td>
-                      <td className="py-4 px-4 text-right font-semibold text-gray-900">{brl(m.valor)}</td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-center">
-                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusConfig[m.status]?.color}`}>
-                            <StatusIcon className="size-3" />
-                            {statusConfig[m.status]?.label}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-center">
-                          {origem ? (
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${origem.color}`}>
-                              <OrigemIcon className="size-3" />
-                              {origem.label}
+          <>
+            <div className="lg:hidden divide-y divide-gray-50">
+              {filtered.map((m) => {
+                const StatusIcon = statusConfig[m.status]?.icon || Clock;
+                const origem = m.origem ? origemConfig[m.origem] : null;
+                const OrigemIcon = origem?.icon || Shield;
+                return (
+                  <div key={m.id} className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{m.mesReferencia}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {m.status === "pago"
+                            ? `Pago em ${m.dataPagamento}`
+                            : `Vence ${m.dataVencimento}`}
+                        </p>
+                      </div>
+                      <p className="text-sm font-bold text-gray-900">{brl(m.valor)}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusConfig[m.status]?.color}`}
+                      >
+                        <StatusIcon className="size-3" />
+                        {statusConfig[m.status]?.label}
+                      </span>
+                      {origem && (
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${origem.color}`}
+                        >
+                          <OrigemIcon className="size-3" />
+                          {origem.label}
+                        </span>
+                      )}
+                    </div>
+                    {m.status === "pendente" || m.status === "atrasado" ? (
+                      <button
+                        onClick={() => handlePagar(m)}
+                        disabled={pagandoId === m.id}
+                        className="mt-3 w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D62828] text-white text-sm font-semibold hover:bg-[#B01E1E] transition-all shadow-sm active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {pagandoId === m.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <ExternalLink className="size-4" />
+                        )}
+                        {pagandoId === m.id ? "Gerando..." : "Pagar com PIX"}
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium mt-3">
+                        <CheckCircle2 className="size-3.5" />
+                        Quitado
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50/50">
+                    <th className="text-left py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Mês
+                    </th>
+                    <th className="text-left py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Vencimento
+                    </th>
+                    <th className="text-right py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Valor
+                    </th>
+                    <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Origem
+                    </th>
+                    <th className="text-center py-3.5 px-4 text-gray-400 font-medium text-xs uppercase tracking-wider">
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((m, idx) => {
+                    const StatusIcon = statusConfig[m.status]?.icon || Clock;
+                    const origem = m.origem ? origemConfig[m.origem] : null;
+                    const OrigemIcon = origem?.icon || Shield;
+                    return (
+                      <tr
+                        key={m.id}
+                        className={`hover:bg-gray-50/50 transition-colors ${idx < filtered.length - 1 ? "border-b border-gray-50" : ""}`}
+                      >
+                        <td className="py-4 px-4">
+                          <span className="font-medium text-gray-900">{m.mesReferencia}</span>
+                        </td>
+                        <td className="py-4 px-4 text-gray-500">{m.dataVencimento}</td>
+                        <td className="py-4 px-4 text-right font-semibold text-gray-900">
+                          {brl(m.valor)}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex justify-center">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusConfig[m.status]?.color}`}
+                            >
+                              <StatusIcon className="size-3" />
+                              {statusConfig[m.status]?.label}
                             </span>
-                          ) : (
-                            <span className="text-xs text-gray-300">—</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex justify-center">
-                          {m.status === "pendente" || m.status === "atrasado" ? (
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handlePagar(m)}
-                                disabled={pagandoId === m.id}
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex justify-center">
+                            {origem ? (
+                              <span
+                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${origem.color}`}
                               >
-                                {pagandoId === m.id ? (
-                                  <Loader2 className="size-3.5 animate-spin" />
-                                ) : (
-                                  <ExternalLink className="size-3.5" />
-                                )}
-                                {pagandoId === m.id ? "Gerando..." : "Pix"}
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">
-                              <CheckCircle2 className="size-3.5" />
-                              Quitado
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                                <OrigemIcon className="size-3" />
+                                {origem.label}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-gray-300">—</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex justify-center">
+                            {m.status === "pendente" || m.status === "atrasado" ? (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handlePagar(m)}
+                                  disabled={pagandoId === m.id}
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D62828] text-white text-xs font-semibold hover:bg-[#B01E1E] transition-all shadow-sm hover:shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {pagandoId === m.id ? (
+                                    <Loader2 className="size-3.5 animate-spin" />
+                                  ) : (
+                                    <ExternalLink className="size-3.5" />
+                                  )}
+                                  {pagandoId === m.id ? "Gerando..." : "Pix"}
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-xs text-emerald-500 font-medium">
+                                <CheckCircle2 className="size-3.5" />
+                                Quitado
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
       {pixModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
-            {pixModal.status === 'confirmed' ? (
+            {pixModal.status === "confirmed" ? (
               <>
                 <div className="size-16 rounded-full bg-emerald-50 grid place-items-center mx-auto mb-4 animate-bounce">
                   <CheckCircle2 className="size-8 text-emerald-500" />
@@ -878,7 +1103,9 @@ function PagamentosTab() {
                   <Smartphone className="size-6 text-emerald-500" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">Pague com PIX</h3>
-                <p className="text-sm text-gray-500 mb-6">Escaneie o QR Code abaixo com seu banco</p>
+                <p className="text-sm text-gray-500 mb-6">
+                  Escaneie o QR Code abaixo com seu banco
+                </p>
                 {pixModal.qrCodeBase64 && (
                   <img
                     src={`data:image/png;base64,${pixModal.qrCodeBase64}`}
@@ -890,7 +1117,9 @@ function PagamentosTab() {
                   <>
                     <p className="text-xs text-gray-400 mb-2">Ou copie o código PIX abaixo:</p>
                     <div className="bg-gray-50 rounded-xl p-3 mb-6">
-                      <p className="text-xs text-gray-600 break-all font-mono select-all">{pixModal.qrCode}</p>
+                      <p className="text-xs text-gray-600 break-all font-mono select-all">
+                        {pixModal.qrCode}
+                      </p>
                     </div>
                   </>
                 )}
@@ -926,8 +1155,8 @@ function PagamentosTab() {
               </a>
             ) : (
               <p className="text-sm text-amber-600 bg-amber-50 rounded-xl px-4 py-3 mb-2">
-                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível.
-                Ela aparecerá em alguns instantes na lista de boletos do associado.
+                Cobrança gerada com sucesso, mas a URL do boleto ainda não está disponível. Ela
+                aparecerá em alguns instantes na lista de boletos do associado.
               </p>
             )}
             <p className="text-xs text-gray-400 mt-4">
@@ -988,20 +1217,26 @@ function HistoricoTab() {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="px-6 py-5 border-b border-gray-50">
         <h3 className="text-sm font-semibold text-gray-900">Histórico de Contribuições</h3>
-        <p className="text-xs text-gray-400 mt-0.5">Registro completo de todas as suas mensalidades</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Registro completo de todas as suas mensalidades
+        </p>
       </div>
 
       {years.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400">
           <History className="size-12 mb-4 opacity-30" />
           <p className="text-sm font-medium">Nenhuma contribuição registrada</p>
-          <p className="text-xs text-gray-300 mt-1">Suas mensalidades aparecerão aqui assim que forem criadas</p>
+          <p className="text-xs text-gray-300 mt-1">
+            Suas mensalidades aparecerão aqui assim que forem criadas
+          </p>
         </div>
       ) : (
         <div className="px-6 py-5">
           {years.map((year, yearIdx) => {
             const ms = groupedByYear[year];
-            const totalPago = ms.filter((m) => m.status === "pago").reduce((a, m) => a + m.valor, 0);
+            const totalPago = ms
+              .filter((m) => m.status === "pago")
+              .reduce((a, m) => a + m.valor, 0);
             const totalGeral = ms.reduce((a, m) => a + m.valor, 0);
             return (
               <div key={year} className={yearIdx < years.length - 1 ? "mb-8" : ""}>
@@ -1012,7 +1247,9 @@ function HistoricoTab() {
                     </div>
                     <div>
                       <h4 className="text-base font-bold text-gray-900">{year}</h4>
-                      <p className="text-xs text-gray-400">{ms.length} mensalidade{ms.length !== 1 ? "s" : ""}</p>
+                      <p className="text-xs text-gray-400">
+                        {ms.length} mensalidade{ms.length !== 1 ? "s" : ""}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -1036,13 +1273,28 @@ function HistoricoTab() {
                     const origem = m.origem ? origemConfig[m.origem] : null;
                     const OrigemIcon = origem?.icon || Shield;
                     return (
-                      <div key={m.id} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
-                        <div className={`size-9 rounded-lg grid place-items-center flex-shrink-0 ${
-                          m.status === "pago" ? "bg-emerald-50" : m.status === "atrasado" ? "bg-red-50" : "bg-amber-50"
-                        }`}>
-                          <StatusIcon className={`size-4 ${
-                            m.status === "pago" ? "text-emerald-500" : m.status === "atrasado" ? "text-red-500" : "text-amber-500"
-                          }`} />
+                      <div
+                        key={m.id}
+                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors"
+                      >
+                        <div
+                          className={`size-9 rounded-lg grid place-items-center flex-shrink-0 ${
+                            m.status === "pago"
+                              ? "bg-emerald-50"
+                              : m.status === "atrasado"
+                                ? "bg-red-50"
+                                : "bg-amber-50"
+                          }`}
+                        >
+                          <StatusIcon
+                            className={`size-4 ${
+                              m.status === "pago"
+                                ? "text-emerald-500"
+                                : m.status === "atrasado"
+                                  ? "text-red-500"
+                                  : "text-amber-500"
+                            }`}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
@@ -1050,20 +1302,28 @@ function HistoricoTab() {
                             <p className="text-sm font-semibold text-gray-900">{brl(m.valor)}</p>
                           </div>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${statusConfig[m.status]?.color}`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${statusConfig[m.status]?.color}`}
+                            >
                               <StatusIcon className="size-3" />
                               {statusConfig[m.status]?.label}
                             </span>
                             {origem && (
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${origem.color}`}>
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${origem.color}`}
+                              >
                                 <OrigemIcon className="size-3" />
                                 {origem.label}
                               </span>
                             )}
                             {m.dataPagamento ? (
-                              <span className="text-xs text-gray-400">Pago em {m.dataPagamento}</span>
+                              <span className="text-xs text-gray-400">
+                                Pago em {m.dataPagamento}
+                              </span>
                             ) : (
-                              <span className="text-xs text-gray-400">Vence {m.dataVencimento}</span>
+                              <span className="text-xs text-gray-400">
+                                Vence {m.dataVencimento}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -1124,7 +1384,9 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
       <div className="px-6 py-5">
         <div className="grid sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Nome completo</label>
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              Nome completo
+            </label>
             {editing ? (
               <input
                 type="text"
@@ -1141,7 +1403,9 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">E-mail</label>
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              E-mail
+            </label>
             <div className="h-11 flex items-center px-4 bg-gray-50 rounded-xl text-sm text-gray-900">
               <Mail className="size-4 text-gray-400 mr-2 flex-shrink-0" />
               {associado.email}
@@ -1149,7 +1413,9 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">Telefone</label>
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              Telefone
+            </label>
             {editing ? (
               <input
                 type="text"
@@ -1166,7 +1432,9 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">CPF</label>
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              CPF
+            </label>
             <div className="h-11 flex items-center px-4 bg-gray-50 rounded-xl text-sm font-medium text-gray-900">
               <Shield className="size-4 text-gray-400 mr-2 flex-shrink-0" />
               {maskCPF(associado.cpf)}
@@ -1181,7 +1449,10 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
             </label>
             <div className="space-y-2">
               {associado.alunos.map((al) => (
-                <div key={al.id} className="h-11 flex items-center px-4 bg-gradient-to-r from-[#D62828]/5 to-transparent rounded-xl text-sm font-medium text-gray-900">
+                <div
+                  key={al.id}
+                  className="h-11 flex items-center px-4 bg-gradient-to-r from-[#D62828]/5 to-transparent rounded-xl text-sm font-medium text-gray-900"
+                >
                   <User className="size-4 text-[#D62828] mr-2 flex-shrink-0" />
                   {al.nome}
                 </div>
@@ -1202,7 +1473,9 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
                   <Loader2 className="size-4 animate-spin" />
                   Salvando...
                 </span>
-              ) : "Salvar alterações"}
+              ) : (
+                "Salvar alterações"
+              )}
             </button>
             <button
               onClick={() => {
@@ -1230,9 +1503,21 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
 
 function BeneficiosTab() {
   const beneficios = [
-    { icon: Gift, title: "Descontos Exclusivos", desc: "Aproveite descontos especiais em eventos e atividades da escola." },
-    { icon: Users, title: "Participação Ativa", desc: "Participe das decisões importantes da associação de pais e mestres." },
-    { icon: TrendingUp, title: "Acompanhamento", desc: "Acompanhe de perto o desenvolvimento educacional do seu filho." },
+    {
+      icon: Gift,
+      title: "Descontos Exclusivos",
+      desc: "Aproveite descontos especiais em eventos e atividades da escola.",
+    },
+    {
+      icon: Users,
+      title: "Participação Ativa",
+      desc: "Participe das decisões importantes da associação de pais e mestres.",
+    },
+    {
+      icon: TrendingUp,
+      title: "Acompanhamento",
+      desc: "Acompanhe de perto o desenvolvimento educacional do seu filho.",
+    },
   ];
 
   return (
@@ -1243,7 +1528,10 @@ function BeneficiosTab() {
       </div>
       <div className="px-6 py-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {beneficios.map((b) => (
-          <div key={b.title} className="p-5 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 hover:shadow-sm transition-shadow">
+          <div
+            key={b.title}
+            className="p-5 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-100 hover:shadow-sm transition-shadow"
+          >
             <div className="size-10 rounded-xl bg-[#D62828]/5 grid place-items-center mb-4">
               <b.icon className="size-5 text-[#D62828]" />
             </div>
