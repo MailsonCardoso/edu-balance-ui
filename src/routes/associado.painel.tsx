@@ -229,20 +229,8 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
     const pendentes = mensalidades.filter((m) => m.status === "pendente");
     const vencidas = mensalidades.filter((m) => m.status === "atrasado");
     const pagas = mensalidades.filter((m) => m.status === "pago");
-    const totalValor = mensalidades.reduce((a, m) => a + m.valor, 0);
     const pagoValor = pagas.reduce((a, m) => a + m.valor, 0);
-    const adimplencia = totalValor > 0 ? Math.round((pagoValor / totalValor) * 100) : 0;
-    return { pendentes, vencidas, pagas, totalValor, pagoValor, adimplencia };
-  }, [mensalidades]);
-
-  const mensalidadesPorAluno = useMemo(() => {
-    const grupos: Record<string, Mensalidade[]> = {};
-    for (const m of mensalidades) {
-      const nome = m.alunoNome || "Sem nome";
-      if (!grupos[nome]) grupos[nome] = [];
-      grupos[nome].push(m);
-    }
-    return grupos;
+    return { pendentes, vencidas, pagas, pagoValor };
   }, [mensalidades]);
 
   if (loading) {
@@ -310,64 +298,6 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
         />
       </div>
 
-      {stats.adimplencia > 0 && (
-        <div className="rounded-3xl border border-black/[0.04] bg-white p-4 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
-          <div className="mb-2 flex items-center justify-between text-xs">
-            <span className="font-medium text-gray-400">Adimplência</span>
-            <span className="font-bold text-brand">{stats.adimplencia}%</span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-gray-100">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-brand to-brand-dark transition-all duration-700"
-              style={{ width: `${stats.adimplencia}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {Object.entries(mensalidadesPorAluno).map(([alunoNome, ms], gi) => {
-        const pendentes = ms.filter((m) => m.status === "pendente" || m.status === "atrasado");
-        const totalDevido = pendentes.reduce((s, m) => s + m.valor, 0);
-        return (
-          <div
-            key={alunoNome}
-            className="overflow-hidden rounded-3xl border border-black/[0.04] bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)] animate-fade-up"
-            style={{ animationDelay: `${gi * 60}ms` }}
-          >
-            <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="grid size-10 shrink-0 place-items-center rounded-2xl bg-brand-light">
-                  <User className="size-5 text-brand" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="truncate text-sm font-bold text-gray-900">{alunoNome}</h3>
-                  <p className="text-[11px] text-gray-400">
-                    {ms.length} mensalidade{ms.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
-              </div>
-              {totalDevido > 0 && (
-                <div className="text-right">
-                  <p className="text-[10px] text-gray-400">Devido</p>
-                  <p className="text-sm font-bold text-red-500">{brl(totalDevido)}</p>
-                </div>
-              )}
-            </div>
-            <div className="divide-y divide-gray-50">
-              {ms.map((m) => (
-                <MensalidadeRow
-                  key={m.id}
-                  m={m}
-                  onPagar={handlePagar}
-                  pagando={pagandoId === m.id}
-                  showAluno={Object.keys(mensalidadesPorAluno).length > 1}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-
       <PixSheet
         open={!!pix}
         status={pix?.status ?? "waiting"}
@@ -404,6 +334,11 @@ function PagamentosTab() {
     if (filter === "todas") return mensalidades;
     return mensalidades.filter((m) => m.status === filter);
   }, [mensalidades, filter]);
+
+  const temMultiplosAlunos = useMemo(
+    () => new Set(mensalidades.map((m) => m.alunoNome)).size > 1,
+    [mensalidades],
+  );
 
   if (loading) {
     return (
@@ -472,7 +407,13 @@ function PagamentosTab() {
         <div className="overflow-hidden rounded-3xl border border-black/[0.04] bg-white shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
           <div className="divide-y divide-gray-50">
             {filtered.map((m) => (
-              <MensalidadeRow key={m.id} m={m} onPagar={handlePagar} pagando={pagandoId === m.id} />
+              <MensalidadeRow
+                key={m.id}
+                m={m}
+                onPagar={handlePagar}
+                pagando={pagandoId === m.id}
+                showAluno={temMultiplosAlunos}
+              />
             ))}
           </div>
         </div>
