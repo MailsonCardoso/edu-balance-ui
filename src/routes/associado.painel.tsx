@@ -568,12 +568,6 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
                           </div>
                         </div>
                       </div>
-                      {(m.status === "pendente" || m.status === "atrasado") && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#D62828]">
-                          <ExternalLink className="size-3.5" />
-                          Pagar na aba Pagamentos
-                        </span>
-                      )}
                     </div>
                   );
                 })}

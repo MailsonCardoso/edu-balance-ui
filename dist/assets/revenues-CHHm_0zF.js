@@ -1,1 +1,0 @@
-import{O as t}from"./index-BmWLNmM4.js";async function s(){try{const{data:e}=await t.get("/revenues");return e}catch{return[]}}async function r(e){const{data:a}=await t.post("/revenues",e);return a}async function c(e,a){const{data:n}=await t.put(`/revenues/${e}`,a);return n}async function o(e){await t.delete(`/revenues/${e}`)}export{r as c,o as d,s as f,c as u};
