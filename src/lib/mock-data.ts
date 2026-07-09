@@ -24,6 +24,8 @@ export interface Aluno {
   bairro: string;
   cidade: string;
   uf: string;
+  nomePai?: string;
+  nomeMae?: string;
   responsavel: string;
   cpfResponsavel: string;
   telefoneResponsavel: string;
@@ -32,6 +34,7 @@ export interface Aluno {
   situacao: SituacaoFinanceira;
   valorMensalidade: number;
   diaVencimento: number;
+  anoLetivo?: string;
 }
 
 export interface Mensalidade {

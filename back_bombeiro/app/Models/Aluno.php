@@ -9,9 +9,10 @@ class Aluno extends Model
 {
     protected $fillable = [
         'nome', 'sexo', 'cpf', 'data_nascimento',         'telefone', 'email', 'cep', 'logradouro', 'numero', 'bairro', 'cidade', 'uf',
+        'nome_pai', 'nome_mae',
         'responsavel', 'cpf_responsavel', 'telefone_responsavel',
         'turma', 'status', 'situacao',
-        'valor_mensalidade', 'dia_vencimento',
+        'valor_mensalidade', 'dia_vencimento', 'ano_letivo',
     ];
 
     protected function casts(): array

@@ -46,6 +46,8 @@ class AlunoController extends Controller
             'bairro' => 'required|string|max:255',
             'cidade' => 'required|string|max:255',
             'uf' => 'required|string|max:2',
+            'nome_pai' => 'nullable|string|max:120',
+            'nome_mae' => 'nullable|string|max:120',
             'responsavel' => 'required|string|max:255',
             'cpf_responsavel' => 'nullable|string|max:14',
             'telefone_responsavel' => 'nullable|string|max:20',
@@ -54,6 +56,7 @@ class AlunoController extends Controller
             'situacao' => 'required|in:em_dia,em_atraso,inadimplente',
             'valor_mensalidade' => 'nullable|numeric|min:0',
             'dia_vencimento' => 'nullable|integer|min:1|max:31',
+            'ano_letivo' => 'nullable|string|max:4',
         ]);
 
         $aluno = DB::transaction(function () use ($validated) {
@@ -120,6 +123,8 @@ class AlunoController extends Controller
             'bairro' => 'sometimes|required|string|max:255',
             'cidade' => 'sometimes|required|string|max:255',
             'uf' => 'sometimes|required|string|max:2',
+            'nome_pai' => 'nullable|string|max:120',
+            'nome_mae' => 'nullable|string|max:120',
             'responsavel' => 'sometimes|string|max:255',
             'cpf_responsavel' => 'nullable|string|max:14',
             'telefone_responsavel' => 'nullable|string|max:20',
@@ -128,6 +133,7 @@ class AlunoController extends Controller
             'situacao' => 'sometimes|in:em_dia,em_atraso,inadimplente',
             'valor_mensalidade' => 'nullable|numeric|min:0',
             'dia_vencimento' => 'nullable|integer|min:1|max:31',
+            'ano_letivo' => 'nullable|string|max:4',
         ]);
 
         $aluno->update($validated);

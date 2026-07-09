@@ -27,6 +27,8 @@ const schema = z.object({
   bairro: z.string().min(2, "Bairro obrigatório").max(255),
   cidade: z.string().min(2, "Cidade obrigatória").max(255),
   uf: z.string().regex(/^[A-Z]{2}$/, "UF inválida (ex: SP)"),
+  nomePai: z.string().max(120).optional().or(z.literal("")),
+  nomeMae: z.string().max(120).optional().or(z.literal("")),
   responsavel: z.string().min(3, "Nome do responsável obrigatório"),
   cpfResponsavel: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF do responsável inválido"),
   telefoneResponsavel: z.string().min(10, "Telefone do responsável inválido"),
@@ -34,6 +36,7 @@ const schema = z.object({
   status: z.enum(["ativo", "inativo"]),
   valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
   diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
+  anoLetivo: z.string().max(4).optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -225,6 +228,12 @@ function NovoAluno() {
             <Field label="Cidade" error={errors.cidade?.message} className="md:col-span-2">
               <Input className="h-10" {...register("cidade")} />
             </Field>
+            <Field label="Nome do pai" error={errors.nomePai?.message}>
+              <Input className="h-10" {...register("nomePai")} />
+            </Field>
+            <Field label="Nome da mãe" error={errors.nomeMae?.message}>
+              <Input className="h-10" {...register("nomeMae")} />
+            </Field>
           </div>
         </section>
 
@@ -307,6 +316,9 @@ function NovoAluno() {
                   />
                 )}
               />
+            </Field>
+            <Field label="Ano letivo" error={errors.anoLetivo?.message}>
+              <Input className="h-10" placeholder="2026" {...register("anoLetivo")} />
             </Field>
             <Field label="Dia vencimento" error={errors.diaVencimento?.message}>
               <Controller
