@@ -34,14 +34,8 @@ class ImportarAlunosXls extends Command
             return Command::FAILURE;
         }
 
-        $nodePath = $this->findNodePath();
-        if (!$nodePath) {
-            $this->error('Node.js nao encontrado no sistema');
-            return Command::FAILURE;
-        }
-
         $nodeModules = realpath(base_path('../node_modules'));
-        $cmd = sprintf('set NODE_PATH=%s && %s %s %s 2>&1', $nodeModules, $nodePath, $nodeScript, escapeshellarg($arquivo));
+        $cmd = sprintf('set NODE_PATH=%s && node %s %s', $nodeModules, $nodeScript, escapeshellarg($arquivo));
 
         $this->line('Executando parser...');
         $output = shell_exec($cmd);
@@ -239,18 +233,5 @@ class ImportarAlunosXls extends Command
             return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $clean);
         }
         return $cpf;
-    }
-
-    private function findNodePath(): ?string
-    {
-        $candidates = ['node', 'node.exe'];
-        foreach ($candidates as $cmd) {
-            $which = shell_exec("where {$cmd} 2>NUL");
-            if ($which) {
-                $lines = explode("\n", trim($which));
-                return trim($lines[0]);
-            }
-        }
-        return null;
     }
 }
