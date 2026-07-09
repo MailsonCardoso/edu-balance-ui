@@ -22,6 +22,7 @@ function alunoFromApi(raw: Record<string, unknown>): Aluno {
   mapped.id = String(mapped.id);
   mapped.valorMensalidade = Number(mapped.valorMensalidade) || 0;
   mapped.diaVencimento = Number(mapped.diaVencimento) || 0;
+  mapped.situacao = mapped.situacao as "em_dia" | "em_atraso" | "inadimplente";
   return mapped as unknown as Aluno;
 }
 

@@ -30,11 +30,13 @@ export interface Aluno {
   cpfResponsavel: string;
   telefoneResponsavel: string;
   turma: string;
-  status: AlunoStatus;
-  situacao: SituacaoFinanceira;
+  status: "ativo" | "inativo";
   valorMensalidade: number;
   diaVencimento: number;
   anoLetivo?: string;
+  situacao?: "em_dia" | "em_atraso" | "inadimplente";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Mensalidade {

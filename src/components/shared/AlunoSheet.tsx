@@ -53,6 +53,9 @@ const schema = z.object({
   status: z.enum(["ativo", "inativo"]),
   valorMensalidade: z.coerce.number().min(0, "Valor inválido"),
   diaVencimento: z.coerce.number().int().min(1, "Mínimo 1").max(31, "Máximo 31"),
+  anoLetivo: z.string().max(4).optional().or(z.literal("")),
+  nomePai: z.string().max(120).optional().or(z.literal("")),
+  nomeMae: z.string().max(120).optional().or(z.literal("")),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -96,6 +99,8 @@ const emptyAluno: Aluno = {
   bairro: "",
   cidade: "",
   uf: "",
+  nomePai: "",
+  nomeMae: "",
   responsavel: "",
   cpfResponsavel: "",
   telefoneResponsavel: "",
@@ -103,6 +108,7 @@ const emptyAluno: Aluno = {
   status: "ativo",
   valorMensalidade: 0,
   diaVencimento: 10,
+  anoLetivo: "",
 };
 
 export function AlunoSheet({
@@ -342,17 +348,36 @@ const handleCepBlur = async (value: string) => {
                   <p className={viewCls}>{current.bairro}</p>
                 )}
               </Field>
-              <Field label="Cidade" error={errors.cidade?.message} className="sm:col-span-2">
-                {editing ? (
-                  <Input className="h-10" {...register("cidade")} />
-                ) : (
-                  <p className={viewCls}>{current.cidade}</p>
-                )}
-              </Field>
-            </div>
-          </section>
-
-          <section className="bg-muted/30 rounded-lg p-4 space-y-3">
+            <Field label="Cidade" error={errors.cidade?.message} className="sm:col-span-2">
+              {editing ? (
+                <Input className="h-10" {...register("cidade")} />
+              ) : (
+                <p className={viewCls}>{current.cidade}</p>
+              )}
+            </Field>
+            <Field label="Nome do pai" error={errors.nomePai?.message}>
+              {editing ? (
+                <Input className="h-10" {...register("nomePai")} />
+              ) : (
+                <p className={viewCls}>{current.nomePai || "—"}</p>
+              )}
+            </Field>
+            <Field label="Nome da mãe" error={errors.nomeMae?.message}>
+              {editing ? (
+                <Input className="h-10" {...register("nomeMae")} />
+              ) : (
+                <p className={viewCls}>{current.nomeMae || "—"}</p>
+              )}
+            </Field>
+            <Field label="Ano letivo" error={errors.anoLetivo?.message}>
+              {editing ? (
+                <Input className="h-10" placeholder="2026" {...register("anoLetivo")} />
+              ) : (
+                <p className={viewCls}>{current.anoLetivo || "—"}</p>
+              )}
+            </Field>
+          </div>
+        </section>
             <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <span className="size-1.5 rounded-full bg-primary inline-block" />
               Responsável financeiro

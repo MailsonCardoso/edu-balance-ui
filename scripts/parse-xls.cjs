@@ -1,13 +1,18 @@
 const xlsx = require('xlsx');
 const path = require('path');
+const fs = require('fs');
 
-const filePath = process.argv[2];
-if (!filePath) {
-  console.error('Uso: node scripts/parse-xls.cjs <caminho-do-xls>');
+// Caminhos dos arquivos
+const excelPath = process.argv[2] || 'C:\\Users\\Mailson\\Documents\\Projetos\\escola_bombeiro\\edu-balance-ui\\scripts\\DADOS_APA_alterar.xls';
+const outputPath = process.argv[3] || 'C:\\Users\\Mailson\\Documents\\Projetos\\escola_bombeiro\\edu-balance-ui\\scripts\\output.json';
+
+if (!fs.existsSync(excelPath)) {
+  console.error(`ERRO: Arquivo Excel não encontrado: ${excelPath}`);
+  console.error('Por favor, verifique se o arquivo DADOS_APA_alterar.xls está no diretório correto');
   process.exit(1);
 }
 
-const wb = xlsx.readFile(filePath);
+const wb = xlsx.readFile(excelPath);
 const ws = wb.Sheets[wb.SheetNames[0]];
 const rows = xlsx.utils.sheet_to_json(ws, { header: 1 });
 
@@ -90,4 +95,8 @@ for (const row of data) {
   });
 }
 
-console.log(JSON.stringify(result, null, 2));
+// Grava o JSON no arquivo de saída
+fs.writeFileSync(outputPath, JSON.stringify(result, null, 2), 'utf8');
+
+console.log(`Parse completo. ${result.length} registros importados.`);
+console.log(`Arquivo salvo em: ${outputPath}`);
