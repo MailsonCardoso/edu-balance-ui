@@ -102,6 +102,8 @@ function Financeiro() {
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
 
   const carregar = async () => {
     try {
@@ -177,6 +179,16 @@ function Financeiro() {
       ),
     [data, q, statusFilter],
   );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * perPage, page * perPage),
+    [filtered, page, perPage],
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [q, statusFilter]);
 
   const totals = useMemo(
     () => ({
@@ -561,7 +573,7 @@ function Financeiro() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filtered.map((m) => (
+                {paged.map((m) => (
                   <tr key={m.id} className="hover:bg-muted/30">
                     <td className="px-4 py-3 font-medium">{m.alunoNome || "—"}</td>
                     <td className="px-4 py-3">{m.mesReferencia}</td>
@@ -592,6 +604,69 @@ function Financeiro() {
             </table>
           )}
         </div>
+
+        {!loading && filtered.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>
+                Exibindo {(page - 1) * perPage + 1}-
+                {Math.min(page * perPage, filtered.length)} de {filtered.length}
+              </span>
+              <Select
+                value={String(perPage)}
+                onValueChange={(v) => {
+                  setPerPage(Number(v));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-20 h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[20, 50, 100].map((n) => (
+                    <SelectItem key={n} value={String(n)}>
+                      {n}/pág
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Anterior
+              </Button>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+                const p = start + i;
+                if (p > totalPages) return null;
+                return (
+                  <Button
+                    key={p}
+                    variant={p === page ? "default" : "outline"}
+                    size="sm"
+                    className="w-9"
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </Button>
+                );
+              })}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Próximo
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <ActionSheet
