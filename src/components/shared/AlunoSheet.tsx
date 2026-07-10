@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shared/Primitives";
 import type { Aluno } from "@/lib/mock-data";
+import { turmas } from "@/lib/mock-data";
 import { maskCPF, maskDate, maskPhone, fmtDate } from "@/lib/format";
 import { checkCpfExists } from "@/lib/api/alunos";
 import { buscarCep, formatarCep } from "@/lib/format";
@@ -463,15 +464,7 @@ const handleCepBlur = async (value: string) => {
                           <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {[
-                            "1º Ano A",
-                            "1º Ano B",
-                            "2º Ano A",
-                            "3º Ano A",
-                            "5º Ano B",
-                            "6º Ano A",
-                            "9º Ano A",
-                          ].map((t) => (
+                          {turmas.map((t) => (
                             <SelectItem key={t} value={t}>
                               {t}
                             </SelectItem>
