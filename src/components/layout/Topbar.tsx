@@ -1,4 +1,4 @@
-import { Bell, LogOut, Menu, MessageCircle, Moon, Wallet, Sun } from "lucide-react";
+import { Bell, LogOut, Menu, MessageCircle, Moon, Shield, Wallet, Sun } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import { useNavigate, Link } from "@tanstack/react-router";
@@ -54,9 +54,20 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <Menu className="size-5" />
       </button>
 
-      <span className="hidden md:block text-sm font-semibold text-foreground/80 truncate">
-        ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII - PARANÁ
-      </span>
+      <div className="hidden md:flex items-center gap-3">
+        <div className="size-9 rounded-xl bg-brand/10 grid place-items-center">
+          <Shield className="size-5 text-brand" />
+        </div>
+        <div className="leading-tight">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Associação de Pais e Amigos
+          </span>
+          <br />
+          <span className="text-sm font-bold text-foreground">
+            CMCB XII — Paraná
+          </span>
+        </div>
+      </div>
 
       <div className="ml-auto flex items-center gap-1">
         <button
