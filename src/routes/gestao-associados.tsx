@@ -1,9 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Users, Loader2, Search, GraduationCap } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -23,20 +31,36 @@ export const Route = createFileRoute("/gestao-associados")({
 function GestaoAssociados() {
   const [q, setQ] = useState("");
   const [alunosDialog, setAlunosDialog] = useState<AssociadoListItem | null>(null);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
 
   const { data: associados = [], isLoading } = useQuery({
     queryKey: ["associados"],
     queryFn: fetchAssociados,
   });
 
-  const filtered = q
-    ? associados.filter(
-        (a) =>
-          a.nome.toLowerCase().includes(q.toLowerCase()) ||
-          a.cpf.includes(q) ||
-          a.email.toLowerCase().includes(q.toLowerCase()),
-      )
-    : associados;
+  const filtered = useMemo(
+    () =>
+      q
+        ? associados.filter(
+            (a) =>
+              a.nome.toLowerCase().includes(q.toLowerCase()) ||
+              a.cpf.includes(q) ||
+              a.email.toLowerCase().includes(q.toLowerCase()),
+          )
+        : associados,
+    [associados, q],
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * perPage, page * perPage),
+    [filtered, page, perPage],
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [q]);
 
   return (
     <>
@@ -58,7 +82,7 @@ function GestaoAssociados() {
               />
             </div>
             <span className="text-sm text-muted-foreground">
-              {filtered.length} de {associados.length} associados
+              {associados.length} associados
             </span>
           </div>
         </div>
@@ -88,7 +112,7 @@ function GestaoAssociados() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filtered.map((a) => (
+                  {paged.map((a) => (
                     <tr
                       key={a.id}
                       className="hover:bg-muted/30 transition-colors"
@@ -133,6 +157,69 @@ function GestaoAssociados() {
               </table>
           )}
         </div>
+
+        {!isLoading && filtered.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>
+                Exibindo {(page - 1) * perPage + 1}-
+                {Math.min(page * perPage, filtered.length)} de {filtered.length}
+              </span>
+              <Select
+                value={String(perPage)}
+                onValueChange={(v) => {
+                  setPerPage(Number(v));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-20 h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[20, 50, 100].map((n) => (
+                    <SelectItem key={n} value={String(n)}>
+                      {n}/pág
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Anterior
+              </Button>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+                const p = start + i;
+                if (p > totalPages) return null;
+                return (
+                  <Button
+                    key={p}
+                    variant={p === page ? "default" : "outline"}
+                    size="sm"
+                    className="w-9"
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </Button>
+                );
+              })}
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Próximo
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={!!alunosDialog} onOpenChange={(open) => { if (!open) setAlunosDialog(null); }}>
