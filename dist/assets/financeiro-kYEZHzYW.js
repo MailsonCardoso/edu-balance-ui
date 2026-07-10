@@ -1,0 +1,1 @@
+import{j as t,a8 as n}from"./index-Cdtp1M6s.js";function r(){return t.jsx("div",{children:t.jsx(n,{})})}export{r as component};

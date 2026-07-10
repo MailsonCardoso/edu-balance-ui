@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Ouvidoria;
+use App\Models\PagamentoTransacao;
+use Illuminate\Http\JsonResponse;
+
+class NotificationController extends Controller
+{
+    public function index(): JsonResponse
+    {
+        $ouvidorias = Ouvidoria::where('status', 'pendente')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn ($o) => [
+                'id' => 'ouvidoria_' . $o->id,
+                'type' => 'ouvidoria',
+                'message' => "Nova manifestação: {$o->tipo}",
+                'protocolo' => $o->protocolo,
+                'link' => '/gestao-ouvidoria',
+                'created_at' => $o->created_at,
+            ]);
+
+        $pagamentos = PagamentoTransacao::where('status', 'pending')
+            ->with('mensalidade.aluno:id,nome')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(fn ($p) => [
+                'id' => 'pagamento_' . $p->id,
+                'type' => 'pagamento',
+                'message' => "Novo pagamento de {$p->mensalidade?->aluno?->nome}",
+                'link' => '/gestao-auditoria',
+                'created_at' => $p->created_at,
+            ]);
+
+        $notifications = $ouvidorias
+            ->concat($pagamentos)
+            ->sortByDesc('created_at')
+            ->values()
+            ->take(10);
+
+        return response()->json([
+            'total' => $notifications->count(),
+            'data' => $notifications,
+        ]);
+    }
+
+    public function markAsRead(): JsonResponse
+    {
+        return response()->json(['success' => true]);
+    }
+}
