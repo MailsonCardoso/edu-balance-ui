@@ -114,9 +114,9 @@ function PainelAssociado() {
     <div className="flex min-h-screen flex-col bg-gray-50/50">
       <AppHeader nome={associado.nome} onLogout={handleLogout} />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-28 pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-28 pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6 overflow-x-hidden">
         <div className="grid gap-6 lg:grid-cols-4">
-          <aside className="hidden lg:col-span-1">
+          <aside className="hidden lg:block lg:col-span-1">
             <nav className="sticky top-24 space-y-1 rounded-3xl border border-black/[0.04] bg-white p-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
               {menuItems.map((item) => {
                 const Icon = item.icon;

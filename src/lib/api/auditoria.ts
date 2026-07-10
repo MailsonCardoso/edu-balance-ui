@@ -47,3 +47,7 @@ export async function fetchAuditoria(filters: AuditoriaFilters): Promise<Auditor
   const { data } = await api.get(`/admin/auditoria/pagamentos?${params}`);
   return data;
 }
+
+export async function deleteAuditoria(id: number): Promise<void> {
+  await api.delete(`/admin/auditoria/pagamentos/${id}`);
+}

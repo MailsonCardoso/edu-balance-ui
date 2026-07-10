@@ -99,6 +99,7 @@ function GestaoInventario() {
   const [editTarget, setEditTarget] = useState<Patrimonio | null>(null);
 
   const [detailsTarget, setDetailsTarget] = useState<Patrimonio | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Patrimonio | null>(null);
   const [baixaTarget, setBaixaTarget] = useState<{ item?: Patrimonio; bulkIds?: Set<string> } | null>(null);
   const [baixaMotivo, setBaixaMotivo] = useState("");
 
@@ -205,6 +206,18 @@ function GestaoInventario() {
           ? (err as { response: { data: { message?: string } } }).response?.data?.message
           : null;
       toast.error(msg || "Erro ao salvar ativo");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deletePatrimonio(deleteTarget.id);
+      setData((d) => d.filter((a) => a.id !== deleteTarget.id));
+      toast.success("Ativo excluído permanentemente!");
+      setDeleteTarget(null);
+    } catch {
+      toast.error("Erro ao excluir ativo");
     }
   };
 
@@ -460,6 +473,13 @@ function GestaoInventario() {
                           >
                             <Printer className="size-4" />
                           </button>
+                          <button
+                            onClick={() => setDeleteTarget(item)}
+                            className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                            title="Excluir"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button className="p-1.5 rounded hover:bg-accent" title="Mais ações">
@@ -588,6 +608,24 @@ function GestaoInventario() {
           {detailsTarget && <InventarioDetails patrimonio={detailsTarget} onClose={() => setDetailsTarget(null)} />}
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir ativo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir <strong>{deleteTarget?.nome}</strong> ({deleteTarget?.tag})?
+              Esta ação remove o registro permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={!!baixaTarget} onOpenChange={(open) => { if (!open) { setBaixaTarget(null); setBaixaMotivo(""); } }}>
         <AlertDialogContent>
