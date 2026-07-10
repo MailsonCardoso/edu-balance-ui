@@ -10,25 +10,12 @@ import {
   Clock,
   Play,
   Send,
-  Trash2,
 } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/Primitives";
 import { OuvidoriaSheet } from "@/components/shared/OuvidoriaSheet";
 import {
   listarManifestacoes,
   atualizarStatus,
-  excluirManifestacao,
   type OuvidoriaListItem,
 } from "@/lib/api/ouvidoria";
 
@@ -75,7 +62,6 @@ function GestaoOuvidoria() {
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
   const [sheetItem, setSheetItem] = useState<OuvidoriaListItem | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<OuvidoriaListItem | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -97,16 +83,6 @@ function GestaoOuvidoria() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ouvidoria"] });
     },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => excluirManifestacao(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ouvidoria"] });
-      toast.success("Manifestação excluída com sucesso!");
-      setDeleteTarget(null);
-    },
-    onError: () => toast.error("Erro ao excluir manifestação"),
   });
 
   const filtered = manifestacoes.filter((item) => {
@@ -266,13 +242,6 @@ function GestaoOuvidoria() {
                                 <Send className="size-4" />
                               </button>
                             )}
-                            <button
-                              onClick={() => setDeleteTarget(item)}
-                              className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
-                              title="Excluir"
-                            >
-                              <Trash2 className="size-4" />
-                            </button>
                           </div>
                         </td>
                       </tr>
@@ -284,32 +253,6 @@ function GestaoOuvidoria() {
           )}
         </div>
       </div>
-
-      <AlertDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir manifestação</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir a manifestação <strong>{deleteTarget?.protocolo}</strong>?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteMutation.mutate(deleteTarget!.id)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Sim, excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <OuvidoriaSheet
         open={!!sheetItem}

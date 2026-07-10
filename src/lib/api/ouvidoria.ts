@@ -72,12 +72,4 @@ export async function atualizarStatus(
   return data;
 }
 
-export async function excluirManifestacao(
-  id: number
-): Promise<{ success: boolean; message: string }> {
-  const { data } = await api.post<{ success: boolean; message: string }>(
-    `/ouvidoria/${id}`,
-    { _method: "DELETE" }
-  );
-  return data;
-}
+
