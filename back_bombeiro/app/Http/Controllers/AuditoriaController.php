@@ -75,6 +75,16 @@ class AuditoriaController extends Controller
         return response()->json($pagamentos);
     }
 
+    public function destroy(PagamentoTransacao $pagamentoTransacao): JsonResponse
+    {
+        $pagamentoTransacao->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Transação excluída com sucesso.',
+        ]);
+    }
+
     private static function getNomeBanco(?string $issuerId): ?string
     {
         $bancos = [

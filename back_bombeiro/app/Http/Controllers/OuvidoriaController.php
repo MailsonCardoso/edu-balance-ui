@@ -83,6 +83,16 @@ class OuvidoriaController extends Controller
         ], 201);
     }
 
+    public function destroy(Ouvidoria $ouvidoria): JsonResponse
+    {
+        $ouvidoria->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Manifestação excluída com sucesso.',
+        ]);
+    }
+
     private function gerarProtocolo(): string
     {
         $ano = now()->format('Y');
