@@ -115,6 +115,21 @@ function Financeiro() {
     carregar();
   }, []);
 
+  useEffect(() => {
+    if (new Date().getDate() >= 25) {
+      gerarProximoMesFaltante(10)
+        .then(({ mesReferencia, criadas }) => {
+          if (criadas > 0) {
+            toast.success(
+              `${criadas} mensalidade(s) de ${mesReferencia} criada(s) automaticamente`,
+            );
+            carregar();
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
   const gerarEmMassa = async () => {
     setGerando(true);
     try {
