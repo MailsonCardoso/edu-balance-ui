@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   TrendingUp,
   Receipt,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -110,31 +111,68 @@ function PainelAssociado() {
 
   if (!associado) return null;
 
+  const iniciais = associado.nome
+    .split(" ")
+    .slice(0, 2)
+    .map((p) => p.charAt(0).toUpperCase())
+    .join("");
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50/50">
-      <AppHeader nome={associado.nome} onLogout={handleLogout} />
+      <div className="lg:hidden">
+        <AppHeader nome={associado.nome} onLogout={handleLogout} />
+      </div>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-28 pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6 overflow-x-hidden">
         <div className="grid gap-6 lg:grid-cols-4">
           <aside className="hidden lg:block lg:col-span-1">
-            <nav className="sticky top-24 space-y-1 rounded-3xl border border-black/[0.04] bg-white p-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = tab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setTab(item.id)}
-                    className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-all ${
-                      isActive ? "bg-brand text-white shadow-sm" : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Icon className="size-4 shrink-0" />
-                    <span className="flex-1 truncate">{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+            <div className="sticky top-24 space-y-4">
+              {/* User card */}
+              <div className="rounded-3xl border border-black/[0.04] bg-white p-5 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
+                <div className="flex items-center gap-4">
+                  <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand to-brand-dark text-xl font-bold text-white shadow-lg">
+                    {iniciais}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-sm font-bold text-gray-900">{associado.nome}</h3>
+                    <p className="truncate text-xs text-gray-400">{associado.email}</p>
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
+                      <span className="size-1.5 rounded-full bg-emerald-500" />
+                      {associado.status === "ativo" ? "Ativo" : associado.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <nav className="rounded-3xl border border-black/[0.04] bg-white p-2 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.12)]">
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = tab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setTab(item.id)}
+                      className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-all ${
+                        isActive ? "bg-brand text-white shadow-sm" : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Icon className="size-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              {/* Logout */}
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
+              >
+                <LogOut className="size-4" />
+                <span>Sair</span>
+              </button>
+            </div>
           </aside>
 
           <div className="min-w-0 lg:col-span-3">
