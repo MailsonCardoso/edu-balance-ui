@@ -2,7 +2,7 @@ import { Bell, LogOut, Menu, MessageCircle, Moon, Wallet, Sun } from "lucide-rea
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import { useNavigate, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import api from "@/lib/api";
 import {
@@ -30,6 +30,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { theme, toggle } = useTheme();
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
   const { data, isPending } = useQuery<NotificationsResponse>({
@@ -128,6 +129,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                   className="w-full text-xs"
                   onClick={async () => {
                     await api.put("/notifications/read");
+                    queryClient.invalidateQueries({ queryKey: ["notifications"] });
                   }}
                 >
                   Marcar todas como lidas

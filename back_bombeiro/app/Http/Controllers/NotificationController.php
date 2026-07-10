@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Ouvidoria;
 use App\Models\PagamentoTransacao;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
     public function index(): JsonResponse
     {
+        $user = Auth::user();
+        $since = $user->notifications_read_at ?? now()->subDay();
+
         $ouvidorias = Ouvidoria::where('status', 'pendente')
+            ->where('created_at', '>', $since)
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
@@ -24,6 +29,7 @@ class NotificationController extends Controller
             ]);
 
         $pagamentos = PagamentoTransacao::where('status', 'pending')
+            ->where('created_at', '>', $since)
             ->with('mensalidade.aluno:id,nome')
             ->orderBy('created_at', 'desc')
             ->limit(10)
@@ -50,6 +56,10 @@ class NotificationController extends Controller
 
     public function markAsRead(): JsonResponse
     {
+        $user = Auth::user();
+        $user->notifications_read_at = now();
+        $user->save();
+
         return response()->json(['success' => true]);
     }
 }
