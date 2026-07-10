@@ -55,6 +55,7 @@ import {
   updateMensalidade,
   deleteMensalidade,
   gerarProximoMesFaltante,
+  resetMensalidadesEmMassa,
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 
@@ -67,6 +68,13 @@ const formaPagamentoLabel: Record<string, string> = {
   debito: "Débito",
   credito: "Crédito",
 };
+
+function mesAlvo(): string {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const mm = String(next.getMonth() + 1).padStart(2, "0");
+  return `${mm}/${next.getFullYear()}`;
+}
 
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
@@ -93,6 +101,7 @@ function Financeiro() {
   const [pagamentoForma, setPagamentoForma] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState(false);
 
   const carregar = async () => {
     try {
@@ -130,21 +139,14 @@ function Financeiro() {
     }
   }, []);
 
-  const gerarEmMassa = async () => {
+  const confirmarReset = () => {
+    setResetConfirm(false);
     setGerando(true);
-    try {
-      const { mesReferencia, criadas } = await gerarProximoMesFaltante(10);
-      toast.success(
-        criadas > 0
-          ? `${criadas} mensalidade(s) de ${mesReferencia} criada(s)`
-          : `Mês ${mesReferencia} já está completo`,
-      );
-      await carregar();
-    } catch {
-      toast.error("Erro ao gerar mensalidades em massa");
-    } finally {
-      setGerando(false);
-    }
+    const mes = mesAlvo();
+    resetMensalidadesEmMassa(mes, 10, 70)
+      .then(() => carregar())
+      .catch(() => toast.error("Erro na operação em massa"))
+      .finally(() => setGerando(false));
   };
 
   const filtered = useMemo(
@@ -433,7 +435,11 @@ function Financeiro() {
         description="Mensalidades, pagamentos e histórico"
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={gerarEmMassa} disabled={gerando}>
+            <Button
+              variant="outline"
+              onClick={() => setResetConfirm(true)}
+              disabled={gerando}
+            >
               {gerando ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
@@ -753,6 +759,34 @@ function Financeiro() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={resetConfirm}
+        onOpenChange={(o) => {
+          if (!o) setResetConfirm(false);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset de mensalidades</AlertDialogTitle>
+            <AlertDialogDescription>
+              Isso <strong>apagará TODAS</strong> as mensalidades atuais, definirá o valor de
+              todos os alunos <strong>ativos</strong> como <strong>R$ 70,00</strong> e criará as
+              mensalidades de <strong>{mesAlvo()}</strong> (vencimento dia 10). O processo roda em
+              segundo plano e continua mesmo se você sair desta tela. Confirma?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmarReset}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sim, aplicar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
