@@ -20,23 +20,56 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/alunos", label: "Alunos", icon: Users },
-  { to: "/financeiro", label: "Mensalidades", icon: Wallet },
-  { to: "/financeiro/receita-despesa", label: "Receita/Despesa", icon: TrendingUp },
-  { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
-  { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
-  { to: "/perfil", label: "Perfil", icon: UserCircle },
-  { to: "/gestao-inventario", label: "Inventário", icon: Package },
-  { to: "/gestao-associados", label: "Associados", icon: Users },
-  { to: "/gestao-categorias", label: "Categorias", icon: Tags },
-  { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
-  { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
-  { to: "/gestao-documentos", label: "Documentos", icon: FileText },
-  { to: "/gestao-estatuto", label: "Estatuto", icon: ScrollText },
-  { to: "/gestao-auditoria", label: "Auditoria", icon: ShieldCheck },
-] as const;
+interface NavItem {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const sections: NavSection[] = [
+  {
+    title: "Gestão Financeira",
+    items: [
+      { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { to: "/financeiro", label: "Mensalidades", icon: Wallet },
+      { to: "/financeiro/receita-despesa", label: "Receita/Despesa", icon: TrendingUp },
+      { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
+      { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
+    ],
+  },
+  {
+    title: "Cadastros",
+    items: [
+      { to: "/alunos", label: "Alunos", icon: Users },
+      { to: "/gestao-associados", label: "Associados", icon: Users },
+      { to: "/gestao-categorias", label: "Categorias", icon: Tags },
+    ],
+  },
+  {
+    title: "Administração",
+    items: [
+      { to: "/gestao-inventario", label: "Inventário", icon: Package },
+      { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
+      { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
+      { to: "/gestao-documentos", label: "Documentos", icon: FileText },
+      { to: "/gestao-estatuto", label: "Estatuto", icon: ScrollText },
+      { to: "/gestao-auditoria", label: "Auditoria", icon: ShieldCheck },
+    ],
+  },
+  {
+    title: "Pessoal",
+    items: [
+      { to: "/perfil", label: "Perfil", icon: UserCircle },
+    ],
+  },
+];
+
+const allNav = sections.flatMap((s) => s.items);
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -67,29 +100,40 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         </button>
       </div>
 
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-        {nav.map((item) => {
-          const sorted = [...nav].sort((a, b) => b.to.length - a.to.length);
-          const best = sorted.find((i) => pathname === i.to || pathname.startsWith(i.to + "/"));
-          const active = best?.to === item.to;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors group",
-                active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-              )}
-              title={collapsed ? item.label : undefined}
-            >
-              <Icon className="size-[18px] shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
-          );
-        })}
+      <nav className="flex-1 px-2 py-4 overflow-y-auto">
+        {sections.map((section) => (
+          <div key={section.title} className="mb-4 last:mb-0">
+            {!collapsed && (
+              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                {section.title}
+              </div>
+            )}
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const sorted = [...allNav].sort((a, b) => b.to.length - a.to.length);
+                const best = sorted.find((i) => pathname === i.to || pathname.startsWith(i.to + "/"));
+                const active = best?.to === item.to;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors group",
+                      active
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                    )}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <Icon className="size-[18px] shrink-0" />
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className="p-2 border-t border-sidebar-border">

@@ -1,1 +1,0 @@
-import{J as t}from"./index-CP9aFKBR.js";async function c(){try{const{data:e}=await t.get("/expenses");return e}catch{return[]}}async function p(e){const{data:a}=await t.post("/expenses",e);return a}async function r(e,a){const{data:n}=await t.put(`/expenses/${e}`,a);return n}async function o(e){await t.delete(`/expenses/${e}`)}export{p as c,o as d,c as f,r as u};
