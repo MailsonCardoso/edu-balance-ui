@@ -54,6 +54,10 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <Menu className="size-5" />
       </button>
 
+      <span className="hidden md:block text-sm font-semibold text-foreground/80 truncate">
+        ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII - PARANÁ
+      </span>
+
       <div className="ml-auto flex items-center gap-1">
         <button
           onClick={toggle}
