@@ -1,7 +1,6 @@
 import api from "@/lib/api";
 import type { Mensalidade } from "@/lib/mock-data";
-import { fetchAlunos, updateAluno } from "@/lib/api/alunos";
-import { toast } from "sonner";
+import { fetchAlunos } from "@/lib/api/alunos";
 
 function toCamel(str: string): string {
   return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
@@ -132,82 +131,4 @@ export async function gerarProximoMesFaltante(
   }
   const ref = mesRefDe(cursor);
   return { mesReferencia: ref, criadas: 0 };
-}
-
-export async function limparMensalidades(): Promise<number> {
-  const mensalidades = await fetchMensalidades();
-  let removidas = 0;
-  for (const m of mensalidades) {
-    await deleteMensalidade(m.id);
-    removidas++;
-  }
-  return removidas;
-}
-
-export async function aplicarMensalidadeEmMassa(
-  mesReferencia: string,
-  diaVencimento = 10,
-  valor = 70,
-  atualizarValorAluno = true,
-): Promise<{ criadas: number; alunosAtualizados: number }> {
-  const [alunos, existentes] = await Promise.all([
-    fetchAlunos(),
-    fetchMensalidades(),
-  ]);
-
-  const ativos = alunos.filter((a) => a.status === "ativo");
-  const jaExistentes = new Set(
-    existentes
-      .filter((m) => m.mesReferencia === mesReferencia)
-      .map((m) => m.alunoId),
-  );
-
-  const [mes, ano] = mesReferencia.split("/");
-  const dataVencimento = `${ano}-${mes}-${String(diaVencimento).padStart(2, "0")}`;
-
-  let alunosAtualizados = 0;
-  if (atualizarValorAluno) {
-    for (const a of ativos) {
-      if (Number(a.valorMensalidade) === valor) continue;
-      await updateAluno(a.id, { valorMensalidade: valor });
-      alunosAtualizados++;
-    }
-  }
-
-  let criadas = 0;
-  for (const a of ativos) {
-    if (jaExistentes.has(a.id)) continue;
-    await createMensalidade({
-      alunoId: a.id,
-      mesReferencia,
-      valor,
-      dataVencimento,
-      status: "pendente",
-    });
-    criadas++;
-  }
-  return { criadas, alunosAtualizados };
-}
-
-export async function resetMensalidadesEmMassa(
-  mesReferencia: string,
-  diaVencimento = 10,
-  valor = 70,
-): Promise<void> {
-  const id = toast.loading("Limpando mensalidades existentes...");
-  const removidas = await limparMensalidades();
-  toast.loading(
-    `Aplicando R$ ${valor} e gerando mensalidades de ${mesReferencia}...`,
-    { id },
-  );
-  const { criadas, alunosAtualizados } = await aplicarMensalidadeEmMassa(
-    mesReferencia,
-    diaVencimento,
-    valor,
-    true,
-  );
-  toast.success(
-    `Concluído: ${removidas} removidas · ${alunosAtualizados} alunos em R$ ${valor} · ${criadas} mensalidades de ${mesReferencia} criadas.`,
-    { id },
-  );
 }
