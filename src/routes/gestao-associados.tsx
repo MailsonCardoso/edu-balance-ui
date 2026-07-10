@@ -101,72 +101,72 @@ function GestaoAssociados() {
               icon={<Users className="size-6" />}
             />
           ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Nome</th>
-                  <th className="px-4 py-3 font-medium">CPF</th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Telefone</th>
-                  <th className="px-4 py-3 font-medium">Aluno</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Cadastro</th>
-                  <th className="w-12 px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filtered.map((a) => (
-                  <tr
-                    key={a.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <td className="px-4 py-3 font-medium">{a.nome}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.email}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.telefone}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {a.alunos.length === 0 ? (
-                        "-"
-                      ) : a.alunos.length === 1 ? (
-                        a.alunos[0].nome
-                      ) : (
-                        <button
-                          onClick={() => setAlunosDialog(a)}
-                          className="text-primary underline-offset-2 hover:underline cursor-pointer"
-                        >
-                          {a.alunos.length} alunos
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                          a.status === "ativo"
-                            ? "bg-emerald-50 text-emerald-700"
-                            : a.status === "pendente"
-                              ? "bg-amber-50 text-amber-700"
-                              : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {a.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.created_at}</td>
-                    <td className="px-4 py-3">
-                      <button
-                        onClick={() => setDeleteTarget(a)}
-                        className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
-                        title="Excluir"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    </td>
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3 font-medium w-[180px]">Nome</th>
+                    <th className="px-4 py-3 font-medium w-[140px]">CPF</th>
+                    <th className="px-4 py-3 font-medium w-[200px]">Email</th>
+                    <th className="px-4 py-3 font-medium w-[130px]">Telefone</th>
+                    <th className="px-4 py-3 font-medium w-[100px]">Aluno</th>
+                    <th className="px-4 py-3 font-medium w-[90px]">Status</th>
+                    <th className="px-4 py-3 font-medium w-[100px]">Cadastro</th>
+                    <th className="w-12 px-4 py-3" />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filtered.map((a) => (
+                    <tr
+                      key={a.id}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="px-4 py-3 font-medium max-w-[180px] truncate" title={a.nome}>{a.nome}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap font-mono text-xs">
+                        {a.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate" title={a.email}>{a.email}</td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{a.telefone}</td>
+                      <td className="px-4 py-3 text-muted-foreground max-w-[100px] truncate">
+                        {a.alunos.length === 0 ? (
+                          "-"
+                        ) : a.alunos.length === 1 ? (
+                          <span title={a.alunos[0].nome} className="truncate block">{a.alunos[0].nome}</span>
+                        ) : (
+                          <button
+                            onClick={() => setAlunosDialog(a)}
+                            className="text-primary underline-offset-2 hover:underline cursor-pointer"
+                          >
+                            {a.alunos.length} alunos
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            a.status === "ativo"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : a.status === "pendente"
+                                ? "bg-amber-50 text-amber-700"
+                                : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {a.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{a.created_at}</td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => setDeleteTarget(a)}
+                          className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                          title="Excluir"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
           )}
         </div>
       </div>

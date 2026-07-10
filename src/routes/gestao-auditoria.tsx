@@ -1,11 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Search, FileDown, Loader2, Receipt, Smartphone, Ban, CheckCircle2, Clock, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search, FileDown, Loader2, Receipt, Smartphone, Ban, CheckCircle2, Clock, AlertCircle, ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { fetchAuditoria, type AuditoriaItem, type AuditoriaFilters } from "@/lib/api/auditoria";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { fetchAuditoria, deleteAuditoria, type AuditoriaItem, type AuditoriaFilters } from "@/lib/api/auditoria";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -50,10 +61,23 @@ function StatusIcon({ status }: { status: string }) {
 function GestaoAuditoria() {
   const [filters, setFilters] = useState<AuditoriaFilters>({ page: 1, per_page: 50, status: "approved" });
   const [searchInput, setSearchInput] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<AuditoriaItem | null>(null);
+
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["auditoria", filters],
     queryFn: () => fetchAuditoria(filters),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteAuditoria(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auditoria"] });
+      toast.success("Registro excluído com sucesso!");
+      setDeleteTarget(null);
+    },
+    onError: () => toast.error("Erro ao excluir registro"),
   });
 
   const setFilter = (key: keyof AuditoriaFilters, value: string) => {
@@ -212,6 +236,7 @@ function GestaoAuditoria() {
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">ID Pix</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Criação</th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">Aprovação</th>
+                    <th className="w-12 px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody>
@@ -252,6 +277,15 @@ function GestaoAuditoria() {
                         </td>
                         <td className="py-3 px-3 text-xs text-muted-foreground whitespace-nowrap">{formatDate(item.data_criacao)}</td>
                         <td className="py-3 px-3 text-xs text-muted-foreground whitespace-nowrap">{item.data_aprovacao ? formatDate(item.data_aprovacao) : "-"}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => setDeleteTarget(item)}
+                            className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
+                            title="Excluir"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -305,6 +339,31 @@ function GestaoAuditoria() {
           </>
         )}
       </div>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir registro</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o registro de <strong>{deleteTarget?.aluno_nome}</strong>?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteMutation.mutate(deleteTarget!.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
