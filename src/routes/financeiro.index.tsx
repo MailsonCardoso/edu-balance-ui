@@ -9,6 +9,7 @@ import {
   MoreVertical,
   Plus,
   Pencil,
+  CalendarClock,
   Printer,
   Search,
   Trash2,
@@ -53,6 +54,7 @@ import {
   createMensalidade,
   updateMensalidade,
   deleteMensalidade,
+  gerarMensalidadesDoMes,
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 
@@ -65,6 +67,13 @@ const formaPagamentoLabel: Record<string, string> = {
   debito: "Débito",
   credito: "Crédito",
 };
+
+function proximoMesRef(): string {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const mm = String(next.getMonth() + 1).padStart(2, "0");
+  return `${mm}/${next.getFullYear()}`;
+}
 
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
@@ -90,6 +99,7 @@ function Financeiro() {
   const [pagamentoId, setPagamentoId] = useState("");
   const [pagamentoForma, setPagamentoForma] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
+  const [gerando, setGerando] = useState(false);
 
   const carregar = async () => {
     try {
@@ -111,6 +121,40 @@ function Financeiro() {
   useEffect(() => {
     carregar();
   }, []);
+
+  useEffect(() => {
+    if (new Date().getDate() >= 25) {
+      const ref = proximoMesRef();
+      gerarMensalidadesDoMes(ref, 10)
+        .then((n) => {
+          if (n > 0) {
+            toast.success(
+              `${n} mensalidade(s) de ${ref} criada(s) automaticamente`,
+            );
+            carregar();
+          }
+        })
+        .catch(() => toast.error("Erro ao gerar mensalidades automáticas"));
+    }
+  }, []);
+
+  const gerarProximoMes = async () => {
+    const ref = proximoMesRef();
+    setGerando(true);
+    try {
+      const n = await gerarMensalidadesDoMes(ref, 10);
+      toast.success(
+        n > 0
+          ? `${n} mensalidade(s) de ${ref} criada(s)`
+          : `Mensalidades de ${ref} já existem`,
+      );
+      await carregar();
+    } catch {
+      toast.error("Erro ao gerar mensalidades");
+    } finally {
+      setGerando(false);
+    }
+  };
 
   const filtered = useMemo(
     () =>
@@ -397,9 +441,19 @@ function Financeiro() {
         title="Financeiro"
         description="Mensalidades, pagamentos e histórico"
         actions={
-          <Button onClick={() => abrirForm("create")}>
-            <Plus className="size-4" /> Nova mensalidade
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={gerarProximoMes} disabled={gerando}>
+              {gerando ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <CalendarClock className="size-4" />
+              )}
+              Gerar próximo mês
+            </Button>
+            <Button onClick={() => abrirForm("create")}>
+              <Plus className="size-4" /> Nova mensalidade
+            </Button>
+          </div>
         }
       />
 

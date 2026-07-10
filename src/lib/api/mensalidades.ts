@@ -1,5 +1,6 @@
 import api from "@/lib/api";
 import type { Mensalidade } from "@/lib/mock-data";
+import { fetchAlunos } from "@/lib/api/alunos";
 
 function toCamel(str: string): string {
   return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
@@ -76,4 +77,38 @@ export async function verificarVencidas(): Promise<number> {
 
 export async function deleteMensalidade(id: string): Promise<void> {
   await api.delete(`/mensalidades/${id}`);
+}
+
+export async function gerarMensalidadesDoMes(
+  mesReferencia: string,
+  diaVencimento = 10,
+): Promise<number> {
+  const [alunos, existentes] = await Promise.all([
+    fetchAlunos(),
+    fetchMensalidades(),
+  ]);
+
+  const jaExistentes = new Set(
+    existentes
+      .filter((m) => m.mesReferencia === mesReferencia)
+      .map((m) => m.alunoId),
+  );
+
+  const [mes, ano] = mesReferencia.split("/");
+  const dataVencimento = `${ano}-${mes}-${String(diaVencimento).padStart(2, "0")}`;
+
+  let criadas = 0;
+  for (const a of alunos) {
+    if (a.status !== "ativo") continue;
+    if (jaExistentes.has(a.id)) continue;
+    await createMensalidade({
+      alunoId: a.id,
+      mesReferencia,
+      valor: Number(a.valorMensalidade) || 0,
+      dataVencimento,
+      status: "pendente",
+    });
+    criadas++;
+  }
+  return criadas;
 }
