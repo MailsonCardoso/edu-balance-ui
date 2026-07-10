@@ -1,21 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trash2, Users, Loader2, Search, GraduationCap } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Users, Loader2, Search, GraduationCap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   fetchAssociados,
-  deleteAssociado,
   type AssociadoListItem,
 } from "@/lib/api/associado";
 
@@ -35,24 +22,11 @@ export const Route = createFileRoute("/gestao-associados")({
 
 function GestaoAssociados() {
   const [q, setQ] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<AssociadoListItem | null>(null);
   const [alunosDialog, setAlunosDialog] = useState<AssociadoListItem | null>(null);
-
-  const queryClient = useQueryClient();
 
   const { data: associados = [], isLoading } = useQuery({
     queryKey: ["associados"],
     queryFn: fetchAssociados,
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => deleteAssociado(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["associados"] });
-      toast.success("Associado excluído com sucesso!");
-      setDeleteTarget(null);
-    },
-    onError: () => toast.error("Erro ao excluir associado"),
   });
 
   const filtered = q
@@ -111,7 +85,6 @@ function GestaoAssociados() {
                     <th className="px-4 py-3 font-medium w-[100px]">Aluno</th>
                     <th className="px-4 py-3 font-medium w-[90px]">Status</th>
                     <th className="px-4 py-3 font-medium w-[100px]">Cadastro</th>
-                    <th className="w-12 px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -154,15 +127,6 @@ function GestaoAssociados() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{a.created_at}</td>
-                      <td className="px-4 py-3">
-                        <button
-                          onClick={() => setDeleteTarget(a)}
-                          className="p-1.5 rounded hover:bg-destructive/10 text-destructive"
-                          title="Excluir"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -170,32 +134,6 @@ function GestaoAssociados() {
           )}
         </div>
       </div>
-
-      <AlertDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDeleteTarget(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir associado</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir <strong>{deleteTarget?.nome}</strong>?
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteMutation.mutate(deleteTarget!.id)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Sim, excluir
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       <Dialog open={!!alunosDialog} onOpenChange={(open) => { if (!open) setAlunosDialog(null); }}>
         <DialogContent>
