@@ -33,14 +33,6 @@ interface NavSection {
 
 const sections: NavSection[] = [
   {
-    title: "Cadastros",
-    items: [
-      { to: "/alunos", label: "Alunos", icon: Users },
-      { to: "/gestao-associados", label: "Associados", icon: Users },
-      { to: "/gestao-categorias", label: "Categorias", icon: Tags },
-    ],
-  },
-  {
     title: "Gestão Financeira",
     items: [
       { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -48,6 +40,14 @@ const sections: NavSection[] = [
       { to: "/financeiro/receita-despesa", label: "Receita/Despesa", icon: TrendingUp },
       { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
       { to: "/relatorios", label: "Relatórios", icon: FileBarChart },
+    ],
+  },
+  {
+    title: "Cadastros",
+    items: [
+      { to: "/alunos", label: "Alunos", icon: Users },
+      { to: "/gestao-associados", label: "Associados", icon: Users },
+      { to: "/gestao-categorias", label: "Categorias", icon: Tags },
     ],
   },
   {
