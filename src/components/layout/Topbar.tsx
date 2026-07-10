@@ -1,8 +1,7 @@
-import { Bell, LogOut, Menu, Moon, Search, Sun } from "lucide-react";
+import { Bell, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
-import { Input } from "@/components/ui/input";
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { theme, toggle } = useTheme();
@@ -17,15 +16,6 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       >
         <Menu className="size-5" />
       </button>
-
-      <div className="relative flex-1 max-w-md">
-        <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
-        <Input
-          type="search"
-          placeholder="Buscar alunos, mensalidades..."
-          className="pl-9 h-10 bg-muted/50 border-transparent focus:bg-background"
-        />
-      </div>
 
       <div className="ml-auto flex items-center gap-1">
         <button
