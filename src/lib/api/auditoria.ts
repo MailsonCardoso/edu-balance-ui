@@ -49,5 +49,5 @@ export async function fetchAuditoria(filters: AuditoriaFilters): Promise<Auditor
 }
 
 export async function deleteAuditoria(id: number): Promise<void> {
-  await api.delete(`/admin/auditoria/pagamentos/${id}`);
+  await api.post(`/admin/auditoria/pagamentos/${id}`, { _method: "DELETE" });
 }

@@ -75,8 +75,9 @@ export async function atualizarStatus(
 export async function excluirManifestacao(
   id: number
 ): Promise<{ success: boolean; message: string }> {
-  const { data } = await api.delete<{ success: boolean; message: string }>(
-    `/ouvidoria/${id}`
+  const { data } = await api.post<{ success: boolean; message: string }>(
+    `/ouvidoria/${id}`,
+    { _method: "DELETE" }
   );
   return data;
 }
