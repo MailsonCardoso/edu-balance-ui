@@ -293,7 +293,7 @@ function AlunoDetalhe() {
                   }}
                 />
               ) : (
-                <p className="text-sm py-2.5">{aluno.cpf}</p>
+                <p className="text-sm py-2.5">{aluno.cpf ? maskCPF(aluno.cpf) : ""}</p>
               )}
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
@@ -327,7 +327,7 @@ function AlunoDetalhe() {
                   }}
                 />
               ) : (
-                <p className="text-sm py-2.5">{aluno.telefone}</p>
+                <p className="text-sm py-2.5">{aluno.telefone ? maskPhone(aluno.telefone) : ""}</p>
               )}
             </Field>
             <Field label="CEP" error={errors.cep?.message}>
@@ -438,7 +438,7 @@ function AlunoDetalhe() {
                   }}
                 />
               ) : (
-                <p className="text-sm py-2.5">{aluno.cpfResponsavel}</p>
+                <p className="text-sm py-2.5">{aluno.cpfResponsavel ? maskCPF(aluno.cpfResponsavel) : ""}</p>
               )}
             </Field>
             <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
@@ -454,7 +454,7 @@ function AlunoDetalhe() {
                   }}
                 />
               ) : (
-                <p className="text-sm py-2.5">{aluno.telefoneResponsavel}</p>
+                <p className="text-sm py-2.5">{aluno.telefoneResponsavel ? maskPhone(aluno.telefoneResponsavel) : ""}</p>
               )}
             </Field>
             <Field label="E-mail do responsável" error={errors.email?.message}>

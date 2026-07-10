@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { turmas } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { maskCPF, maskPhone, formatarCep, buscarCep } from "@/lib/format";
+import { maskCPF, maskDate, maskPhone, formatarCep, buscarCep } from "@/lib/format";
 import { CurrencyInput } from "@/components/shared/CurrencyInput";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
 
@@ -169,7 +169,16 @@ function NovoAluno() {
               />
             </Field>
             <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
-              <Input type="date" className="h-10" {...register("dataNascimento")} />
+              <Input
+                className="h-10"
+                placeholder="DD/MM/AAAA"
+                {...register("dataNascimento")}
+                onChange={(e) => {
+                  const masked = maskDate(e.target.value);
+                  e.target.value = masked;
+                  setValue("dataNascimento", masked, { shouldValidate: true });
+                }}
+              />
             </Field>
             <Field label="Telefone" error={errors.telefone?.message}>
               <Input

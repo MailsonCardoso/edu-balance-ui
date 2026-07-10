@@ -256,7 +256,7 @@ const handleCepBlur = async (value: string) => {
                     }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.cpf}</p>
+                  <p className={viewCls}>{current.cpf ? maskCPF(current.cpf) : ""}</p>
                 )}
               </Field>
               <Field label="Data de nascimento" error={errors.dataNascimento?.message}>
@@ -290,7 +290,7 @@ const handleCepBlur = async (value: string) => {
                     }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.telefone}</p>
+                  <p className={viewCls}>{current.telefone ? maskPhone(current.telefone) : ""}</p>
                 )}
               </Field>
               <Field label="CEP" error={errors.cep?.message}>
@@ -378,6 +378,7 @@ const handleCepBlur = async (value: string) => {
             </Field>
           </div>
         </section>
+        <section className="bg-muted/30 rounded-lg p-4 space-y-3">
             <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <span className="size-1.5 rounded-full bg-primary inline-block" />
               Responsável financeiro
@@ -411,7 +412,7 @@ const handleCepBlur = async (value: string) => {
                     }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.cpfResponsavel}</p>
+                  <p className={viewCls}>{current.cpfResponsavel ? maskCPF(current.cpfResponsavel) : ""}</p>
                 )}
               </Field>
               <Field label="Telefone do responsável" error={errors.telefoneResponsavel?.message}>
@@ -427,7 +428,7 @@ const handleCepBlur = async (value: string) => {
                     }}
                   />
                 ) : (
-                  <p className={viewCls}>{current.telefoneResponsavel}</p>
+                  <p className={viewCls}>{current.telefoneResponsavel ? maskPhone(current.telefoneResponsavel) : ""}</p>
                 )}
               </Field>
               <Field label="E-mail do responsável" error={errors.email?.message}>
