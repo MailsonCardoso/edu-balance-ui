@@ -112,3 +112,23 @@ export async function gerarMensalidadesDoMes(
   }
   return criadas;
 }
+
+function mesRefDe(data: Date): string {
+  const mm = String(data.getMonth() + 1).padStart(2, "0");
+  return `${mm}/${data.getFullYear()}`;
+}
+
+export async function gerarProximoMesFaltante(
+  diaVencimento = 10,
+  limite = 12,
+): Promise<{ mesReferencia: string; criadas: number }> {
+  let cursor = new Date();
+  for (let i = 0; i < limite; i++) {
+    const ref = mesRefDe(cursor);
+    const criadas = await gerarMensalidadesDoMes(ref, diaVencimento);
+    if (criadas > 0) return { mesReferencia: ref, criadas };
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+  }
+  const ref = mesRefDe(cursor);
+  return { mesReferencia: ref, criadas: 0 };
+}

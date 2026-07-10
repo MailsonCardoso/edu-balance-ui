@@ -54,7 +54,7 @@ import {
   createMensalidade,
   updateMensalidade,
   deleteMensalidade,
-  gerarMensalidadesDoMes,
+  gerarProximoMesFaltante,
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 
@@ -67,13 +67,6 @@ const formaPagamentoLabel: Record<string, string> = {
   debito: "Débito",
   credito: "Crédito",
 };
-
-function proximoMesRef(): string {
-  const now = new Date();
-  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  const mm = String(next.getMonth() + 1).padStart(2, "0");
-  return `${mm}/${next.getFullYear()}`;
-}
 
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
@@ -122,35 +115,18 @@ function Financeiro() {
     carregar();
   }, []);
 
-  useEffect(() => {
-    if (new Date().getDate() >= 25) {
-      const ref = proximoMesRef();
-      gerarMensalidadesDoMes(ref, 10)
-        .then((n) => {
-          if (n > 0) {
-            toast.success(
-              `${n} mensalidade(s) de ${ref} criada(s) automaticamente`,
-            );
-            carregar();
-          }
-        })
-        .catch(() => toast.error("Erro ao gerar mensalidades automáticas"));
-    }
-  }, []);
-
-  const gerarProximoMes = async () => {
-    const ref = proximoMesRef();
+  const gerarEmMassa = async () => {
     setGerando(true);
     try {
-      const n = await gerarMensalidadesDoMes(ref, 10);
+      const { mesReferencia, criadas } = await gerarProximoMesFaltante(10);
       toast.success(
-        n > 0
-          ? `${n} mensalidade(s) de ${ref} criada(s)`
-          : `Mensalidades de ${ref} já existem`,
+        criadas > 0
+          ? `${criadas} mensalidade(s) de ${mesReferencia} criada(s)`
+          : `Mês ${mesReferencia} já está completo`,
       );
       await carregar();
     } catch {
-      toast.error("Erro ao gerar mensalidades");
+      toast.error("Erro ao gerar mensalidades em massa");
     } finally {
       setGerando(false);
     }
@@ -442,13 +418,13 @@ function Financeiro() {
         description="Mensalidades, pagamentos e histórico"
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={gerarProximoMes} disabled={gerando}>
+            <Button variant="outline" onClick={gerarEmMassa} disabled={gerando}>
               {gerando ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <CalendarClock className="size-4" />
               )}
-              Gerar próximo mês
+              Gerar mensalidade em massa
             </Button>
             <Button onClick={() => abrirForm("create")}>
               <Plus className="size-4" /> Nova mensalidade
