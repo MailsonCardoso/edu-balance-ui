@@ -25,6 +25,12 @@ Route::post('/documentos/chunks', [App\Http\Controllers\DocumentoController::cla
 Route::get('/documentos', [App\Http\Controllers\DocumentoController::class, 'index']);
 Route::post('/associado', [App\Http\Controllers\AssociadoController::class, 'store']);
 Route::post('/associado/login', [App\Http\Controllers\AssociadoController::class, 'login']);
+Route::get('/associado/login', function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'Método não permitido. Use POST para realizar o login.',
+    ], 405);
+});
 Route::get('/associado', [App\Http\Controllers\AssociadoController::class, 'show']);
 Route::put('/associado', [App\Http\Controllers\AssociadoController::class, 'update']);
 Route::get('/associado/mensalidades', [App\Http\Controllers\AssociadoController::class, 'mensalidades']);

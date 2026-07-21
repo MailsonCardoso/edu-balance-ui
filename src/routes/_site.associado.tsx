@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   UserPlus,
   LogIn,
@@ -198,18 +198,17 @@ function AssociadoCadastro() {
 
 function AssociadoLogin() {
   const [loading, setLoading] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    if (loading) return;
     setLoading(true);
-
-    const form = e.currentTarget;
-    const data = new FormData(form);
 
     try {
       const res = await loginAssociado(
-        data.get("email") as string,
-        data.get("password") as string,
+        emailRef.current?.value ?? "",
+        passwordRef.current?.value ?? "",
       );
 
       if (res.success && res.token) {
@@ -218,44 +217,54 @@ function AssociadoLogin() {
         toast.success(res.message);
         window.location.href = "/associado/painel";
       }
-    } catch {
+    } catch (err) {
+      console.error("Erro no login do associado:", err);
       toast.error("E-mail ou senha inválidos.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
       <h2 className="text-lg font-semibold text-[#D62828] mb-6">Entrar</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700">Email ou CPF</label>
           <input
-            name="email"
+            ref={emailRef}
             type="text"
             required
+            onKeyDown={handleKeyDown}
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-gray-700">Senha</label>
           <input
-            name="password"
+            ref={passwordRef}
             type="password"
             required
+            onKeyDown={handleKeyDown}
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <button
-          type="submit"
+          type="button"
           disabled={loading}
+          onClick={handleLogin}
           className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors disabled:opacity-50"
         >
           {loading ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
           {loading ? "Entrando..." : "Entrar"}
         </button>
-      </form>
+      </div>
       <div className="mt-4 text-center">
         <a href="#" className="text-sm text-[#D62828] hover:underline">Esqueceu a senha? Recuperar acesso</a>
       </div>
