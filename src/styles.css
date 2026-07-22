@@ -166,6 +166,30 @@
     font-family: var(--font-sans);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  html:hover body {
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background: var(--color-border);
   }
 
   h1, h2, h3, h4, h5 {
