@@ -101,7 +101,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         </button>
       </div>
 
-      <ScrollArea className="flex-1 bg-sidebar" type="hover">
+      <ScrollArea className="flex-1 bg-sidebar" type="never">
         <nav className="px-2 py-4">
         {sections.map((section) => (
           <div key={section.title} className="mb-4 last:mb-0">
