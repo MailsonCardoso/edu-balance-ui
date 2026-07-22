@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   LayoutDashboard,
   Users,
@@ -100,7 +101,8 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
         </button>
       </div>
 
-      <nav className="flex-1 px-2 py-4 overflow-y-auto">
+      <ScrollArea className="flex-1">
+        <nav className="px-2 py-4">
         {sections.map((section) => (
           <div key={section.title} className="mb-4 last:mb-0">
             {!collapsed && (
@@ -135,6 +137,7 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
           </div>
         ))}
       </nav>
+    </ScrollArea>
 
       <div className="p-2 border-t border-sidebar-border">
         <Link
