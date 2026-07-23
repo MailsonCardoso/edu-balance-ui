@@ -9,6 +9,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
 import {
   cadastrarAssociado,
   loginAssociado,
@@ -219,7 +220,11 @@ function AssociadoLogin() {
       }
     } catch (err) {
       console.error("Erro no login do associado:", err);
-      toast.error("E-mail ou senha inválidos.");
+      const msg =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "E-mail ou senha inválidos.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -236,22 +241,24 @@ function AssociadoLogin() {
       <h2 className="text-lg font-semibold text-[#D62828] mb-6">Entrar</h2>
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Email ou CPF</label>
+          <label className="text-sm font-medium text-gray-700">Email</label>
           <input
             ref={emailRef}
-            type="text"
+            type="email"
             required
             onKeyDown={handleKeyDown}
+            placeholder="seu@email.com"
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Senha</label>
+          <label className="text-sm font-medium text-gray-700">Senha (CPF cadastrado)</label>
           <input
             ref={passwordRef}
             type="password"
             required
             onKeyDown={handleKeyDown}
+            placeholder="Seu CPF (apenas números)"
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
