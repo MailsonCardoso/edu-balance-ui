@@ -6,9 +6,16 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const url = config.url ?? "";
+  const method = config.method ?? "";
+  const isPublic =
+    url === "/associado/login" ||
+    (url === "/associado" && method === "post");
+  if (!isPublic) {
+    const token = localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   if (config.data instanceof FormData) {
     delete config.headers["Content-Type"];
