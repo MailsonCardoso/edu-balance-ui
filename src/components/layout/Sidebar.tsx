@@ -17,6 +17,7 @@ import {
   ScrollText,
   Package,
   TrendingUp,
+  TrendingDown,
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ const sections: NavSection[] = [
     items: [
       { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { to: "/financeiro", label: "Mensalidades", icon: Wallet },
+      { to: "/financeiro/fluxo-caixa", label: "Fluxo de Caixa", icon: TrendingDown },
       { to: "/financeiro/receita-despesa", label: "Receita/Despesa", icon: TrendingUp },
       { to: "/inadimplentes", label: "Inadimplentes", icon: AlertTriangle },
       { to: "/relatorios", label: "Relatórios", icon: FileBarChart },

@@ -11,6 +11,7 @@ use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatrimonioController;
 use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 // Rotas públicas
@@ -57,6 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('revenues', RevenueController::class);
     Route::apiResource('expenses', ExpenseController::class);
     Route::apiResource('patrimonios', PatrimonioController::class);
+    Route::get('transactions', [TransactionController::class, 'index']);
+    Route::post('transactions', [TransactionController::class, 'store']);
+    Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy']);
 
     Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
     Route::apiResource('categorias', App\Http\Controllers\CategoriaController::class)->except(['show']);

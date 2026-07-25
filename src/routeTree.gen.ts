@@ -30,6 +30,7 @@ import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
 import { Route as FinanceiroReceitasRouteImport } from './routes/financeiro.receitas'
 import { Route as FinanceiroReceitaDespesaRouteImport } from './routes/financeiro.receita-despesa'
+import { Route as FinanceiroFluxoCaixaRouteImport } from './routes/financeiro.fluxo-caixa'
 import { Route as FinanceiroDespesasRouteImport } from './routes/financeiro.despesas'
 import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
@@ -146,6 +147,11 @@ const FinanceiroReceitaDespesaRoute =
     path: '/receita-despesa',
     getParentRoute: () => FinanceiroRoute,
   } as any)
+const FinanceiroFluxoCaixaRoute = FinanceiroFluxoCaixaRouteImport.update({
+  id: '/fluxo-caixa',
+  path: '/fluxo-caixa',
+  getParentRoute: () => FinanceiroRoute,
+} as any)
 const FinanceiroDespesasRoute = FinanceiroDespesasRouteImport.update({
   id: '/despesas',
   path: '/despesas',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/alunos/': typeof AlunosIndexRoute
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/': typeof SiteIndexRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
   '/financeiro/despesas': typeof FinanceiroDespesasRoute
+  '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
   '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/_site/': typeof SiteIndexRoute
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/alunos/'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/alunos/novo'
     | '/associado/painel'
     | '/financeiro/despesas'
+    | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
     | '/financeiro/receitas'
     | '/_site/'
@@ -560,6 +572,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceiroReceitaDespesaRouteImport
       parentRoute: typeof FinanceiroRoute
     }
+    '/financeiro/fluxo-caixa': {
+      id: '/financeiro/fluxo-caixa'
+      path: '/fluxo-caixa'
+      fullPath: '/financeiro/fluxo-caixa'
+      preLoaderRoute: typeof FinanceiroFluxoCaixaRouteImport
+      parentRoute: typeof FinanceiroRoute
+    }
     '/financeiro/despesas': {
       id: '/financeiro/despesas'
       path: '/despesas'
@@ -672,6 +691,7 @@ const AlunosRouteWithChildren =
 
 interface FinanceiroRouteChildren {
   FinanceiroDespesasRoute: typeof FinanceiroDespesasRoute
+  FinanceiroFluxoCaixaRoute: typeof FinanceiroFluxoCaixaRoute
   FinanceiroReceitaDespesaRoute: typeof FinanceiroReceitaDespesaRoute
   FinanceiroReceitasRoute: typeof FinanceiroReceitasRoute
   FinanceiroIndexRoute: typeof FinanceiroIndexRoute
@@ -679,6 +699,7 @@ interface FinanceiroRouteChildren {
 
 const FinanceiroRouteChildren: FinanceiroRouteChildren = {
   FinanceiroDespesasRoute: FinanceiroDespesasRoute,
+  FinanceiroFluxoCaixaRoute: FinanceiroFluxoCaixaRoute,
   FinanceiroReceitaDespesaRoute: FinanceiroReceitaDespesaRoute,
   FinanceiroReceitasRoute: FinanceiroReceitasRoute,
   FinanceiroIndexRoute: FinanceiroIndexRoute,
