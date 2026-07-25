@@ -28,7 +28,7 @@ class NotificationController extends Controller
                 'created_at' => $o->created_at,
             ]);
 
-        $pagamentos = PagamentoTransacao::where('status', 'pending')
+        $pagamentos = PagamentoTransacao::where('status', 'approved')
             ->where('created_at', '>', $since)
             ->with('mensalidade.aluno:id,nome')
             ->orderBy('created_at', 'desc')

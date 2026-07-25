@@ -61,10 +61,6 @@ class PagamentoService
                 'notification_url' => $dto->notificationUrl,
             ]);
 
-            $mensalidade->update([
-                'origem' => PagamentoOrigem::MercadoPago->value,
-            ]);
-
             Log::info('Pagamento: Cobranca gerada (PIX)', [
                 'mensalidade_id' => $mensalidade->id,
                 'transacao_id' => $transacao->id,
@@ -132,6 +128,7 @@ class PagamentoService
                 if ($dto->status === MercadoPagoStatus::Approved->value) {
                     $dadosAtualizacao['data_pagamento'] = now();
                     $dadosAtualizacao['forma_pagamento'] = $this->mapearFormaPagamento($dto->paymentMethod);
+                    $dadosAtualizacao['origem'] = PagamentoOrigem::MercadoPago->value;
                 }
 
                 $transacao->mensalidade->update($dadosAtualizacao);
