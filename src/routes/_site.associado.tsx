@@ -209,7 +209,7 @@ function AssociadoLogin() {
     try {
       const res = await loginAssociado(
         emailRef.current?.value ?? "",
-        passwordRef.current?.value ?? "",
+        (passwordRef.current?.value ?? "").replace(/\D/g, ""),
       );
 
       if (res.success && res.token) {

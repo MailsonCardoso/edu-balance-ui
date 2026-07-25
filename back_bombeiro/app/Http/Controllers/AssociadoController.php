@@ -65,7 +65,35 @@ class AssociadoController extends Controller
 
         $associado = Associado::where('email', $request->email)->first();
 
-        if (!$associado || !Hash::check($request->password, $associado->password)) {
+        if (!$associado) {
+            return response()->json([
+                'success' => false,
+                'message' => 'E-mail ou senha inválidos.',
+            ], 401);
+        }
+
+        $password = $request->password;
+
+        // Tenta verificar com a senha fornecida
+        $match = Hash::check($password, $associado->password);
+
+        // Se não match, tenta limpar não-dígitos (CPF formatado)
+        if (!$match) {
+            $cleaned = preg_replace('/\D/', '', $password);
+            if ($cleaned !== $password) {
+                $match = Hash::check($cleaned, $associado->password);
+            }
+        }
+
+        // Fallback para senhas armazenadas como plain text (registros antigos)
+        if (!$match && !$this->isBcryptHash($associado->password)) {
+            $match = $password === $associado->password;
+            if ($match) {
+                $associado->forceFill(['password' => bcrypt($password)])->save();
+            }
+        }
+
+        if (!$match) {
             return response()->json([
                 'success' => false,
                 'message' => 'E-mail ou senha inválidos.',
@@ -244,6 +272,11 @@ class AssociadoController extends Controller
             'success' => true,
             'message' => 'Associado excluído com sucesso.',
         ]);
+    }
+
+    private function isBcryptHash(string $value): bool
+    {
+        return strlen($value) === 60 && str_starts_with($value, '$2y$');
     }
 
     private function buscarAlunoPorCpf(string $cpf): ?Aluno
