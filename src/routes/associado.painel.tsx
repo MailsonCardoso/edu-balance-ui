@@ -167,7 +167,7 @@ function PainelAssociado() {
               {/* Logout */}
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600"
+                className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
               >
                 <LogOut className="size-4" />
                 <span>Sair</span>

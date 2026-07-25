@@ -200,7 +200,7 @@ export function AppHeader({ nome, onLogout }: { nome: string; onLogout: () => vo
         <button
           onClick={onLogout}
           aria-label="Sair"
-          className="grid size-9 place-items-center rounded-xl text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 active:scale-95"
+          className="grid size-9 place-items-center rounded-xl text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 active:scale-95"
         >
           <LogOut className="size-5" />
         </button>
