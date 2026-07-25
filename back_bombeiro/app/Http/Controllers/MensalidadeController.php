@@ -62,6 +62,50 @@ class MensalidadeController extends Controller
         return $mensalidade;
     }
 
+    public function gerarProximoMes(Request $request): JsonResponse
+    {
+        $mes = $request->input('mes_referencia');
+        $diaVencimento = (int) $request->input('dia_vencimento', 10);
+
+        if (!$mes || !preg_match('/^\d{2}\/\d{4}$/', $mes)) {
+            return response()->json(['message' => 'Formato inválido. Use MM/YYYY.'], 422);
+        }
+
+        [$mm, $yyyy] = explode('/', $mes);
+        $vencimento = sprintf('%d-%02d-%02d', $yyyy, $mm, $diaVencimento);
+
+        $alunos = Aluno::where('status', 'ativo')
+            ->where('valor_mensalidade', '>', 0)
+            ->get();
+
+        $criadas = 0;
+
+        foreach ($alunos as $aluno) {
+            $jaExiste = Mensalidade::where('aluno_id', $aluno->id)
+                ->where('mes_referencia', $mes)
+                ->exists();
+
+            if ($jaExiste) {
+                continue;
+            }
+
+            Mensalidade::create([
+                'aluno_id' => $aluno->id,
+                'mes_referencia' => $mes,
+                'valor' => $aluno->valor_mensalidade,
+                'data_vencimento' => $vencimento,
+                'status' => 'pendente',
+            ]);
+
+            $criadas++;
+        }
+
+        return response()->json([
+            'mes_referencia' => $mes,
+            'criadas' => $criadas,
+        ]);
+    }
+
     public function verificarVencidas(): JsonResponse
     {
         $hoje = now()->format('Y-m-d');

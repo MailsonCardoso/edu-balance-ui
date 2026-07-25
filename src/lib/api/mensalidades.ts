@@ -84,34 +84,11 @@ export async function gerarMensalidadesDoMes(
   mesReferencia: string,
   diaVencimento = 10,
 ): Promise<number> {
-  const [alunos, existentes] = await Promise.all([
-    fetchAlunos(),
-    fetchMensalidades(),
-  ]);
-
-  const jaExistentes = new Set(
-    existentes
-      .filter((m) => m.mesReferencia === mesReferencia)
-      .map((m) => m.alunoId),
-  );
-
-  const [mes, ano] = mesReferencia.split("/");
-  const dataVencimento = `${ano}-${mes}-${String(diaVencimento).padStart(2, "0")}`;
-
-  let criadas = 0;
-  for (const a of alunos) {
-    if (a.status !== "ativo") continue;
-    if (jaExistentes.has(a.id)) continue;
-    await createMensalidade({
-      alunoId: a.id,
-      mesReferencia,
-      valor: Number(a.valorMensalidade) || 0,
-      dataVencimento,
-      status: "pendente",
-    });
-    criadas++;
-  }
-  return criadas;
+  const { data } = await api.post("/mensalidades/gerar-proximo-mes", {
+    mes_referencia: mesReferencia,
+    dia_vencimento: diaVencimento,
+  });
+  return data.criadas;
 }
 
 function mesRefDe(data: Date): string {
