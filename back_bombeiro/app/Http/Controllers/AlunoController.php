@@ -11,11 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class AlunoController extends Controller
 {
-    private array $meses = [
-        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Marco', 4 => 'Abril',
-        5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
-        9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro',
-    ];
 
     public function checkCpf(string $cpf, Request $request): JsonResponse
     {
@@ -75,11 +70,9 @@ class AlunoController extends Controller
     private function criarMensalidadeInicial(Aluno $aluno): void
     {
         $agora = now();
-        $mesNum = (int) $agora->format('n');
-        $ano = $agora->year;
         $dia = $aluno->dia_vencimento ?? 10;
 
-        $mesRef = $this->meses[$mesNum] . '/' . $ano;
+        $mesRef = $agora->format('m/Y');
 
         $jaExiste = Mensalidade::where('aluno_id', $aluno->id)
             ->where('mes_referencia', $mesRef)
@@ -93,7 +86,7 @@ class AlunoController extends Controller
             'aluno_id' => $aluno->id,
             'mes_referencia' => $mesRef,
             'valor' => $aluno->valor_mensalidade,
-            'data_vencimento' => sprintf('%d-%02d-%02d', $ano, $mesNum, $dia),
+            'data_vencimento' => $agora->format('Y-m') . sprintf('-%02d', $dia),
             'status' => 'pendente',
         ]);
 

@@ -18,7 +18,7 @@ class MensalidadeController extends Controller
     {
         $validated = $request->validate([
             'aluno_id' => 'required|exists:alunos,id',
-            'mes_referencia' => 'required|string|max:20',
+            'mes_referencia' => 'required|string|max:7',
             'valor' => 'required|numeric|min:0',
             'data_vencimento' => 'required|date',
             'data_pagamento' => 'nullable|date',
@@ -26,6 +26,16 @@ class MensalidadeController extends Controller
             'forma_pagamento' => 'nullable|in:pix,debito,credito',
             'origem' => 'nullable|in:mercadopago,caixa,admin,pix_manual,dinheiro,transferencia',
         ]);
+
+        $jaExiste = Mensalidade::where('aluno_id', $validated['aluno_id'])
+            ->where('mes_referencia', $validated['mes_referencia'])
+            ->exists();
+
+        if ($jaExiste) {
+            return response()->json([
+                'message' => 'Já existe uma mensalidade para este aluno no período informado.',
+            ], 409);
+        }
 
         return Mensalidade::create($validated);
     }

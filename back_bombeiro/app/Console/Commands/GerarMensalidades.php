@@ -13,22 +13,13 @@ class GerarMensalidades extends Command
     protected $signature = 'mensalidades:gerar-proximo-mes';
     protected $description = 'Gera mensalidades do proximo mes para todos os alunos ativos';
 
-    private array $meses = [
-        1 => 'Janeiro', 2 => 'Fevereiro', 3 => 'Marco', 4 => 'Abril',
-        5 => 'Maio', 6 => 'Junho', 7 => 'Julho', 8 => 'Agosto',
-        9 => 'Setembro', 10 => 'Outubro', 11 => 'Novembro', 12 => 'Dezembro',
-    ];
-
     public function handle(): int
     {
         $proximoMes = Carbon::now()->addMonth();
-        $ano = $proximoMes->year;
-        $mesNum = $proximoMes->month;
-
-        $mesRef = $this->meses[$mesNum] . '/' . $ano;
+        $mesRef = $proximoMes->format('m/Y');
         $diaVencimento = 10;
 
-        $vencimento = sprintf('%d-%02d-%02d', $ano, $mesNum, $diaVencimento);
+        $vencimento = $proximoMes->format('Y-m') . sprintf('-%02d', $diaVencimento);
 
         $alunos = Aluno::where('status', 'ativo')
             ->where('valor_mensalidade', '>', 0)
