@@ -23,7 +23,6 @@ class AssociadoController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
         $validated['status'] = 'ativo';
 
         $aluno = $this->buscarAlunoPorCpf($validated['cpf']);
