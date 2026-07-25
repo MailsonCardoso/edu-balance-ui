@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('transactions', [TransactionController::class, 'index']);
     Route::post('transactions', [TransactionController::class, 'store']);
     Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy']);
+    Route::post('transactions/close-month', [TransactionController::class, 'closeMonth']);
 
     Route::apiResource('noticias', App\Http\Controllers\NoticiaController::class);
     Route::apiResource('categorias', App\Http\Controllers\CategoriaController::class)->except(['show']);

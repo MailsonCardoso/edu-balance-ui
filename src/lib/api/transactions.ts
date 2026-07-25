@@ -14,6 +14,8 @@ export interface Transaction {
 export interface TransactionsResponse {
   previous_balance: number;
   transactions: Transaction[];
+  is_closed: boolean;
+  closing_balance: number | null;
 }
 
 export async function fetchTransactions(
@@ -33,4 +35,12 @@ export async function createTransaction(
 
 export async function deleteTransaction(id: number): Promise<void> {
   await api.delete(`/transactions/${id}`);
+}
+
+export async function closeMonth(
+  month: number,
+  year: number,
+): Promise<{ message: string; closing_balance: number }> {
+  const { data } = await api.post("/transactions/close-month", { month, year });
+  return data;
 }

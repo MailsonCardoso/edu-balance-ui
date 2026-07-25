@@ -12,6 +12,8 @@ import {
   TrendingDown,
   TrendingUp,
   PiggyBank,
+  Lock,
+  LockKeyhole,
 } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
@@ -46,6 +48,7 @@ import {
   fetchTransactions,
   createTransaction,
   deleteTransaction,
+  closeMonth as apiCloseMonth,
   type Transaction,
   type TransactionsResponse,
 } from "@/lib/api/transactions";
@@ -120,7 +123,9 @@ function FluxoCaixaPage() {
     return { entradas, saidas };
   }, [data]);
 
-  const saldoAtual = (data?.previous_balance ?? 0) + totais.entradas - totais.saidas;
+  const saldoAtual = data?.is_closed && data?.closing_balance != null
+    ? data.closing_balance
+    : (data?.previous_balance ?? 0) + totais.entradas - totais.saidas;
 
   const anos = useMemo(() => {
     const atual = hoje.getFullYear();
@@ -152,6 +157,21 @@ function FluxoCaixaPage() {
     }
   };
 
+  const [finalizando, setFinalizando] = useState(false);
+
+  const finalizarMes = async () => {
+    setFinalizando(true);
+    try {
+      const res = await apiCloseMonth(Number(mes), Number(ano));
+      toast.success(`Mês finalizado! Saldo: ${brl(res.closing_balance)}`);
+      carregar(mes, ano);
+    } catch {
+      toast.error("Erro ao finalizar mês");
+    } finally {
+      setFinalizando(false);
+    }
+  };
+
   const confirmarExclusao = async () => {
     if (!deleteTarget) return;
     try {
@@ -170,9 +190,30 @@ function FluxoCaixaPage() {
         title="Fluxo de Caixa"
         description="Extrato mensal consolidado de entradas e saídas"
         actions={
-          <Button onClick={abrirForm}>
-            <Plus className="size-4" /> Nova transação
-          </Button>
+          <div className="flex items-center gap-2">
+            {data?.is_closed ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-info/10 text-info border border-info/20">
+                <LockKeyhole className="size-3.5" />
+                Mês Finalizado
+              </span>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={finalizarMes}
+                disabled={finalizando || loading}
+              >
+                {finalizando ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Lock className="size-4" />
+                )}
+                Finalizar Mês
+              </Button>
+            )}
+            <Button onClick={abrirForm} disabled={data?.is_closed}>
+              <Plus className="size-4" /> Nova transação
+            </Button>
+          </div>
         }
       />
 
@@ -279,7 +320,7 @@ function FluxoCaixaPage() {
                       <th className="px-4 py-3 font-medium">Categoria</th>
                       <th className="px-4 py-3 font-medium">Tipo</th>
                       <th className="px-4 py-3 font-medium text-right">Valor</th>
-                      <th className="px-4 py-3 w-12"></th>
+                      {!data?.is_closed && <th className="px-4 py-3 w-12"></th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -321,13 +362,15 @@ function FluxoCaixaPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => setDeleteTarget(t)}
-                            className="p-1.5 rounded hover:bg-accent text-destructive"
-                            title="Excluir"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
+                          {!data?.is_closed && (
+                            <button
+                              onClick={() => setDeleteTarget(t)}
+                              className="p-1.5 rounded hover:bg-accent text-destructive"
+                              title="Excluir"
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
