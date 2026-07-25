@@ -80,7 +80,7 @@ function Dashboard() {
 
   const stats = useMemo(() => {
     const ativos = alunos.filter((a) => a.status === "ativo");
-    const inadimplentes = alunos.filter((a) => a.situacao === "inadimplente");
+    const inadimplentes = alunos.filter((a) => a.situacao === "inadimplente" || a.situacao === "em_atraso");
 
     const ticketMedio = ativos.length > 0
       ? mensalidades.filter((m) => m.status !== "pago").reduce((s, m) => s + m.valor, 0) / ativos.length
