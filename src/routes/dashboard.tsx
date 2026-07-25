@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Wallet, CalendarClock, Users, UserX, TrendingUp, Percent } from "lucide-react";
+import { Loader2, Wallet, CalendarClock, Users, UserX, TrendingUp, Percent, TrendingDown } from "lucide-react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -16,9 +16,10 @@ import {
   Legend,
 } from "recharts";
 import { PageHeader, StatCard } from "@/components/shared/Primitives";
-import { brl, fmtDate } from "@/lib/format";
+import { brl } from "@/lib/format";
 import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades } from "@/lib/api/mensalidades";
+import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 import type { Mensalidade } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/dashboard")({
@@ -66,12 +67,13 @@ function mesAno(d: Date): string {
 
 function Dashboard() {
   const [loading, setLoading] = useState(true);
+  const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [alunos, setAlunos] = useState<Awaited<ReturnType<typeof fetchAlunos>>>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
 
   useEffect(() => {
-    Promise.all([fetchAlunos(), fetchMensalidades()])
-      .then(([a, m]) => { setAlunos(a); setMensalidades(m); })
+    Promise.all([fetchAlunos(), fetchMensalidades(), fetchDashboardFinanceiro()])
+      .then(([a, m, d]) => { setAlunos(a); setMensalidades(m); setDashboard(d); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -79,29 +81,6 @@ function Dashboard() {
   const stats = useMemo(() => {
     const ativos = alunos.filter((a) => a.status === "ativo");
     const inadimplentes = alunos.filter((a) => a.situacao === "inadimplente");
-    const agora = new Date();
-    const mesCorrente = agora.getMonth();
-    const anoCorrente = agora.getFullYear();
-
-    const recebidoMes = mensalidades
-      .filter((m) => {
-        if (m.status !== "pago" || !m.dataPagamento) return false;
-        const d = parseDataBr(m.dataPagamento);
-        return d.getMonth() === mesCorrente && d.getFullYear() === anoCorrente;
-      })
-      .reduce((s, m) => s + m.valor, 0);
-
-    const aberto = mensalidades
-      .filter((m) => m.status === "pendente")
-      .reduce((s, m) => s + m.valor, 0);
-
-    const vencido = mensalidades
-      .filter((m) => m.status === "atrasado")
-      .reduce((s, m) => s + m.valor, 0);
-
-    const totalMensalidadesAtivas = mensalidades
-      .filter((m) => m.status !== "pago")
-      .reduce((s, m) => s + m.valor, 0);
 
     const ticketMedio = ativos.length > 0
       ? mensalidades.filter((m) => m.status !== "pago").reduce((s, m) => s + m.valor, 0) / ativos.length
@@ -112,9 +91,6 @@ function Dashboard() {
       : 0;
 
     return {
-      totalRecebido: recebidoMes,
-      totalAberto: aberto,
-      totalVencido: vencido,
       alunosAtivos: ativos.length,
       alunosInadimplentes: inadimplentes.length,
       ticketMedio,
@@ -125,7 +101,6 @@ function Dashboard() {
   const chartData = useMemo(() => {
     const meses: Record<string, number> = {};
     const anos: Record<string, number> = {};
-    const inadimplenciaPorMes: Record<string, { total: number; atrasados: number }> = {};
 
     for (const m of mensalidades) {
       if (m.status === "pago" && m.dataPagamento) {
@@ -134,16 +109,6 @@ function Dashboard() {
         meses[label] = (meses[label] || 0) + m.valor;
         const anoLabel = String(d.getFullYear());
         anos[anoLabel] = (anos[anoLabel] || 0) + m.valor;
-      }
-
-      const venc = parseDataBr(m.dataVencimento);
-      const vencLabel = mesAno(venc);
-      if (!inadimplenciaPorMes[vencLabel]) {
-        inadimplenciaPorMes[vencLabel] = { total: 0, atrasados: 0 };
-      }
-      inadimplenciaPorMes[vencLabel].total += m.valor;
-      if (m.status === "atrasado") {
-        inadimplenciaPorMes[vencLabel].atrasados += m.valor;
       }
     }
 
@@ -155,14 +120,7 @@ function Dashboard() {
       .map(([ano, receita]) => ({ ano, receita }))
       .sort((a, b) => a.ano.localeCompare(b.ano));
 
-    const inadimplencia = Object.entries(inadimplenciaPorMes)
-      .map(([mes, v]) => ({
-        mes,
-        percentual: v.total > 0 ? Math.round((v.atrasados / v.total) * 100) : 0,
-      }))
-      .sort((a, b) => a.mes.localeCompare(b.mes));
-
-    return { receitaMensal, receitaAnual, inadimplencia };
+    return { receitaMensal, receitaAnual };
   }, [mensalidades]);
 
   const pagamentosDiarios = useMemo(() => {
@@ -186,6 +144,16 @@ function Dashboard() {
     return Object.entries(dias).map(([dia, v]) => ({ dia, ...v }));
   }, [mensalidades]);
 
+  const chartConsolidado = useMemo(() => {
+    return (
+      dashboard?.receitas_mensais.map((r) => ({
+        mes: r.mes,
+        receita: r.receita,
+        despesa: r.despesa,
+      })) ?? []
+    );
+  }, [dashboard]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -201,24 +169,24 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <StatCard
           label="Recebido no mês"
-          value={brl(stats.totalRecebido)}
+          value={brl(dashboard?.receita_mes ?? 0)}
           icon={<Wallet className="size-5" />}
           tone="success"
-          trend={stats.totalRecebido > 0 ? `${brl(stats.totalRecebido)} recebidos` : "Nenhum registro"}
+          trend="Mensalidades + Receitas"
         />
         <StatCard
-          label="Em aberto"
-          value={brl(stats.totalAberto)}
-          icon={<CalendarClock className="size-5" />}
-          tone="warning"
-          trend={stats.totalAberto > 0 ? `${brl(stats.totalAberto)} a receber` : "Nenhum registro"}
-        />
-        <StatCard
-          label="Vencido"
-          value={brl(stats.totalVencido)}
-          icon={<Wallet className="size-5" />}
+          label="Despesas no mês"
+          value={brl(dashboard?.despesa_mes ?? 0)}
+          icon={<TrendingDown className="size-5" />}
           tone="destructive"
-          trend={stats.totalVencido > 0 ? `${brl(stats.totalVencido)} vencidos` : "Nenhum registro"}
+          trend="Contas pagas"
+        />
+        <StatCard
+          label="Saldo do mês"
+          value={brl(dashboard?.saldo_mes ?? 0)}
+          icon={<Wallet className="size-5" />}
+          tone={((dashboard?.saldo_mes ?? 0) >= 0) ? "success" : "destructive"}
+          trend={((dashboard?.saldo_mes ?? 0) >= 0) ? "Positivo" : "Negativo"}
         />
         <StatCard
           label="Alunos ativos"
@@ -229,7 +197,21 @@ function Dashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          label="A receber"
+          value={brl(dashboard?.receita_prevista ?? 0)}
+          icon={<CalendarClock className="size-5" />}
+          tone="warning"
+          trend="Mensalidades + Receitas pendentes"
+        />
+        <StatCard
+          label="A pagar"
+          value={brl(dashboard?.despesa_pendente ?? 0)}
+          icon={<CalendarClock className="size-5" />}
+          tone="warning"
+          trend="Despesas pendentes"
+        />
         <StatCard
           label="Inadimplentes"
           value={stats.alunosInadimplentes}
@@ -244,23 +226,20 @@ function Dashboard() {
           tone={stats.taxaAdimplencia >= 70 ? "success" : stats.taxaAdimplencia >= 40 ? "warning" : "destructive"}
           trend={stats.taxaAdimplencia >= 70 ? "Boa" : stats.taxaAdimplencia >= 40 ? "Regular" : "Baixa"}
         />
-        <StatCard
-          label="Ticket médio"
-          value={brl(stats.ticketMedio)}
-          icon={<TrendingUp className="size-5" />}
-          tone="default"
-          trend="Valor médio por aluno ativo"
-        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <ChartCard title="Receita mensal" subtitle="Valores recebidos por mês" index={0}>
+        <ChartCard title="Receita vs Despesa" subtitle="Últimos 6 meses" index={0}>
           <ResponsiveContainer width="100%" height={256}>
-            <AreaChart data={chartData.receitaMensal}>
+            <AreaChart data={chartConsolidado.length > 0 ? chartConsolidado : chartData.receitaMensal}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
                   <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--destructive)" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="var(--destructive)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -270,7 +249,9 @@ function Dashboard() {
                 contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
                 formatter={(v) => brl(Number(v))}
               />
-              <Area type="monotone" dataKey="receita" stroke="var(--primary)" fill="url(#grad1)" strokeWidth={2} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Area type="monotone" dataKey="receita" stroke="var(--primary)" fill="url(#grad1)" strokeWidth={2} name="Receita" />
+              <Area type="monotone" dataKey="despesa" stroke="var(--destructive)" fill="url(#grad2)" strokeWidth={2} name="Despesa" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -292,19 +273,14 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ChartCard title="Inadimplência por período" subtitle="Percentual do valor em atraso" index={2}>
-          <ResponsiveContainer width="100%" height={256}>
-            <LineChart data={chartData.inadimplencia}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="mes" tick={axisStyle} stroke="var(--border)" />
-              <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v}%`} />
-              <Tooltip
-                contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
-                formatter={(v) => `${v}%`}
-              />
-              <Line type="monotone" dataKey="percentual" stroke="var(--destructive)" strokeWidth={2} dot={{ r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
+        <ChartCard title="Ticket médio" subtitle="Valor médio por aluno ativo" index={2}>
+          <StatCard
+            label="Ticket médio"
+            value={brl(stats.ticketMedio)}
+            icon={<TrendingUp className="size-5" />}
+            tone="default"
+            trend="Valor médio por aluno ativo"
+          />
         </ChartCard>
 
         <ChartCard title="Evolução de pagamentos" subtitle="Pagos vs pendentes no mês" index={3}>

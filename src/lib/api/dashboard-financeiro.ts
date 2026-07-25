@@ -8,11 +8,14 @@ export interface DashboardFinanceiro {
   qtd_pendentes: number;
   qtd_vencidas: number;
   receita_mes: number;
+  despesa_mes: number;
+  saldo_mes: number;
   receita_prevista: number;
+  despesa_pendente: number;
   alunos_ativos: number;
   alunos_inadimplentes: number;
   perc_inadimplencia: number;
-  receitas_mensais: { mes: string; receita: number }[];
+  receitas_mensais: { mes: string; receita: number; despesa: number }[];
 }
 
 export async function fetchDashboardFinanceiro(): Promise<DashboardFinanceiro> {

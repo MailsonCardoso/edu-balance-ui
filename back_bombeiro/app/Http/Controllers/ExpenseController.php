@@ -3,10 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
+    private function syncTransaction(Expense $expense): void
+    {
+        if ($expense->status === 'pago') {
+            Transaction::updateOrCreate(
+                [
+                    'source_type' => 'expense',
+                    'source_id' => $expense->id,
+                ],
+                [
+                    'description' => $expense->descricao,
+                    'amount' => $expense->valor,
+                    'type' => 'saida',
+                    'category_name' => $expense->category?->nome ?? 'Despesas',
+                    'date' => $expense->data_pagamento ?? $expense->data_vencimento,
+                ]
+            );
+        } else {
+            Transaction::where('source_type', 'expense')
+                ->where('source_id', $expense->id)
+                ->delete();
+        }
+    }
+
     public function index()
     {
         return Expense::with('category')->orderBy('created_at', 'desc')->get();
@@ -24,7 +48,10 @@ class ExpenseController extends Controller
             'observacao' => 'nullable|string|max:500',
         ]);
 
-        return Expense::create($validated)->load('category');
+        $expense = Expense::create($validated);
+        $this->syncTransaction($expense);
+
+        return $expense->load('category');
     }
 
     public function show(Expense $expense)
@@ -45,11 +72,16 @@ class ExpenseController extends Controller
         ]);
 
         $expense->update($validated);
+        $this->syncTransaction($expense->fresh());
+
         return $expense->load('category');
     }
 
     public function destroy(Expense $expense)
     {
+        Transaction::where('source_type', 'expense')
+            ->where('source_id', $expense->id)
+            ->delete();
         $expense->delete();
         return response()->noContent();
     }

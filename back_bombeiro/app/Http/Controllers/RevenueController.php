@@ -3,10 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Revenue;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class RevenueController extends Controller
 {
+    private function syncTransaction(Revenue $revenue): void
+    {
+        if ($revenue->status === 'recebido') {
+            Transaction::updateOrCreate(
+                [
+                    'source_type' => 'revenue',
+                    'source_id' => $revenue->id,
+                ],
+                [
+                    'description' => $revenue->descricao,
+                    'amount' => $revenue->valor,
+                    'type' => 'entrada',
+                    'category_name' => $revenue->category?->nome ?? 'Receitas',
+                    'date' => $revenue->data_recebimento ?? $revenue->data,
+                ]
+            );
+        } else {
+            Transaction::where('source_type', 'revenue')
+                ->where('source_id', $revenue->id)
+                ->delete();
+        }
+    }
+
     public function index()
     {
         return Revenue::with('category')->orderBy('created_at', 'desc')->get();
@@ -24,7 +48,10 @@ class RevenueController extends Controller
             'observacao' => 'nullable|string|max:500',
         ]);
 
-        return Revenue::create($validated)->load('category');
+        $revenue = Revenue::create($validated);
+        $this->syncTransaction($revenue);
+
+        return $revenue->load('category');
     }
 
     public function show(Revenue $revenue)
@@ -45,11 +72,16 @@ class RevenueController extends Controller
         ]);
 
         $revenue->update($validated);
+        $this->syncTransaction($revenue->fresh());
+
         return $revenue->load('category');
     }
 
     public function destroy(Revenue $revenue)
     {
+        Transaction::where('source_type', 'revenue')
+            ->where('source_id', $revenue->id)
+            ->delete();
         $revenue->delete();
         return response()->noContent();
     }

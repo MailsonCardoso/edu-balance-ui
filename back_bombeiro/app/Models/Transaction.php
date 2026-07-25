@@ -8,6 +8,7 @@ class Transaction extends Model
 {
     protected $fillable = [
         'description', 'amount', 'type', 'category_name', 'date',
+        'source_type', 'source_id',
     ];
 
     protected function casts(): array
