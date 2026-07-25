@@ -124,6 +124,7 @@ export async function gerarProximoMesFaltante(
   limite = 12,
 ): Promise<{ mesReferencia: string; criadas: number }> {
   let cursor = new Date();
+  cursor.setMonth(cursor.getMonth() + 1);
   for (let i = 0; i < limite; i++) {
     const ref = mesRefDe(cursor);
     const criadas = await gerarMensalidadesDoMes(ref, diaVencimento);
