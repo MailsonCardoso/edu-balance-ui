@@ -28,10 +28,8 @@ import { Route as SiteRouteImport } from './routes/_site'
 import { Route as FinanceiroIndexRouteImport } from './routes/financeiro.index'
 import { Route as AlunosIndexRouteImport } from './routes/alunos.index'
 import { Route as SiteIndexRouteImport } from './routes/_site.index'
-import { Route as FinanceiroReceitasRouteImport } from './routes/financeiro.receitas'
 import { Route as FinanceiroReceitaDespesaRouteImport } from './routes/financeiro.receita-despesa'
 import { Route as FinanceiroFluxoCaixaRouteImport } from './routes/financeiro.fluxo-caixa'
-import { Route as FinanceiroDespesasRouteImport } from './routes/financeiro.despesas'
 import { Route as AssociadoPainelRouteImport } from './routes/associado.painel'
 import { Route as AlunosNovoRouteImport } from './routes/alunos.novo'
 import { Route as AlunosIdRouteImport } from './routes/alunos.$id'
@@ -136,11 +134,6 @@ const SiteIndexRoute = SiteIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SiteRoute,
 } as any)
-const FinanceiroReceitasRoute = FinanceiroReceitasRouteImport.update({
-  id: '/receitas',
-  path: '/receitas',
-  getParentRoute: () => FinanceiroRoute,
-} as any)
 const FinanceiroReceitaDespesaRoute =
   FinanceiroReceitaDespesaRouteImport.update({
     id: '/receita-despesa',
@@ -150,11 +143,6 @@ const FinanceiroReceitaDespesaRoute =
 const FinanceiroFluxoCaixaRoute = FinanceiroFluxoCaixaRouteImport.update({
   id: '/fluxo-caixa',
   path: '/fluxo-caixa',
-  getParentRoute: () => FinanceiroRoute,
-} as any)
-const FinanceiroDespesasRoute = FinanceiroDespesasRouteImport.update({
-  id: '/despesas',
-  path: '/despesas',
   getParentRoute: () => FinanceiroRoute,
 } as any)
 const AssociadoPainelRoute = AssociadoPainelRouteImport.update({
@@ -229,10 +217,8 @@ export interface FileRoutesByFullPath {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
-  '/financeiro/despesas': typeof FinanceiroDespesasRoute
   '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
-  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/alunos/': typeof AlunosIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
 }
@@ -259,10 +245,8 @@ export interface FileRoutesByTo {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
-  '/financeiro/despesas': typeof FinanceiroDespesasRoute
   '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
-  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/': typeof SiteIndexRoute
   '/alunos': typeof AlunosIndexRoute
   '/financeiro': typeof FinanceiroIndexRoute
@@ -294,10 +278,8 @@ export interface FileRoutesById {
   '/alunos/$id': typeof AlunosIdRoute
   '/alunos/novo': typeof AlunosNovoRoute
   '/associado/painel': typeof AssociadoPainelRoute
-  '/financeiro/despesas': typeof FinanceiroDespesasRoute
   '/financeiro/fluxo-caixa': typeof FinanceiroFluxoCaixaRoute
   '/financeiro/receita-despesa': typeof FinanceiroReceitaDespesaRoute
-  '/financeiro/receitas': typeof FinanceiroReceitasRoute
   '/_site/': typeof SiteIndexRoute
   '/alunos/': typeof AlunosIndexRoute
   '/financeiro/': typeof FinanceiroIndexRoute
@@ -330,10 +312,8 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
-    | '/financeiro/despesas'
     | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
-    | '/financeiro/receitas'
     | '/alunos/'
     | '/financeiro/'
   fileRoutesByTo: FileRoutesByTo
@@ -360,10 +340,8 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
-    | '/financeiro/despesas'
     | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
-    | '/financeiro/receitas'
     | '/'
     | '/alunos'
     | '/financeiro'
@@ -394,10 +372,8 @@ export interface FileRouteTypes {
     | '/alunos/$id'
     | '/alunos/novo'
     | '/associado/painel'
-    | '/financeiro/despesas'
     | '/financeiro/fluxo-caixa'
     | '/financeiro/receita-despesa'
-    | '/financeiro/receitas'
     | '/_site/'
     | '/alunos/'
     | '/financeiro/'
@@ -558,13 +534,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SiteIndexRouteImport
       parentRoute: typeof SiteRoute
     }
-    '/financeiro/receitas': {
-      id: '/financeiro/receitas'
-      path: '/receitas'
-      fullPath: '/financeiro/receitas'
-      preLoaderRoute: typeof FinanceiroReceitasRouteImport
-      parentRoute: typeof FinanceiroRoute
-    }
     '/financeiro/receita-despesa': {
       id: '/financeiro/receita-despesa'
       path: '/receita-despesa'
@@ -577,13 +546,6 @@ declare module '@tanstack/react-router' {
       path: '/fluxo-caixa'
       fullPath: '/financeiro/fluxo-caixa'
       preLoaderRoute: typeof FinanceiroFluxoCaixaRouteImport
-      parentRoute: typeof FinanceiroRoute
-    }
-    '/financeiro/despesas': {
-      id: '/financeiro/despesas'
-      path: '/despesas'
-      fullPath: '/financeiro/despesas'
-      preLoaderRoute: typeof FinanceiroDespesasRouteImport
       parentRoute: typeof FinanceiroRoute
     }
     '/associado/painel': {
@@ -690,18 +652,14 @@ const AlunosRouteWithChildren =
   AlunosRoute._addFileChildren(AlunosRouteChildren)
 
 interface FinanceiroRouteChildren {
-  FinanceiroDespesasRoute: typeof FinanceiroDespesasRoute
   FinanceiroFluxoCaixaRoute: typeof FinanceiroFluxoCaixaRoute
   FinanceiroReceitaDespesaRoute: typeof FinanceiroReceitaDespesaRoute
-  FinanceiroReceitasRoute: typeof FinanceiroReceitasRoute
   FinanceiroIndexRoute: typeof FinanceiroIndexRoute
 }
 
 const FinanceiroRouteChildren: FinanceiroRouteChildren = {
-  FinanceiroDespesasRoute: FinanceiroDespesasRoute,
   FinanceiroFluxoCaixaRoute: FinanceiroFluxoCaixaRoute,
   FinanceiroReceitaDespesaRoute: FinanceiroReceitaDespesaRoute,
-  FinanceiroReceitasRoute: FinanceiroReceitasRoute,
   FinanceiroIndexRoute: FinanceiroIndexRoute,
 }
 
