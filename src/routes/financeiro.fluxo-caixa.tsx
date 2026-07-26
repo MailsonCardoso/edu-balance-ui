@@ -118,10 +118,10 @@ function FluxoCaixaPage() {
   const totais = useMemo(() => {
     const entradas = data?.transactions
       .filter((t) => t.type === "entrada")
-      .reduce((s, t) => s + t.amount, 0) ?? 0;
+      .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
     const saidas = data?.transactions
       .filter((t) => t.type === "saida")
-      .reduce((s, t) => s + t.amount, 0) ?? 0;
+      .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
     return { entradas, saidas };
   }, [data]);
 

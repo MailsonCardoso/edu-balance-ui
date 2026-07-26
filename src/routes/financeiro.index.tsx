@@ -151,6 +151,11 @@ function Financeiro() {
             financial_category_id: catMensalidade ? catMensalidade.id : null,
             date: todayStr(),
           });
+          await updateMensalidade(mens.id, {
+            status: "pago",
+            dataPagamento: mens.dataPagamento,
+            formaPagamento: (mens.formaPagamento || null) as FormaPagamento | null,
+          });
           criadas++;
         } catch {
           /* ignora falha isolada */
