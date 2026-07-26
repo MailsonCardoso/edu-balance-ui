@@ -52,4 +52,11 @@ export async function deleteAuditoria(id: number): Promise<void> {
   await api.delete(`/admin/auditoria/pagamentos/${id}`);
 }
 
+export async function createAuditoria(
+  data: Partial<AuditoriaItem>,
+): Promise<AuditoriaItem> {
+  const { data: result } = await api.post("/admin/auditoria/pagamentos", data);
+  return result;
+}
+
 

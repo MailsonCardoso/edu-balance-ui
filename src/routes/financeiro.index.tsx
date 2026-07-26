@@ -59,6 +59,7 @@ import {
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 import { fetchCategories } from "@/lib/api/financial-categories";
 import { createTransaction, fetchTransactions } from "@/lib/api/transactions";
+import { createAuditoria } from "@/lib/api/auditoria";
 
 export const Route = createFileRoute("/financeiro/")({
   component: Financeiro,
@@ -155,6 +156,18 @@ function Financeiro() {
             status: "pago",
             dataPagamento: mens.dataPagamento,
             formaPagamento: (mens.formaPagamento || null) as FormaPagamento | null,
+          });
+          const aluno = a.find((al) => al.id === mens.alunoId);
+          await createAuditoria({
+            aluno_nome: mens.alunoNome,
+            aluno_cpf: aluno?.cpf || null,
+            responsavel: aluno?.responsavel || null,
+            cpf_responsavel: aluno?.cpfResponsavel || null,
+            mes_referencia: mens.mesReferencia,
+            valor: mens.valor,
+            status: "approved",
+            payment_method: formaParaMetodo(mens.formaPagamento),
+            mensalidade_status: "pago",
           });
           criadas++;
         } catch {
@@ -303,6 +316,13 @@ function Financeiro() {
     }
   };
 
+  const formaParaMetodo = (fp: string | null): string => {
+    if (fp === "pix") return "bank_transfer";
+    if (fp === "debito") return "debit";
+    if (fp === "credito") return "credit";
+    return "manual";
+  };
+
   const confirmarPagamento = async () => {
     try {
       await updateMensalidade(pagamentoId, {
@@ -321,6 +341,19 @@ function Financeiro() {
           category_name: "Mensalidades",
           financial_category_id: catMensalidade ? catMensalidade.id : null,
           date: todayStr(),
+        });
+
+        const aluno = alunos.find((a) => a.id === mensalidade.alunoId);
+        await createAuditoria({
+          aluno_nome: mensalidade.alunoNome,
+          aluno_cpf: aluno?.cpf || null,
+          responsavel: aluno?.responsavel || null,
+          cpf_responsavel: aluno?.cpfResponsavel || null,
+          mes_referencia: mensalidade.mesReferencia,
+          valor: mensalidade.valor,
+          status: "approved",
+          payment_method: formaParaMetodo(pagamentoForma),
+          mensalidade_status: "pago",
         });
       }
 
