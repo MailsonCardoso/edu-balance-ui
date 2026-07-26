@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Plus, Pencil, Trash2, Search, X, CheckCircle2 } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Search, X, CheckCircle2, Info } from "lucide-react";
 import { PageHeader, EmptyState, StatusBadge } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { fetchRevenues, createRevenue, updateRevenue, deleteRevenue, type Revenue } from "@/lib/api/revenues";
 import { fetchExpenses, createExpense, updateExpense, deleteExpense, type Expense } from "@/lib/api/expenses";
 import { fetchCategories, type FinancialCategory } from "@/lib/api/financial-categories";
+import { createTransaction } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/financeiro/receita-despesa")({
   component: ReceitaDespesaPage,
@@ -20,6 +21,20 @@ export const Route = createFileRoute("/financeiro/receita-despesa")({
 type Tab = "receitas" | "despesas";
 
 const statusLabelReceita: Record<string, string> = { pendente: "Pendente", recebido: "Recebido" };
+
+async function criarTransacaoNoCaixa(params: {
+  description: string;
+  amount: number;
+  type: "entrada" | "saida";
+  financial_category_id: number | null;
+  date: string;
+}) {
+  try {
+    await createTransaction(params);
+  } catch {
+    toast.error("Erro ao registrar no Fluxo de Caixa");
+  }
+}
 
 function ReceitaDespesaPage() {
   const [tab, setTab] = useState<Tab>("receitas");
@@ -89,13 +104,24 @@ function ReceitasSection() {
   const salvar = async () => {
     try {
       const payload = { ...form, valor: Number(form.valor), financial_category_id: form.financial_category_id ? Number(form.financial_category_id) : null };
+      let saved;
       if (selected) {
-        await updateRevenue(selected.id, payload);
-        toast.success("Receita atualizada!");
+        saved = await updateRevenue(selected.id, payload);
       } else {
-        await createRevenue(payload);
-        toast.success("Receita criada!");
+        saved = await createRevenue(payload);
       }
+
+      if (payload.status === "recebido") {
+        await criarTransacaoNoCaixa({
+          description: payload.descricao,
+          amount: payload.valor,
+          type: "entrada",
+          financial_category_id: payload.financial_category_id,
+          date: new Date().toISOString().split("T")[0],
+        });
+      }
+
+      toast.success(selected ? "Receita atualizada!" : "Receita criada!");
       setFormOpen(false);
       setSelected(null);
       await carregar();
@@ -156,6 +182,12 @@ function ReceitasSection() {
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor (R$)</label><Input type="number" step="0.01" className="h-10" value={form.valor || ""} onChange={(e) => setForm((f) => ({ ...f, valor: Number(e.target.value) || 0 }))} /></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Data</label><Input type="date" className="h-10" value={form.data} onChange={(e) => setForm((f) => ({ ...f, data: e.target.value }))} /></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</label><Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as "pendente" | "recebido" }))}><SelectTrigger className="h-10"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pendente">Pendente</SelectItem><SelectItem value="recebido">Recebido</SelectItem></SelectContent></Select></div>
+            {form.status === "recebido" && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-info/5 border border-info/20 text-xs text-info">
+                <Info className="size-4 mt-0.5 shrink-0" />
+                <span>Ao salvar como <strong>Recebido</strong>, será registrada uma <strong>entrada</strong> no Fluxo de Caixa automaticamente.</span>
+              </div>
+            )}
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Categoria</label><Select value={form.financial_category_id} onValueChange={(v) => setForm((f) => ({ ...f, financial_category_id: v }))}><SelectTrigger className="h-10"><SelectValue placeholder="Sem categoria" /></SelectTrigger><SelectContent>{cats.map((c) => <SelectItem key={c.id} value={String(c.id)}>{c.nome}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Observação</label><Input className="h-10" value={form.observacao} onChange={(e) => setForm((f) => ({ ...f, observacao: e.target.value }))} /></div>
           </div>
@@ -212,11 +244,21 @@ function DespesasSection() {
       const payload = { ...form, valor: Number(form.valor), financial_category_id: form.financial_category_id ? Number(form.financial_category_id) : null };
       if (selected) {
         await updateExpense(selected.id, payload);
-        toast.success("Despesa atualizada!");
       } else {
         await createExpense(payload);
-        toast.success("Despesa criada!");
       }
+
+      if (payload.status === "pago") {
+        await criarTransacaoNoCaixa({
+          description: payload.descricao,
+          amount: payload.valor,
+          type: "saida",
+          financial_category_id: payload.financial_category_id,
+          date: new Date().toISOString().split("T")[0],
+        });
+      }
+
+      toast.success(selected ? "Despesa atualizada!" : "Despesa criada!");
       setFormOpen(false);
       setSelected(null);
       await carregar();
@@ -226,6 +268,13 @@ function DespesasSection() {
   const pagar = async (e: Expense) => {
     try {
       await updateExpense(e.id, { status: "pago", data_pagamento: new Date().toISOString().split("T")[0] });
+      await criarTransacaoNoCaixa({
+        description: e.descricao,
+        amount: e.valor,
+        type: "saida",
+        financial_category_id: e.financial_category_id,
+        date: new Date().toISOString().split("T")[0],
+      });
       toast.success("Despesa paga!");
       await carregar();
     } catch { toast.error("Erro ao pagar"); }
@@ -286,6 +335,12 @@ function DespesasSection() {
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Valor (R$)</label><Input type="number" step="0.01" className="h-10" value={form.valor || ""} onChange={(e) => setForm((f) => ({ ...f, valor: Number(e.target.value) || 0 }))} /></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Data vencimento</label><Input type="date" className="h-10" value={form.data_vencimento} onChange={(e) => setForm((f) => ({ ...f, data_vencimento: e.target.value }))} /></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</label><Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as "pendente" | "pago" | "atrasado" }))}><SelectTrigger className="h-10"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="pendente">Pendente</SelectItem><SelectItem value="pago">Pago</SelectItem><SelectItem value="atrasado">Atrasado</SelectItem></SelectContent></Select></div>
+            {form.status === "pago" && (
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-info/5 border border-info/20 text-xs text-info">
+                <Info className="size-4 mt-0.5 shrink-0" />
+                <span>Ao salvar como <strong>Pago</strong>, será registrada uma <strong>saída</strong> no Fluxo de Caixa automaticamente.</span>
+              </div>
+            )}
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Categoria</label><Select value={form.financial_category_id} onValueChange={(v) => setForm((f) => ({ ...f, financial_category_id: v }))}><SelectTrigger className="h-10"><SelectValue placeholder="Sem categoria" /></SelectTrigger><SelectContent>{cats.map((c) => <SelectItem key={c.id} value={String(c.id)}>{c.nome}</SelectItem>)}</SelectContent></Select></div>
             <div className="space-y-1.5"><label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Observação</label><Input className="h-10" value={form.observacao} onChange={(e) => setForm((f) => ({ ...f, observacao: e.target.value }))} /></div>
           </div>

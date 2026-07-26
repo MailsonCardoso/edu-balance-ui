@@ -426,6 +426,34 @@ function FluxoCaixaPage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Categoria
+              </label>
+              <Select
+                value={form.financial_category_id}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, financial_category_id: v }))
+                }
+              >
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories
+                    .filter((c) =>
+                      form.type === "entrada"
+                        ? c.tipo === "receita"
+                        : c.tipo === "despesa",
+                    )
+                    .map((cat) => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.nome}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Descrição
               </label>
               <Input
@@ -452,34 +480,6 @@ function FluxoCaixaPage() {
                   setForm((f) => ({ ...f, amount: Number(e.target.value) || 0 }))
                 }
               />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Categoria
-              </label>
-              <Select
-                value={form.financial_category_id}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, financial_category_id: v }))
-                }
-              >
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories
-                    .filter((c) =>
-                      form.type === "entrada"
-                        ? c.tipo === "receita"
-                        : c.tipo === "despesa",
-                    )
-                    .map((cat) => (
-                      <SelectItem key={cat.id} value={String(cat.id)}>
-                        {cat.nome}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
