@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/associados', [App\Http\Controllers\AssociadoController::class, 'listAll']);
     Route::delete('/associados/{id}', [App\Http\Controllers\AssociadoController::class, 'destroy']);
     Route::get('/admin/auditoria/pagamentos', [AuditoriaController::class, 'pagamentos']);
+    Route::post('/admin/auditoria/pagamentos', [AuditoriaController::class, 'store']);
     Route::delete('/admin/auditoria/pagamentos/{pagamentoTransacao}', [AuditoriaController::class, 'destroy']);
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::put('/notifications/read', [NotificationController::class, 'markAsRead']);

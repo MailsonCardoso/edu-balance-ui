@@ -75,6 +75,47 @@ class AuditoriaController extends Controller
         return response()->json($pagamentos);
     }
 
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'mensalidade_id' => 'required|exists:mensalidades,id',
+            'status' => 'required|string',
+            'payment_method' => 'nullable|string',
+        ]);
+
+        $pagamento = PagamentoTransacao::create([
+            'mensalidade_id' => $validated['mensalidade_id'],
+            'origem' => 'caixa',
+            'status' => $validated['status'],
+            'payment_method' => $validated['payment_method'] ?? null,
+            'data_aprovacao' => now(),
+        ]);
+
+        $pagamento->load('mensalidade.aluno:id,nome,cpf,responsavel,cpf_responsavel');
+
+        $t = $pagamento;
+        return response()->json([
+            'id' => $t->id,
+            'payment_id' => $t->payment_id,
+            'external_reference' => $t->external_reference,
+            'status' => $t->status,
+            'payment_method' => $t->payment_method,
+            'payer_email' => $t->payer_email,
+            'data_criacao' => $t->created_at,
+            'data_aprovacao' => $t->data_aprovacao,
+            'issuer_id' => null,
+            'banco_nome' => null,
+            'e2e_id' => null,
+            'aluno_nome' => $t->mensalidade?->aluno?->nome,
+            'aluno_cpf' => $t->mensalidade?->aluno?->cpf,
+            'responsavel' => $t->mensalidade?->aluno?->responsavel,
+            'cpf_responsavel' => $t->mensalidade?->aluno?->cpf_responsavel,
+            'mes_referencia' => $t->mensalidade?->mes_referencia,
+            'valor' => $t->mensalidade?->valor,
+            'mensalidade_status' => $t->mensalidade?->status,
+        ], 201);
+    }
+
     public function destroy(PagamentoTransacao $pagamentoTransacao): JsonResponse
     {
         $pagamentoTransacao->delete();

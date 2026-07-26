@@ -159,6 +159,7 @@ function Financeiro() {
           });
           const aluno = a.find((al) => al.id === mens.alunoId);
           await createAuditoria({
+            mensalidade_id: mens.id,
             aluno_nome: mens.alunoNome,
             aluno_cpf: aluno?.cpf || null,
             responsavel: aluno?.responsavel || null,
@@ -345,6 +346,7 @@ function Financeiro() {
 
         const aluno = alunos.find((a) => a.id === mensalidade.alunoId);
         await createAuditoria({
+          mensalidade_id: mensalidade.id,
           aluno_nome: mensalidade.alunoNome,
           aluno_cpf: aluno?.cpf || null,
           responsavel: aluno?.responsavel || null,

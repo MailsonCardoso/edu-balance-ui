@@ -2,6 +2,7 @@ import api from "@/lib/api";
 
 export interface AuditoriaItem {
   id: number;
+  mensalidade_id?: number | string | null;
   payment_id: string | null;
   external_reference: string | null;
   status: string;
