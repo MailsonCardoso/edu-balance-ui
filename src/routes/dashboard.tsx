@@ -20,7 +20,9 @@ import { brl } from "@/lib/format";
 import { fetchAlunos } from "@/lib/api/alunos";
 import { fetchMensalidades } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
+import { fetchTransactions } from "@/lib/api/transactions";
 import type { Mensalidade } from "@/lib/mock-data";
+import type { Transaction } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -70,10 +72,24 @@ function Dashboard() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [alunos, setAlunos] = useState<Awaited<ReturnType<typeof fetchAlunos>>>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [transacoes, setTransacoes] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    Promise.all([fetchAlunos(), fetchMensalidades(), fetchDashboardFinanceiro()])
-      .then(([a, m, d]) => { setAlunos(a); setMensalidades(m); setDashboard(d); })
+    const now = new Date();
+    Promise.all([
+      fetchAlunos(),
+      fetchMensalidades(),
+      fetchDashboardFinanceiro(),
+      fetchTransactions(now.getMonth() + 1, now.getFullYear()).catch(() => ({
+        transactions: [],
+      })),
+    ])
+      .then(([a, m, d, t]) => {
+        setAlunos(a);
+        setMensalidades(m);
+        setDashboard(d);
+        setTransacoes(t.transactions);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -97,6 +113,16 @@ function Dashboard() {
       taxaAdimplencia,
     };
   }, [alunos, mensalidades]);
+
+  const fluxo = useMemo(() => {
+    const entradas = transacoes
+      .filter((t) => t.type === "entrada")
+      .reduce((s, t) => s + Number(t.amount), 0);
+    const saidas = transacoes
+      .filter((t) => t.type === "saida")
+      .reduce((s, t) => s + Number(t.amount), 0);
+    return { entradas, saidas, saldo: entradas - saidas };
+  }, [transacoes]);
 
   const chartData = useMemo(() => {
     const meses: Record<string, number> = {};
@@ -169,24 +195,24 @@ function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <StatCard
           label="Recebido no mês"
-          value={brl(dashboard?.receita_mes ?? 0)}
+          value={brl(fluxo.entradas)}
           icon={<Wallet className="size-5" />}
           tone="success"
-          trend="Mensalidades + Receitas"
+          trend="Fluxo de Caixa"
         />
         <StatCard
           label="Despesas no mês"
-          value={brl(dashboard?.despesa_mes ?? 0)}
+          value={brl(fluxo.saidas)}
           icon={<TrendingDown className="size-5" />}
           tone="destructive"
-          trend="Contas pagas"
+          trend="Fluxo de Caixa"
         />
         <StatCard
           label="Saldo do mês"
-          value={brl(dashboard?.saldo_mes ?? 0)}
+          value={brl(fluxo.saldo)}
           icon={<Wallet className="size-5" />}
-          tone={((dashboard?.saldo_mes ?? 0) >= 0) ? "success" : "destructive"}
-          trend={((dashboard?.saldo_mes ?? 0) >= 0) ? "Positivo" : "Negativo"}
+          tone={fluxo.saldo >= 0 ? "success" : "destructive"}
+          trend={fluxo.saldo >= 0 ? "Positivo" : "Negativo"}
         />
         <StatCard
           label="Alunos ativos"
