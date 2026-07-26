@@ -57,6 +57,8 @@ import {
   gerarProximoMesFaltante,
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
+import { fetchCategories } from "@/lib/api/financial-categories";
+import { createTransaction } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/financeiro/")({
   component: Financeiro,
@@ -72,6 +74,7 @@ function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [data, setData] = useState<Mensalidade[]>([]);
   const [alunos, setAlunos] = useState<Aluno[]>([]);
+  const [categories, setCategories] = useState<{ id: number; nome: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -96,16 +99,32 @@ function Financeiro() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
+  const criarTransacaoNoCaixa = async (params: {
+    description: string;
+    amount: number;
+    type: "entrada" | "saida";
+    financial_category_id: number | null;
+    date: string;
+  }) => {
+    try {
+      await createTransaction(params);
+    } catch {
+      toast.error("Erro ao registrar no Fluxo de Caixa");
+    }
+  };
+
   const carregar = async () => {
     try {
-      const [m, a, d] = await Promise.all([
+      const [m, a, d, c] = await Promise.all([
         fetchMensalidades(),
         fetchAlunos(),
         fetchDashboardFinanceiro(),
+        fetchCategories(),
       ]);
       setData(m);
       setAlunos(a);
       setDashboard(d);
+      setCategories(c);
     } catch {
       toast.error("Erro ao carregar dados");
     } finally {
@@ -252,6 +271,19 @@ function Financeiro() {
         dataPagamento: new Date().toISOString().split("T")[0],
         formaPagamento: (pagamentoForma || null) as FormaPagamento | null,
       });
+
+      const mensalidade = data.find((x) => x.id === pagamentoId);
+      if (mensalidade) {
+        const catMensalidade = categories.find((c) => c.nome === "Mensalidades");
+        await criarTransacaoNoCaixa({
+          description: `Mensalidade - ${mensalidade.alunoNome || "—"} - ${mensalidade.mesReferencia}`,
+          amount: mensalidade.valor,
+          type: "entrada",
+          financial_category_id: catMensalidade ? catMensalidade.id : null,
+          date: new Date().toISOString().split("T")[0],
+        });
+      }
+
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
