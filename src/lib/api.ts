@@ -13,7 +13,9 @@ api.interceptors.request.use((config) => {
     (url === "/associado" && method === "post");
   if (!isPublic) {
     const isAssociadoRoute =
-      url.startsWith("/associado") || url.startsWith("/mensalidades/");
+      url.startsWith("/associado") ||
+      url.startsWith("/mensalidades/") && url.includes("/gerar-cobranca") ||
+      url.startsWith("/mensalidades/") && url.includes("/status-pagamento");
     const token = isAssociadoRoute
       ? localStorage.getItem("associado_token") || localStorage.getItem("edu_token")
       : localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
