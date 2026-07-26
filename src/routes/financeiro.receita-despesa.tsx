@@ -12,7 +12,6 @@ import { toast } from "sonner";
 import { fetchRevenues, createRevenue, updateRevenue, deleteRevenue, type Revenue } from "@/lib/api/revenues";
 import { fetchExpenses, createExpense, updateExpense, deleteExpense, type Expense } from "@/lib/api/expenses";
 import { fetchCategories, type FinancialCategory } from "@/lib/api/financial-categories";
-import { createTransaction } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/financeiro/receita-despesa")({
   component: ReceitaDespesaPage,
@@ -21,21 +20,6 @@ export const Route = createFileRoute("/financeiro/receita-despesa")({
 type Tab = "receitas" | "despesas";
 
 const statusLabelReceita: Record<string, string> = { pendente: "Pendente", recebido: "Recebido" };
-
-async function criarTransacaoNoCaixa(params: {
-  description: string;
-  amount: number;
-  type: "entrada" | "saida";
-  category_name: string;
-  financial_category_id: number | null;
-  date: string;
-}) {
-  try {
-    await createTransaction(params);
-  } catch {
-    toast.error("Erro ao registrar no Fluxo de Caixa");
-  }
-}
 
 function ReceitaDespesaPage() {
   const [tab, setTab] = useState<Tab>("receitas");
@@ -110,18 +94,6 @@ function ReceitasSection() {
         saved = await updateRevenue(selected.id, payload);
       } else {
         saved = await createRevenue(payload);
-      }
-
-      if (payload.status === "recebido") {
-        const catNome = cats.find((c) => c.id === payload.financial_category_id)?.nome || "";
-        await criarTransacaoNoCaixa({
-          description: payload.descricao,
-          amount: payload.valor,
-          type: "entrada",
-          category_name: catNome,
-          financial_category_id: payload.financial_category_id,
-          date: todayStr(),
-        });
       }
 
       toast.success(selected ? "Receita atualizada!" : "Receita criada!");
@@ -254,18 +226,6 @@ function DespesasSection() {
         await createExpense(payload);
       }
 
-      if (payload.status === "pago") {
-        const catNome = cats.find((c) => c.id === payload.financial_category_id)?.nome || "";
-        await criarTransacaoNoCaixa({
-          description: payload.descricao,
-          amount: payload.valor,
-          type: "saida",
-          category_name: catNome,
-          financial_category_id: payload.financial_category_id,
-          date: todayStr(),
-        });
-      }
-
       toast.success(selected ? "Despesa atualizada!" : "Despesa criada!");
       setFormOpen(false);
       setSelected(null);
@@ -279,15 +239,6 @@ function DespesasSection() {
   const pagar = async (e: Expense) => {
     try {
       await updateExpense(e.id, { status: "pago", data_pagamento: todayStr() });
-      const catNomeDesp = cats.find((c) => c.id === e.financial_category_id)?.nome || "";
-      await criarTransacaoNoCaixa({
-        description: e.descricao,
-        amount: e.valor,
-        type: "saida",
-        category_name: catNomeDesp,
-        financial_category_id: e.financial_category_id,
-        date: todayStr(),
-      });
       toast.success("Despesa paga!");
       await carregar();
     } catch { toast.error("Erro ao pagar"); }
