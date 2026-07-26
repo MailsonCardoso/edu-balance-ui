@@ -96,7 +96,7 @@ function ReceitasSection() {
       setForm({ descricao: item.descricao, valor: item.valor, data: item.data, status: item.status, financial_category_id: String(item.financial_category_id || ""), observacao: item.observacao || "" });
       setSelected(item);
     } else {
-      setForm({ descricao: "", valor: 0, data: "", status: "pendente", financial_category_id: "", observacao: "" });
+      setForm({ descricao: "", valor: 0, data: todayStr(), status: "pendente", financial_category_id: "", observacao: "" });
       setSelected(null);
     }
     setFormOpen(true);
@@ -129,7 +129,7 @@ function ReceitasSection() {
       setSelected(null);
       await carregar();
     } catch (e: any) {
-      const msg = e?.response?.data?.message || JSON.stringify(e?.response?.data?.errors) || "Erro ao salvar";
+      const msg = JSON.stringify(e?.response?.data?.errors) || e?.response?.data?.message || "Erro ao salvar";
       toast.error(msg);
     }
   };
@@ -239,7 +239,7 @@ function DespesasSection() {
       setForm({ descricao: item.descricao, valor: item.valor, data_vencimento: item.data_vencimento, status: item.status, financial_category_id: String(item.financial_category_id || ""), observacao: item.observacao || "" });
       setSelected(item);
     } else {
-      setForm({ descricao: "", valor: 0, data_vencimento: "", status: "pendente", financial_category_id: "", observacao: "" });
+      setForm({ descricao: "", valor: 0, data_vencimento: todayStr(), status: "pendente", financial_category_id: "", observacao: "" });
       setSelected(null);
     }
     setFormOpen(true);
@@ -271,7 +271,7 @@ function DespesasSection() {
       setSelected(null);
       await carregar();
     } catch (e: any) {
-      const msg = e?.response?.data?.message || JSON.stringify(e?.response?.data?.errors) || "Erro ao salvar";
+      const msg = JSON.stringify(e?.response?.data?.errors) || e?.response?.data?.message || "Erro ao salvar";
       toast.error(msg);
     }
   };
