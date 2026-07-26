@@ -128,7 +128,10 @@ function ReceitasSection() {
       setFormOpen(false);
       setSelected(null);
       await carregar();
-    } catch { toast.error("Erro ao salvar"); }
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || JSON.stringify(e?.response?.data?.errors) || "Erro ao salvar";
+      toast.error(msg);
+    }
   };
 
   const confirmarExclusao = async () => {
@@ -267,7 +270,10 @@ function DespesasSection() {
       setFormOpen(false);
       setSelected(null);
       await carregar();
-    } catch { toast.error("Erro ao salvar"); }
+    } catch (e: any) {
+      const msg = e?.response?.data?.message || JSON.stringify(e?.response?.data?.errors) || "Erro ao salvar";
+      toast.error(msg);
+    }
   };
 
   const pagar = async (e: Expense) => {
