@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { brl, fmtDate } from "@/lib/format";
+import { brl, fmtDate, todayStr } from "@/lib/format";
 import { toast } from "sonner";
 import { fetchRevenues, createRevenue, updateRevenue, deleteRevenue, type Revenue } from "@/lib/api/revenues";
 import { fetchExpenses, createExpense, updateExpense, deleteExpense, type Expense } from "@/lib/api/expenses";
@@ -120,7 +120,7 @@ function ReceitasSection() {
           type: "entrada",
           category_name: catNome,
           financial_category_id: payload.financial_category_id,
-          date: new Date().toISOString().split("T")[0],
+          date: todayStr(),
         });
       }
 
@@ -259,7 +259,7 @@ function DespesasSection() {
           type: "saida",
           category_name: catNome,
           financial_category_id: payload.financial_category_id,
-          date: new Date().toISOString().split("T")[0],
+          date: todayStr(),
         });
       }
 
@@ -272,7 +272,7 @@ function DespesasSection() {
 
   const pagar = async (e: Expense) => {
     try {
-      await updateExpense(e.id, { status: "pago", data_pagamento: new Date().toISOString().split("T")[0] });
+      await updateExpense(e.id, { status: "pago", data_pagamento: todayStr() });
       const catNomeDesp = cats.find((c) => c.id === e.financial_category_id)?.nome || "";
       await criarTransacaoNoCaixa({
         description: e.descricao,
@@ -280,7 +280,7 @@ function DespesasSection() {
         type: "saida",
         category_name: catNomeDesp,
         financial_category_id: e.financial_category_id,
-        date: new Date().toISOString().split("T")[0],
+        date: todayStr(),
       });
       toast.success("Despesa paga!");
       await carregar();

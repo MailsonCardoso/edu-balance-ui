@@ -1,5 +1,13 @@
 export const brl = (v: number | string) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+export const todayStr = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 export const fmtDate = (iso: string) => {
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(iso)) return iso;
   const d = new Date(iso);

@@ -45,7 +45,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import type { Mensalidade, Aluno, FormaPagamento } from "@/lib/mock-data";
-import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
+import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso, todayStr } from "@/lib/format";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
@@ -269,7 +269,7 @@ function Financeiro() {
     try {
       await updateMensalidade(pagamentoId, {
         status: "pago",
-        dataPagamento: new Date().toISOString().split("T")[0],
+        dataPagamento: todayStr(),
         formaPagamento: (pagamentoForma || null) as FormaPagamento | null,
       });
 
@@ -282,7 +282,7 @@ function Financeiro() {
           type: "entrada",
           category_name: "Mensalidades",
           financial_category_id: catMensalidade ? catMensalidade.id : null,
-          date: new Date().toISOString().split("T")[0],
+          date: todayStr(),
         });
       }
 
