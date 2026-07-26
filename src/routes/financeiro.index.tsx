@@ -58,7 +58,7 @@ import {
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 import { fetchCategories } from "@/lib/api/financial-categories";
-import { createTransaction } from "@/lib/api/transactions";
+import { createTransaction, fetchTransactions } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/financeiro/")({
   component: Financeiro,
@@ -116,16 +116,49 @@ function Financeiro() {
 
   const carregar = async () => {
     try {
-      const [m, a, d, c] = await Promise.all([
+      const now = new Date();
+      const [m, a, d, c, t] = await Promise.all([
         fetchMensalidades(),
         fetchAlunos(),
         fetchDashboardFinanceiro(),
         fetchCategories(),
+        fetchTransactions(now.getMonth() + 1, now.getFullYear()).catch(() => ({
+          transactions: [],
+        })),
       ]);
       setData(m);
       setAlunos(a);
       setDashboard(d);
       setCategories(c);
+
+      const descricoesExistentes = new Set(t.transactions.map((tx) => tx.description));
+      const catMensalidade = c.find((cat) => cat.nome === "Mensalidades");
+      const pagasSemTransacao = m.filter(
+        (mens) =>
+          mens.status === "pago" &&
+          !descricoesExistentes.has(
+            `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
+          ),
+      );
+      let criadas = 0;
+      for (const mens of pagasSemTransacao) {
+        try {
+          await criarTransacaoNoCaixa({
+            description: `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
+            amount: mens.valor,
+            type: "entrada",
+            category_name: "Mensalidades",
+            financial_category_id: catMensalidade ? catMensalidade.id : null,
+            date: todayStr(),
+          });
+          criadas++;
+        } catch {
+          /* ignora falha isolada */
+        }
+      }
+      if (criadas > 0) {
+        toast.success(`${criadas} entrada(s) de mensalidade(s) criada(s) no Fluxo de Caixa`);
+      }
     } catch {
       toast.error("Erro ao carregar dados");
     } finally {
