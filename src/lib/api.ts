@@ -12,7 +12,11 @@ api.interceptors.request.use((config) => {
     url === "/associado/login" ||
     (url === "/associado" && method === "post");
   if (!isPublic) {
-    const token = localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
+    const isAssociadoRoute =
+      url.startsWith("/associado") || url.startsWith("/mensalidades/");
+    const token = isAssociadoRoute
+      ? localStorage.getItem("associado_token") || localStorage.getItem("edu_token")
+      : localStorage.getItem("edu_token") || localStorage.getItem("associado_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
