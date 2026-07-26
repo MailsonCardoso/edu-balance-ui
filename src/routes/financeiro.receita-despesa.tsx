@@ -26,6 +26,7 @@ async function criarTransacaoNoCaixa(params: {
   description: string;
   amount: number;
   type: "entrada" | "saida";
+  category_name: string;
   financial_category_id: number | null;
   date: string;
 }) {
@@ -112,10 +113,12 @@ function ReceitasSection() {
       }
 
       if (payload.status === "recebido") {
+        const catNome = cats.find((c) => c.id === payload.financial_category_id)?.nome || "";
         await criarTransacaoNoCaixa({
           description: payload.descricao,
           amount: payload.valor,
           type: "entrada",
+          category_name: catNome,
           financial_category_id: payload.financial_category_id,
           date: new Date().toISOString().split("T")[0],
         });
@@ -249,10 +252,12 @@ function DespesasSection() {
       }
 
       if (payload.status === "pago") {
+        const catNome = cats.find((c) => c.id === payload.financial_category_id)?.nome || "";
         await criarTransacaoNoCaixa({
           description: payload.descricao,
           amount: payload.valor,
           type: "saida",
+          category_name: catNome,
           financial_category_id: payload.financial_category_id,
           date: new Date().toISOString().split("T")[0],
         });
@@ -268,10 +273,12 @@ function DespesasSection() {
   const pagar = async (e: Expense) => {
     try {
       await updateExpense(e.id, { status: "pago", data_pagamento: new Date().toISOString().split("T")[0] });
+      const catNomeDesp = cats.find((c) => c.id === e.financial_category_id)?.nome || "";
       await criarTransacaoNoCaixa({
         description: e.descricao,
         amount: e.valor,
         type: "saida",
+        category_name: catNomeDesp,
         financial_category_id: e.financial_category_id,
         date: new Date().toISOString().split("T")[0],
       });

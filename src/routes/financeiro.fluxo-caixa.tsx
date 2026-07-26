@@ -147,11 +147,14 @@ function FluxoCaixaPage() {
 
   const salvar = async () => {
     try {
+      const catId = form.financial_category_id ? Number(form.financial_category_id) : null;
+      const catName = categories.find((c) => c.id === catId)?.nome || "";
       await createTransaction({
         description: form.description,
         amount: Number(form.amount),
         type: form.type,
-        financial_category_id: form.financial_category_id ? Number(form.financial_category_id) : null,
+        category_name: catName,
+        financial_category_id: catId,
         date: form.date,
       });
       toast.success("Transação criada!");

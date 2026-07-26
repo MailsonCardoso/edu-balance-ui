@@ -103,6 +103,7 @@ function Financeiro() {
     description: string;
     amount: number;
     type: "entrada" | "saida";
+    category_name: string;
     financial_category_id: number | null;
     date: string;
   }) => {
@@ -279,6 +280,7 @@ function Financeiro() {
           description: `Mensalidade - ${mensalidade.alunoNome || "—"} - ${mensalidade.mesReferencia}`,
           amount: mensalidade.valor,
           type: "entrada",
+          category_name: "Mensalidades",
           financial_category_id: catMensalidade ? catMensalidade.id : null,
           date: new Date().toISOString().split("T")[0],
         });
