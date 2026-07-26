@@ -5,7 +5,8 @@ export interface Transaction {
   description: string;
   amount: number;
   type: "entrada" | "saida";
-  category_name: string;
+  financial_category_id: number | null;
+  category?: { id: number; nome: string; cor: string } | null;
   date: string;
   created_at: string;
   updated_at: string;

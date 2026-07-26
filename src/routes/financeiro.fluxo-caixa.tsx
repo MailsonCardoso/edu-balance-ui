@@ -52,6 +52,10 @@ import {
   type Transaction,
   type TransactionsResponse,
 } from "@/lib/api/transactions";
+import {
+  fetchCategories,
+  type FinancialCategory,
+} from "@/lib/api/financial-categories";
 
 export const Route = createFileRoute("/financeiro/fluxo-caixa")({
   component: FluxoCaixaPage,
@@ -62,18 +66,12 @@ const meses = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
-const categoriasSugeridas = [
-  "Mensalidades", "Matrículas", "Doações", "Eventos", "Subvenções",
-  "Folha de Pagamento", "Água", "Luz", "Telefone", "Manutenção",
-  "Material Didático", "Alimentação", "Transporte", "Serviços Terceiros",
-  "Impostos", "Outros",
-];
-
 function FluxoCaixaPage() {
   const hoje = new Date();
   const [mes, setMes] = useState(String(hoje.getMonth() + 1).padStart(2, "0"));
   const [ano, setAno] = useState(String(hoje.getFullYear()));
   const [data, setData] = useState<TransactionsResponse | null>(null);
+  const [categories, setCategories] = useState<FinancialCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
@@ -82,7 +80,7 @@ function FluxoCaixaPage() {
     description: "",
     amount: 0,
     type: "entrada" as "entrada" | "saida",
-    category_name: "",
+    financial_category_id: "",
     date: "",
   });
 
@@ -102,13 +100,17 @@ function FluxoCaixaPage() {
     carregar(mes, ano);
   }, [mes, ano]);
 
+  useEffect(() => {
+    fetchCategories().then(setCategories).catch(() => {});
+  }, []);
+
   const filtered = useMemo(
     () =>
       data?.transactions.filter(
         (t) =>
           !q ||
           t.description.toLowerCase().includes(q.toLowerCase()) ||
-          t.category_name.toLowerCase().includes(q.toLowerCase()),
+          (t.category?.nome ?? "").toLowerCase().includes(q.toLowerCase()),
       ) ?? [],
     [data, q],
   );
@@ -137,7 +139,7 @@ function FluxoCaixaPage() {
       description: "",
       amount: 0,
       type: "entrada",
-      category_name: "",
+      financial_category_id: "",
       date: `${ano}-${mes}-01`,
     });
     setFormOpen(true);
@@ -146,8 +148,11 @@ function FluxoCaixaPage() {
   const salvar = async () => {
     try {
       await createTransaction({
-        ...form,
+        description: form.description,
         amount: Number(form.amount),
+        type: form.type,
+        financial_category_id: form.financial_category_id ? Number(form.financial_category_id) : null,
+        date: form.date,
       });
       toast.success("Transação criada!");
       setFormOpen(false);
@@ -331,7 +336,7 @@ function FluxoCaixaPage() {
                         </td>
                         <td className="px-4 py-3 font-medium">{t.description}</td>
                         <td className="px-4 py-3 text-muted-foreground">
-                          {t.category_name}
+                          {t.category?.nome || "—"}
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -453,20 +458,26 @@ function FluxoCaixaPage() {
                 Categoria
               </label>
               <Select
-                value={form.category_name}
+                value={form.financial_category_id}
                 onValueChange={(v) =>
-                  setForm((f) => ({ ...f, category_name: v }))
+                  setForm((f) => ({ ...f, financial_category_id: v }))
                 }
               >
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categoriasSugeridas.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
+                  {categories
+                    .filter((c) =>
+                      form.type === "entrada"
+                        ? c.tipo === "receita"
+                        : c.tipo === "despesa",
+                    )
+                    .map((cat) => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.nome}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
