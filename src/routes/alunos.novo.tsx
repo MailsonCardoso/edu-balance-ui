@@ -81,7 +81,7 @@ function NovoAluno() {
     defaultValues: {
       status: "ativo",
       sexo: "masculino",
-      valorMensalidade: 0 as number,
+      valorMensalidade: 1 as number,
       diaVencimento: 10,
     },
   });

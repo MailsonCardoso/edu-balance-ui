@@ -125,7 +125,7 @@ export async function limparMensalidades(): Promise<number> {
 export async function aplicarMensalidadeEmMassa(
   mesReferencia: string,
   diaVencimento = 10,
-  valor = 70,
+  valor = 1,
   atualizarValorAluno = true,
 ): Promise<{ criadas: number; alunosAtualizados: number }> {
   const [alunos, existentes] = await Promise.all([
@@ -170,7 +170,7 @@ export async function aplicarMensalidadeEmMassa(
 export async function resetMensalidadesEmMassa(
   mesReferencia: string,
   diaVencimento = 10,
-  valor = 70,
+  valor = 1,
 ): Promise<void> {
   const id = toast.loading("Limpando mensalidades existentes...");
   const removidas = await limparMensalidades();
