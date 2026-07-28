@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GerarCobrancaRequest;
 use App\Models\Mensalidade;
+use App\Services\MercadoPagoService;
 use App\Services\PagamentoService;
 use Illuminate\Http\JsonResponse;
 
@@ -11,6 +12,7 @@ class CobrancaController extends Controller
 {
     public function __construct(
         private readonly PagamentoService $pagamentoService,
+        private readonly MercadoPagoService $mercadopago,
     ) {}
 
     public function gerar(Mensalidade $mensalidade, GerarCobrancaRequest $request): JsonResponse
@@ -58,6 +60,28 @@ class CobrancaController extends Controller
 
     public function status(Mensalidade $mensalidade): JsonResponse
     {
+        $transacao = $mensalidade->ultimaTransacao;
+
+        if ($mensalidade->status !== 'pago' && $transacao?->payment_id) {
+            try {
+                $dadosMP = $this->mercadopago->consultarPagamento($transacao->payment_id);
+                $statusMP = $dadosMP['status'] ?? null;
+
+                if ($statusMP === 'approved') {
+                    $this->pagamentoService->processarNotificacaoWebhook(
+                        paymentId: $transacao->payment_id,
+                        payloadWebhook: $dadosMP,
+                    );
+                    $mensalidade->refresh();
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Status: erro ao consultar MP', [
+                    'payment_id' => $transacao->payment_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $transacao = $mensalidade->ultimaTransacao;
 
         return response()->json([
