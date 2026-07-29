@@ -27,7 +27,7 @@ import {
   consultarStatusPagamento,
 } from "@/lib/api/associado-mensalidades";
 import type { Mensalidade } from "@/lib/mock-data";
-import { baixarPdfRecibo } from "@/lib/recibo";
+import { ReciboModal } from "@/components/socio/ReciboModal";
 import {
   ProfileCard,
   InfoTile,
@@ -60,6 +60,7 @@ function PainelAssociado() {
   const [associado, setAssociado] = useState<AssociadoData | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("painel");
+  const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("associado_data");
@@ -178,8 +179,8 @@ function PainelAssociado() {
 
           <div className="min-w-0 lg:col-span-3">
             {tab === "painel" && <PainelTab associado={associado} />}
-            {tab === "pagamentos" && <PagamentosTab />}
-            {tab === "historico" && <HistoricoTab />}
+            {tab === "pagamentos" && <PagamentosTab onRecibo={setReciboMensalidade} />}
+            {tab === "historico" && <HistoricoTab onRecibo={setReciboMensalidade} />}
             {tab === "dados" && <DadosTab associado={associado} />}
             {tab === "beneficios" && <BeneficiosTab />}
             {tab === "comunidade" && <ComunidadeTab />}
@@ -188,6 +189,13 @@ function PainelAssociado() {
       </main>
 
       <FloatingTabBar items={menuItems} active={tab} onChange={setTab} />
+
+      {reciboMensalidade && (
+        <ReciboModal
+          mensalidade={reciboMensalidade}
+          onClose={() => setReciboMensalidade(null)}
+        />
+      )}
     </div>
   );
 }
@@ -348,7 +356,7 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   );
 }
 
-function PagamentosTab() {
+function PagamentosTab({ onRecibo }: { onRecibo: (m: Mensalidade) => void }) {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("todas");
@@ -450,7 +458,7 @@ function PagamentosTab() {
                 key={m.id}
                 m={m}
                 onPagar={handlePagar}
-                onRecibo={baixarPdfRecibo}
+                onRecibo={onRecibo}
                 pagando={pagandoId === m.id}
                 showAluno={temMultiplosAlunos}
               />
@@ -470,7 +478,7 @@ function PagamentosTab() {
   );
 }
 
-function HistoricoTab() {
+function HistoricoTab({ onRecibo }: { onRecibo: (m: Mensalidade) => void }) {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -553,7 +561,7 @@ function HistoricoTab() {
               )}
               <div className="divide-y divide-gray-50">
                 {ms.map((m) => (
-                  <MensalidadeRow key={m.id} m={m} onRecibo={baixarPdfRecibo} />
+                  <MensalidadeRow key={m.id} m={m} onRecibo={onRecibo} />
                 ))}
               </div>
             </div>
