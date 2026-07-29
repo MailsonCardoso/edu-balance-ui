@@ -49,6 +49,12 @@ class AuditoriaController extends Controller
                 ?? data_get($t->payload_response, 'point_of_interaction.transaction_data.e2e_id')
                 ?? null;
             $issuerId = $payload['payment_method']['issuer_id'] ?? null;
+            $bancoNome = data_get($payload, 'point_of_interaction.transaction_data.bank_info.payer.long_name');
+            if ($bancoNome) {
+                $bancoNome = trim(preg_replace('/\s+(S\.?A\.?|LTDA\.?|EIRELI|MEI)\s*$/i', '', $bancoNome));
+            } else {
+                $bancoNome = self::getNomeBanco($issuerId);
+            }
 
             return [
                 'id' => $t->id,
@@ -60,7 +66,7 @@ class AuditoriaController extends Controller
                 'data_criacao' => $payload['date_created'] ?? $t->created_at,
                 'data_aprovacao' => $payload['date_approved'] ?? $t->data_aprovacao,
                 'issuer_id' => $issuerId,
-                'banco_nome' => self::getNomeBanco($issuerId),
+                'banco_nome' => $bancoNome,
                 'e2e_id' => $e2eId,
                 'aluno_nome' => $t->mensalidade?->aluno?->nome,
                 'aluno_cpf' => $t->mensalidade?->aluno?->cpf,
