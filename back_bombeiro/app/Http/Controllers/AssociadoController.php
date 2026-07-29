@@ -175,7 +175,12 @@ class AssociadoController extends Controller
         $associado->update($validated);
 
         if (!empty($validated['email'])) {
-            Aluno::where('cpf_responsavel', $associado->cpf)
+            $cpf = $associado->cpf;
+            $cpfFormatado = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf);
+            Aluno::where(function ($q) use ($cpf, $cpfFormatado) {
+                    $q->where('cpf_responsavel', $cpf)
+                      ->orWhere('cpf_responsavel', $cpfFormatado);
+                })
                 ->where(function ($q) use ($validated) {
                     $q->where('email', '!=', $validated['email'])
                       ->orWhere('email_responsavel', '!=', $validated['email'])

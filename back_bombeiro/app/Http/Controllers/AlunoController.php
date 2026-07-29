@@ -170,7 +170,9 @@ class AlunoController extends Controller
         $email = $aluno->email_responsavel ?? $aluno->email;
         if (empty($email)) return;
 
-        Associado::where('cpf', $cpf)
+        $cpfLimpo = preg_replace('/\D/', '', $cpf);
+
+        Associado::where('cpf', $cpfLimpo)
             ->where('email', '!=', $email)
             ->update(['email' => $email]);
     }
