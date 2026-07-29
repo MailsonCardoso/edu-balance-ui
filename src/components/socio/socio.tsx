@@ -142,7 +142,7 @@ export function FloatingTabBar({
 }) {
   return (
     <nav className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
-      <div className="flex items-center justify-between gap-1 rounded-2xl border border-black/[0.04] bg-white/90 p-1.5 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+      <div className="flex items-center justify-between gap-1 rounded-2xl border border-black/[0.06] bg-white/95 p-1.5 shadow-[0_12px_32px_-10px_rgba(0,0,0,0.3)] backdrop-blur-xl">
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = active === item.id;
@@ -152,7 +152,7 @@ export function FloatingTabBar({
               onClick={() => onChange(item.id)}
               className={cn(
                 "relative flex flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 transition-all duration-300",
-                isActive ? "text-brand" : "text-gray-400 hover:text-gray-600",
+                isActive ? "text-brand" : "text-gray-500 hover:text-gray-700",
               )}
             >
               {isActive && (
@@ -161,7 +161,7 @@ export function FloatingTabBar({
               <span
                 className={cn(
                   "grid place-items-center rounded-xl p-1.5 transition-all duration-300",
-                  isActive && "bg-brand-light scale-105",
+                  isActive && "bg-brand/10 scale-105",
                 )}
               >
                 <Icon className="size-5" />
