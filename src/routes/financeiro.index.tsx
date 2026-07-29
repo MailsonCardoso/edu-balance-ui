@@ -107,10 +107,16 @@ function Financeiro() {
     category_name: string;
     financial_category_id: number | null;
     date: string;
+    source_type?: string;
+    source_id?: number;
   }) => {
     try {
       await createTransaction(params);
-    } catch {
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as { response?: { status?: number } };
+        if (axiosErr.response?.status === 409) return;
+      }
       toast.error("Erro ao registrar no Fluxo de Caixa");
     }
   };
@@ -132,12 +138,22 @@ function Financeiro() {
       setDashboard(d);
       setCategories(c);
 
-      const descricoesExistentes = new Set(t.transactions.map((tx) => tx.description));
+      const transacoesPorSource = new Map(
+        t.transactions
+          .filter((tx) => tx.source_type && tx.source_id)
+          .map((tx) => [`${tx.source_type}-${tx.source_id}`, tx]),
+      );
+      const descricoesLegado = new Set(
+        t.transactions
+          .filter((tx) => !tx.source_type)
+          .map((tx) => tx.description),
+      );
       const catMensalidade = c.find((cat) => cat.nome === "Mensalidades");
       const pagasSemTransacao = m.filter(
         (mens) =>
           mens.status === "pago" &&
-          !descricoesExistentes.has(
+          !transacoesPorSource.has(`mensalidade-${mens.id}`) &&
+          !descricoesLegado.has(
             `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
           ),
       );
@@ -151,6 +167,8 @@ function Financeiro() {
             category_name: "Mensalidades",
             financial_category_id: catMensalidade ? catMensalidade.id : null,
             date: todayStr(),
+            source_type: "mensalidade",
+            source_id: mens.id,
           });
           await updateMensalidade(mens.id, {
             status: "pago",
@@ -342,6 +360,8 @@ function Financeiro() {
           category_name: "Mensalidades",
           financial_category_id: catMensalidade ? catMensalidade.id : null,
           date: todayStr(),
+          source_type: "mensalidade",
+          source_id: mensalidade.id,
         });
 
         const aluno = alunos.find((a) => a.id === mensalidade.alunoId);

@@ -54,7 +54,19 @@ class TransactionController extends Controller
             'type' => 'required|in:entrada,saida',
             'category_name' => 'required|string|max:255',
             'date' => 'required|date',
+            'source_type' => 'nullable|string|in:mensalidade,revenue,expense,manual',
+            'source_id' => 'nullable|integer',
         ]);
+
+        if (!empty($validated['source_type']) && !empty($validated['source_id'])) {
+            $vinculoExiste = Transaction::where('source_type', $validated['source_type'])
+                ->where('source_id', $validated['source_id'])
+                ->exists();
+
+            if ($vinculoExiste) {
+                return response()->json(['message' => 'Transação já vinculada a esta origem.'], 409);
+            }
+        }
 
         $transactionDate = Carbon::parse($validated['date']);
         $isClosed = MonthlyClosure::where('month', $transactionDate->month)

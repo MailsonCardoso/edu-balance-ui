@@ -8,6 +8,8 @@ export interface Transaction {
   category_name: string;
   financial_category_id: number | null;
   category?: { id: number; nome: string; cor: string } | null;
+  source_type: string | null;
+  source_id: number | null;
   date: string;
   created_at: string;
   updated_at: string;
