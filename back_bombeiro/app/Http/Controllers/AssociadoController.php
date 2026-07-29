@@ -174,6 +174,16 @@ class AssociadoController extends Controller
 
         $associado->update($validated);
 
+        if (!empty($validated['email'])) {
+            Aluno::where('cpf_responsavel', $associado->cpf)
+                ->where(function ($q) use ($validated) {
+                    $q->where('email', '!=', $validated['email'])
+                      ->orWhere('email_responsavel', '!=', $validated['email'])
+                      ->orWhereNull('email_responsavel');
+                })
+                ->update(['email_responsavel' => $validated['email']]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Dados atualizados com sucesso.',

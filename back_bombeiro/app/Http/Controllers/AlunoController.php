@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\Associado;
 use App\Models\Mensalidade;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -46,6 +47,7 @@ class AlunoController extends Controller
             'responsavel' => 'required|string|max:255',
             'cpf_responsavel' => 'nullable|string|max:14',
             'telefone_responsavel' => 'nullable|string|max:20',
+            'email_responsavel' => 'nullable|email|max:255',
             'turma' => 'required|string|max:50',
             'status' => 'required|in:ativo,inativo',
             'situacao' => 'required|in:em_dia,em_atraso,inadimplente',
@@ -63,6 +65,8 @@ class AlunoController extends Controller
 
             return $aluno;
         });
+
+        $this->sincronizarEmailAssociado($aluno);
 
         return $aluno->load('mensalidades');
     }
@@ -121,6 +125,7 @@ class AlunoController extends Controller
             'responsavel' => 'sometimes|string|max:255',
             'cpf_responsavel' => 'nullable|string|max:14',
             'telefone_responsavel' => 'nullable|string|max:20',
+            'email_responsavel' => 'nullable|email|max:255',
             'turma' => 'sometimes|string|max:50',
             'status' => 'sometimes|in:ativo,inativo',
             'situacao' => 'sometimes|in:em_dia,em_atraso,inadimplente',
@@ -130,6 +135,7 @@ class AlunoController extends Controller
         ]);
 
         $aluno->update($validated);
+        $this->sincronizarEmailAssociado($aluno);
         return $aluno;
     }
 
@@ -154,5 +160,18 @@ class AlunoController extends Controller
     {
         $aluno->delete();
         return response()->noContent();
+    }
+
+    private function sincronizarEmailAssociado(Aluno $aluno): void
+    {
+        $cpf = $aluno->cpf_responsavel;
+        if (empty($cpf)) return;
+
+        $email = $aluno->email_responsavel ?? $aluno->email;
+        if (empty($email)) return;
+
+        Associado::where('cpf', $cpf)
+            ->where('email', '!=', $email)
+            ->update(['email' => $email]);
     }
 }
