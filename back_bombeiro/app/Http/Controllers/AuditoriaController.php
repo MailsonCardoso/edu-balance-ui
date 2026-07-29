@@ -51,7 +51,7 @@ class AuditoriaController extends Controller
             $issuerId = $payload['payment_method']['issuer_id'] ?? null;
             $bancoNome = data_get($payload, 'point_of_interaction.transaction_data.bank_info.payer.long_name');
             if ($bancoNome) {
-                $bancoNome = trim(preg_replace('/\s+(S\.?A\.?|LTDA\.?|EIRELI|MEI)\s*$/i', '', $bancoNome));
+                $bancoNome = self::getNomeBancoPorLongName($bancoNome);
             } else {
                 $bancoNome = self::getNomeBanco($issuerId);
             }
@@ -159,5 +159,42 @@ class AuditoriaController extends Controller
         ];
 
         return $bancos[$issuerId] ?? "Código {$issuerId}";
+    }
+
+    private static function getNomeBancoPorLongName(string $longName): string
+    {
+        $mapa = [
+            'nu pagamentos' => 'Nubank',
+            'nubank' => 'Nubank',
+            'banco do brasil' => 'Banco do Brasil',
+            'caixa economica' => 'Caixa Econômica Federal',
+            'bradesco' => 'Bradesco',
+            'itaú' => 'Itaú Unibanco',
+            'itau' => 'Itaú Unibanco',
+            'santander' => 'Santander',
+            'banco inter' => 'Banco Inter',
+            'mercado pago' => 'Mercado Pago',
+            'mercadopago' => 'Mercado Pago',
+            'picpay' => 'PicPay',
+            'pagseguro' => 'PagBank',
+            'pagbank' => 'PagBank',
+            'c6' => 'C6 Bank',
+            'neon' => 'Neon',
+            'sicoob' => 'Sicoob',
+            'sicredi' => 'Sicredi',
+            'safra' => 'Safra',
+            'banco do nordeste' => 'Banco do Nordeste',
+        ];
+
+        $lower = mb_strtolower($longName);
+
+        foreach ($mapa as $chave => $nome) {
+            if (str_contains($lower, $chave)) {
+                return $nome;
+            }
+        }
+
+        $nomeLimpo = preg_replace('/\s+(S\.?A\.?|LTDA\.?|EIRELI|MEI)(\s*[-–—].*)?$/i', '', $longName);
+        return trim($nomeLimpo);
     }
 }
