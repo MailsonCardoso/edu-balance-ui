@@ -12,6 +12,8 @@ export interface AssociadoMensalidade {
   forma_pagamento: string | null;
   origem: OrigemPagamento | null;
   aluno_nome: string | null;
+  aluno_responsavel: string | null;
+  aluno_sexo: string | null;
   created_at: string;
 }
 

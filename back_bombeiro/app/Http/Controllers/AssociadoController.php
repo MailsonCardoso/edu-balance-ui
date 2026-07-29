@@ -222,6 +222,8 @@ class AssociadoController extends Controller
                     'forma_pagamento' => $m->forma_pagamento,
                     'origem' => $m->origem,
                     'aluno_nome' => $m->aluno?->nome,
+                    'aluno_responsavel' => $m->aluno?->responsavel,
+                    'aluno_sexo' => $m->aluno?->sexo,
                     'created_at' => $m->created_at->format('d/m/Y H:i'),
                 ];
             });
