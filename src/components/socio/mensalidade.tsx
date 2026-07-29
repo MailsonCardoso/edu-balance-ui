@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { CheckCircle2, Clock, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, Clock, AlertCircle, Loader2, FileText } from "lucide-react";
 import { type Mensalidade, type OrigemPagamento } from "@/lib/mock-data";
 import { brl } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -25,11 +25,13 @@ const origemConfig: Record<OrigemPagamento, { label: string; color: string; icon
 export function MensalidadeRow({
   m,
   onPagar,
+  onRecibo,
   pagando,
   showAluno,
 }: {
   m: Mensalidade;
   onPagar?: (m: Mensalidade) => void;
+  onRecibo?: (m: Mensalidade) => void;
   pagando?: boolean;
   showAluno?: boolean;
 }) {
@@ -83,7 +85,16 @@ export function MensalidadeRow({
             )}
           </button>
         )}
-        {!aberto && <CheckCircle2 className="size-4 text-emerald-500" />}
+        {!aberto && (
+          <button
+            onClick={() => onRecibo?.(m)}
+            className="grid size-9 place-items-center rounded-full bg-emerald-50 text-emerald-600 transition-colors hover:bg-emerald-100 active:scale-90"
+            aria-label="Comprovante"
+            title="Comprovante"
+          >
+            <FileText className="size-4" />
+          </button>
+        )}
       </div>
     </div>
   );

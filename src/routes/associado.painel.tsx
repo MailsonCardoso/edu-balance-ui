@@ -27,6 +27,7 @@ import {
   consultarStatusPagamento,
 } from "@/lib/api/associado-mensalidades";
 import type { Mensalidade } from "@/lib/mock-data";
+import { baixarPdfRecibo } from "@/lib/recibo";
 import {
   ProfileCard,
   InfoTile,
@@ -449,6 +450,7 @@ function PagamentosTab() {
                 key={m.id}
                 m={m}
                 onPagar={handlePagar}
+                onRecibo={baixarPdfRecibo}
                 pagando={pagandoId === m.id}
                 showAluno={temMultiplosAlunos}
               />
@@ -551,7 +553,7 @@ function HistoricoTab() {
               )}
               <div className="divide-y divide-gray-50">
                 {ms.map((m) => (
-                  <MensalidadeRow key={m.id} m={m} />
+                  <MensalidadeRow key={m.id} m={m} onRecibo={baixarPdfRecibo} />
                 ))}
               </div>
             </div>
