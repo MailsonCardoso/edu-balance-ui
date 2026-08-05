@@ -88,40 +88,52 @@ function SiteHome() {
         <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#D62828] via-[#D62828]/95 to-transparent" />
         <div className="relative container-page py-20 lg:py-32 w-full">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              APA CMCB XII — Nova Gestão
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-xs font-medium mb-6">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                APA CMCB XII — Nova Gestão
+              </div>
+
+              <div className="relative overflow-hidden min-h-[180px]">
+                {slides.map((slide, i) => (
+                  <div
+                    key={i}
+                    className={`transition-all duration-700 ${
+                      i === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 absolute inset-0"
+                    }`}
+                  >
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+                      {slide.title}
+                    </h1>
+                    <p className="mt-4 text-lg text-white/70 max-w-lg">
+                      {slide.subtitle}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 mt-8">
+                {slides.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentSlide(i)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === currentSlide ? "w-8 bg-emerald-400" : "w-2 bg-white/30 hover:bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
 
-            <div className="relative overflow-hidden min-h-[180px]">
-              {slides.map((slide, i) => (
-                <div
-                  key={i}
-                  className={`transition-all duration-700 ${
-                    i === currentSlide ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 absolute inset-0"
-                  }`}
-                >
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-                    {slide.title}
-                  </h1>
-                  <p className="mt-4 text-lg text-white/70 max-w-lg">
-                    {slide.subtitle}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2 mt-8">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === currentSlide ? "w-8 bg-emerald-400" : "w-2 bg-white/30 hover:bg-white/50"
-                  }`}
+            <div className="flex justify-center lg:justify-end order-first lg:order-none">
+              <div className="bg-white rounded-2xl p-4 shadow-xl max-w-[280px] sm:max-w-xs">
+                <img
+                  src="/logotipo.jpeg"
+                  alt="Logotipo da APA CMCB XII"
+                  className="w-full h-auto rounded-xl"
                 />
-              ))}
+              </div>
             </div>
           </div>
         </div>
