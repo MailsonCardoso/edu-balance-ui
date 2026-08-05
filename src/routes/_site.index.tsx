@@ -241,7 +241,7 @@ function SiteHome() {
                 <img
                   src={imageUrl(selectedNews.image)}
                   alt={selectedNews.title}
-                  className="w-full h-64 object-cover rounded-lg mt-4"
+                  className="w-full h-64 object-contain rounded-lg mt-4 bg-gray-50"
                 />
               )}
 
