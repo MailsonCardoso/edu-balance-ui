@@ -133,8 +133,12 @@ function Noticias() {
                   onClick={() => setSelectedNews(item)}
                   className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
                 >
-                  <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center">
-                    <FileText className="size-10 text-[#D62828]/20" />
+                  <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
+                    ) : (
+                      <FileText className="size-10 text-[#D62828]/20" />
+                    )}
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
@@ -200,6 +204,14 @@ function Noticias() {
                   <span className="text-sm text-gray-400">{selectedNews.published_at}</span>
                 </div>
               </DialogHeader>
+
+              {selectedNews.image && (
+                <img
+                  src={selectedNews.image}
+                  alt={selectedNews.title}
+                  className="w-full h-56 object-cover rounded-lg mt-4"
+                />
+              )}
 
               {"content" in selectedNews && selectedNews.content ? (
                 <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
