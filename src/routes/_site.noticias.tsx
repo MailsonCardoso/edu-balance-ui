@@ -210,7 +210,7 @@ function Noticias() {
                 <img
                   src={imageUrl(selectedNews.image)}
                   alt={selectedNews.title}
-                  className="w-full aspect-square object-cover rounded-lg mt-4"
+                  className="w-full h-64 object-cover rounded-lg mt-4"
                 />
               )}
 
