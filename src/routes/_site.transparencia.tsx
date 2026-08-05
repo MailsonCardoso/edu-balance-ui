@@ -113,11 +113,11 @@ function Transparencia() {
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="size-11 rounded-lg bg-purple-50 grid place-items-center text-purple-600">
-                <FileText className="size-5" />
+                <User className="size-5" />
               </div>
               <div>
-                <p className="text-xl font-bold text-gray-900">2024/2025</p>
-                <p className="text-sm text-gray-500">Prestação de Contas</p>
+                <p className="text-xl font-bold text-gray-900">{data ? String(data.alunos.ativos) : "—"}</p>
+                <p className="text-sm text-gray-500">Alunos Ativos</p>
               </div>
             </div>
           </div>
