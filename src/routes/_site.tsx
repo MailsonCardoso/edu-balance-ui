@@ -25,9 +25,7 @@ function SiteLayout() {
         <div className="container-page">
           <div className="flex items-center justify-between h-16 lg:h-20">
             <Link to="/" className="flex items-center gap-3 shrink-0">
-              <div className="size-9 rounded-lg bg-[#D62828] grid place-items-center text-white font-bold text-sm">
-                APA
-              </div>
+              <img src="/logotipo.jpeg" alt="APA CMCB XII" className="size-9 rounded-lg object-cover" />
               <div className="hidden sm:block">
                 <p className="text-sm font-semibold text-[#D62828] leading-tight">APA CMCB XII</p>
                 <p className="text-[10px] text-gray-500 leading-tight">Associação de Pais e Amigos</p>
@@ -125,9 +123,7 @@ function SiteLayout() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             <div className="sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-3 mb-4">
-                <div className="size-10 rounded-lg bg-white/10 grid place-items-center text-white font-bold text-sm">
-                  APA
-                </div>
+                <img src="/logotipo.jpeg" alt="APA CMCB XII" className="size-10 rounded-lg object-cover" />
                 <div>
                   <p className="text-sm font-semibold leading-tight">APA CMCB XII</p>
                   <p className="text-[10px] text-white/60 leading-tight">Associação de Pais e Amigos</p>
