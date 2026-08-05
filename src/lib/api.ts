@@ -35,7 +35,15 @@ api.interceptors.response.use(
     if (err?.response?.status === 401) {
       localStorage.removeItem("edu_token");
       localStorage.removeItem("associado_token");
-      window.location.href = "/login";
+      const pathname = window.location.pathname;
+      const isSiteRoute =
+        pathname === "/" ||
+        ["/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"].some(
+          (p) => pathname === p || pathname.startsWith(`${p}/`),
+        );
+      if (!isSiteRoute) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(err);
   },
