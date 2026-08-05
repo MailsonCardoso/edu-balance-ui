@@ -16,15 +16,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   component: RootComponent,
 });
 
+const sitePaths = ["/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
+
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
-  const isSiteRoute = sitePaths.includes(pathname);
+  const isSiteRoute = pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const isAssociadoRoute = pathname.startsWith("/associado");
-  const isPublicRoute = ["/login"].includes(pathname) || isSiteRoute || isAssociadoRoute;
+  const isPublicRoute = pathname === "/login" || isSiteRoute || isAssociadoRoute;
 
   useEffect(() => {
     if (loading) return;
@@ -44,8 +45,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const sitePaths = ["/", "/transparencia", "/institucional", "/noticias", "/contato", "/ouvidoria"];
-  const isSiteRoute = sitePaths.includes(pathname);
+  const isSiteRoute = pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const isAuthRoute = pathname === "/login" || pathname.startsWith("/associado") || isSiteRoute;
 
   return (
