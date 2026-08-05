@@ -8,11 +8,12 @@ export const Route = createFileRoute("/_site/institucional")({
 });
 
 const valores = [
-  { icon: Eye, title: "Transparência", desc: "Gestão aberta e prestação de contas acessível a todos os associados." },
-  { icon: Shield, title: "Ética", desc: "Conduta pautada pela honestidade, integridade e responsabilidade." },
-  { icon: GraduationCap, title: "Educação", desc: "Compromisso inabalável com a qualidade do ensino e formação dos alunos." },
-  { icon: Heart, title: "Democracia", desc: "Participação ativa dos pais nas decisões e na vida da associação." },
-  { icon: Handshake, title: "União", desc: "Força coletiva em prol do bem comum e da comunidade escolar." },
+  { icon: Eye, title: "Transparência", desc: "Contas claras, documentos abertos e comunicação constante com a comunidade." },
+  { icon: Heart, title: "Gestão Democrática", desc: "Respeito ao Estatuto Social e à vontade dos associados." },
+  { icon: GraduationCap, title: "Compromisso com a Educação", desc: "Foco total no bem-estar e no aprendizado dos alunos." },
+  { icon: Shield, title: "Ética e Integridade", desc: "Zero tolerância com desvios de finalidade ou recursos." },
+  { icon: Handshake, title: "União", desc: "Acreditar que juntos somos mais fortes." },
+  { icon: Palette, title: "Cultura Maranhense", desc: "Valorização das tradições e da identidade local." },
 ];
 
 const atividades = [
@@ -25,10 +26,10 @@ const atividades = [
 ];
 
 const management = [
-  { name: "João Silva", role: "Presidente", desc: "Responsável pela coordenação geral e representação institucional da APA." },
-  { name: "Maria Oliveira", role: "Vice-Presidente", desc: "Auxilia na coordenação e substitui o presidente em suas ausências." },
-  { name: "Carlos Santos", role: "Secretário", desc: "Responsável pelas atas, documentação e comunicação oficial." },
-  { name: "Ana Costa", role: "Tesoureira", desc: "Responsável pela gestão financeira, contas e prestação de contas." },
+  { name: "Lígia Costa Cardoso", role: "Presidente", desc: "Responsável pela coordenação geral e representação institucional da APA." },
+  { name: "Camila Pinheiro", role: "Vice-Presidente", desc: "Auxilia na coordenação e substitui o presidente em suas ausências." },
+  { name: "Priscila Stefany Dias Santos", role: "1ª Secretária", desc: "Responsável pelas atas, documentação e comunicação oficial." },
+  { name: "Eliane de Jesus Gomes Pereira", role: "1ª Tesoureira", desc: "Responsável pela gestão financeira, contas e prestação de contas." },
 ];
 
 function Institucional() {
@@ -50,7 +51,7 @@ function Institucional() {
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-white">Quem Somos</h1>
           <p className="mt-3 text-lg text-white/70 max-w-2xl mx-auto">
-            A Associação de Pais e Amigos do CMCB XII — uma nova história de transparência e participação.
+            Entidade civil sem fins lucrativos, fundada em 17 de novembro de 2022, dedicada ao apoio educacional, cultural e social dos alunos do Colégio Militar 2 de Julho: Unidade XII.
           </p>
         </div>
       </section>
@@ -60,14 +61,14 @@ function Institucional() {
           <div className="max-w-3xl">
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Nossa História</h2>
             <p className="mt-4 text-gray-600 leading-relaxed">
-              A APA CMCB XII nasceu da união de pais e responsáveis comprometidos com a excelência na educação de seus filhos. 
-              Ao longo dos anos, enfrentamos desafios e celebramos conquistas, sempre movidos pelo objetivo comum de oferecer 
-              o melhor ambiente educacional possível.
+              A <strong>Associação de Pais e Amigos do CMCB XII (APA)</strong> é uma entidade civil de direito privado, sem fins lucrativos, 
+              fundada em <strong>17 de novembro de 2022</strong>, registrada sob o CNPJ nº 50.264.838/0001-60.
             </p>
             <p className="mt-4 text-gray-600 leading-relaxed">
-              Hoje, vivemos um novo capítulo em nossa história. Com uma gestão renovada, focada em transparência, 
-              reconstrução institucional e participação democrática, estamos reconstruindo as bases da associação para 
-              que ela cumpra plenamente seu papel de apoiar a educação e fortalecer a comunidade escolar.
+              Nascemos da iniciativa de pais, mães e responsáveis de alunos do Colégio Militar 2 de Julho – Unidade XII, unidos pelo desejo comum de contribuir ativamente para a qualidade da educação oferecida aos nossos filhos e para o fortalecimento da comunidade escolar.
+            </p>
+            <p className="mt-4 text-gray-600 leading-relaxed">
+              Somos o elo de união entre as famílias e a escola. Nosso propósito é simples, mas poderoso: trabalhar em benefício dos alunos, apoiando os associados e a comunidade escolar, garantindo que cada recurso seja revertido em melhorias reais para a educação e o bem-estar dos nossos alunos.
             </p>
           </div>
         </div>
@@ -104,16 +105,14 @@ function Institucional() {
                 <Target className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-base font-semibold text-gray-900">Missão</h3>
                 <p className="text-base text-gray-600 mt-2 leading-relaxed">
-                  Promover a integração entre escola, pais e comunidade, apoiando o desenvolvimento educacional, 
-                  social e cultural dos alunos do CMCB XII com transparência, ética e responsabilidade.
+                  Promover o desenvolvimento social, educacional e cultural, oferecendo suporte assistencial aos alunos do Colégio Militar 2 de Julho – Unidade XII e suas famílias, atuando sempre em conformidade com a lei, com a ética e com os princípios da transparência e da governança.
                 </p>
               </div>
               <div className="bg-white rounded-xl border border-gray-100 p-6">
                 <Eye className="size-6 text-[#D62828] mb-3" />
                 <h3 className="text-base font-semibold text-gray-900">Visão</h3>
                 <p className="text-base text-gray-600 mt-2 leading-relaxed">
-                  Ser referência em gestão participativa e transparência entre as associações de pais do Brasil, 
-                  contribuindo ativamente para a excelência da educação pública.
+                  Ser reconhecida como uma associação modelo de transparência e eficiência, onde a confiança dos pais é o nosso maior patrimônio e a educação dos nossos filhos é o nosso foco central.
                 </p>
               </div>
             </div>
@@ -191,7 +190,7 @@ function Institucional() {
             <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828]">Conselho Fiscal</h2>
           </div>
           <div className="max-w-lg mx-auto space-y-2">
-            {["Roberto Almeida (Presidente)", "Fernanda Lima", "Pedro Rocha"].map((name) => (
+            {["Paulo Soares (Titular)", "Denise Magalhães (Titular)", "Valdicélia Rabelo (Suplente)"].map((name) => (
               <div key={name} className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-100">
                 <div className="size-8 rounded-full bg-gray-50 grid place-items-center">
                   <User className="size-4 text-gray-400" />
