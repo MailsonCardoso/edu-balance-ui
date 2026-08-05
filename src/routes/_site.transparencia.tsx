@@ -9,10 +9,6 @@ export const Route = createFileRoute("/_site/transparencia")({
   component: Transparencia,
 });
 
-function fmt(value: number) {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
 const statusConfig = {
   concluido: { icon: CheckCircle, label: "Concluído", color: "text-emerald-500", bg: "bg-emerald-50" },
   andamento: { icon: Clock, label: "Em Andamento", color: "text-amber-500", bg: "bg-amber-50" },
@@ -150,25 +146,6 @@ function Transparencia() {
 
       <section className="py-12 lg:py-16">
         <div className="container-page">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
-              <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.total_pago) : "—"}</p>
-              <p className="text-sm text-gray-500 mt-1">Total Arrecadado (histórico)</p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
-              <p className="text-2xl font-bold text-[#D62828]">{data ? fmt(data.financeiro.receitas_ano) : "—"}</p>
-              <p className="text-sm text-gray-500 mt-1">Receitas do Ano</p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
-              <p className="text-2xl font-bold text-emerald-600">{data ? String(data.mensalidades.pagas) + "/" + String(data.mensalidades.total) : "—"}</p>
-              <p className="text-sm text-gray-500 mt-1">Mensalidades Pagas</p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
-              <p className="text-2xl font-bold text-amber-600">{data ? String(data.alunos.em_dia) + "/" + String(data.alunos.ativos) : "—"}</p>
-              <p className="text-sm text-gray-500 mt-1">Alunos em Dia</p>
-            </div>
-          </div>
-
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl font-bold text-[#D62828] mb-6">Auditoria e Regularização</h2>
