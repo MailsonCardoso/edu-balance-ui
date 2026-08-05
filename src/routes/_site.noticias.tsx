@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Search, FileText, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { fetchNoticiasPublicas } from "@/lib/api/noticias";
 import { fetchCategorias } from "@/lib/api/categorias";
+import { imageUrl } from "@/lib/format";
 
 interface NewsItem {
   id?: number;
@@ -135,7 +136,7 @@ function Noticias() {
                 >
                   <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center overflow-hidden">
                     {item.image ? (
-                      <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
+                      <img src={imageUrl(item.image)} alt={item.title} className="h-full w-full object-cover" />
                     ) : (
                       <FileText className="size-10 text-[#D62828]/20" />
                     )}
@@ -207,7 +208,7 @@ function Noticias() {
 
               {selectedNews.image && (
                 <img
-                  src={selectedNews.image}
+                  src={imageUrl(selectedNews.image)}
                   alt={selectedNews.title}
                   className="w-full h-56 object-cover rounded-lg mt-4"
                 />

@@ -1,5 +1,14 @@
 export const brl = (v: number | string) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+export const imageUrl = (url: string | null | undefined): string => {
+  if (!url) return "";
+  const match = url.match(/drive\.google\.com\/file\/d\/([\w-]+)/);
+  if (match) {
+    return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+  }
+  return url;
+};
+
 export const todayStr = () => {
   const d = new Date();
   const y = d.getFullYear();
