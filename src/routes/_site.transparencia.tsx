@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { TrendingDown, DollarSign, FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, Building2, Package, User, ChevronDown, Users, Loader2 } from "lucide-react";
+import { FileText, Download, CheckCircle, Clock, AlertTriangle, HelpCircle, User, ChevronDown, Users, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { getTransparencia } from "@/lib/api/transparencia";
 import { fetchDocumentos } from "@/lib/api/documentos";
@@ -23,15 +23,6 @@ const auditSteps = [
   { title: "Auditoria de Contas", status: "andamento" as keyof typeof statusConfig },
   { title: "Regularização Fiscal", status: "pendente" as keyof typeof statusConfig },
   { title: "Prestação de Contas Final", status: "aguardando" as keyof typeof statusConfig },
-];
-
-const hardcodedDocuments = [
-  { name: "Estatuto Social", updated: "Disponível na página Institucional" },
-  { name: "Atas de Assembleias", updated: "Em breve" },
-  { name: "Regimento Interno", updated: "Em breve" },
-  { name: "Balancete Mensal", updated: "Em breve" },
-  { name: "CNPJ", updated: "Em breve" },
-  { name: "Certidões Negativas", updated: "Em breve" },
 ];
 
 const faq = [
@@ -81,7 +72,7 @@ function Transparencia() {
     staleTime: 60000,
   });
 
-  const documents = apiDocuments.length > 0 ? apiDocuments : hardcodedDocuments;
+  const documents = apiDocuments;
   const totalPages = Math.ceil(documents.length / PER_PAGE);
   const paged = documents.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
@@ -107,7 +98,7 @@ function Transparencia() {
       </section>
 
       <section className="relative -mt-10 z-10 container-page">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="size-11 rounded-lg bg-blue-50 grid place-items-center text-blue-600">
@@ -116,17 +107,6 @@ function Transparencia() {
               <div>
                 <p className="text-xl font-bold text-gray-900">{data ? String(data.total_associados) : "—"}</p>
                 <p className="text-sm text-gray-500">Total de Associados</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="size-11 rounded-lg bg-amber-50 grid place-items-center text-amber-600">
-                <Clock className="size-5" />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-gray-900">2</p>
-                <p className="text-sm text-gray-500">Projetos em Andamento</p>
               </div>
             </div>
           </div>
@@ -182,34 +162,31 @@ function Transparencia() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {paged.map((doc, i) => {
-                    const isReal = "url" in doc;
-                    return (
-                      <div key={isReal ? (doc as any).id : i} className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
+                  {paged.length === 0 ? (
+                    <div className="text-center py-10 text-sm text-gray-400">
+                      Nenhum documento publicado ainda.
+                    </div>
+                  ) : (
+                    paged.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors group">
                         <div className="flex items-center gap-3 min-w-0">
                           <FileText className="size-5 text-red-400 shrink-0" />
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate">{doc.titulo ?? (doc as any).name}</p>
-                            <p className="text-xs text-gray-400">{(doc as any).created_at ?? (doc as any).updated}</p>
+                            <p className="text-sm font-medium text-gray-900 truncate">{doc.titulo}</p>
+                            <p className="text-xs text-gray-400">{doc.created_at}</p>
                           </div>
                         </div>
-                        {isReal ? (
-                          <a
-                            href={(doc as any).url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 size-8 rounded-lg bg-gray-50 grid place-items-center text-gray-400 hover:text-[#D62828] hover:bg-[#D62828]/5 transition-colors opacity-0 group-hover:opacity-100"
-                          >
-                            <Download className="size-4" />
-                          </a>
-                        ) : (
-                          <div className="shrink-0 size-8 rounded-lg bg-gray-50 grid place-items-center text-gray-300">
-                            <Download className="size-4" />
-                          </div>
-                        )}
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="shrink-0 size-8 rounded-lg bg-gray-50 grid place-items-center text-gray-400 hover:text-[#D62828] hover:bg-[#D62828]/5 transition-colors"
+                        >
+                          <Download className="size-4" />
+                        </a>
                       </div>
-                    );
-                  })}
+                    ))
+                  )}
                   {totalPages > 1 && (
                     <div className="flex items-center justify-center gap-1 pt-3">
                       <button
