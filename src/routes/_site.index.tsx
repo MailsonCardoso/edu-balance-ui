@@ -162,7 +162,7 @@ function SiteHome() {
                 onClick={() => setSelectedNews(item)}
                 className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
               >
-                <div className="h-40 bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="w-full aspect-square bg-gradient-to-br from-[#D62828]/5 to-gray-100 flex items-center justify-center overflow-hidden">
                   {item.image ? (
                     <img src={imageUrl(item.image)} alt={item.title} className="h-full w-full object-cover" />
                   ) : (
@@ -241,7 +241,7 @@ function SiteHome() {
                 <img
                   src={imageUrl(selectedNews.image)}
                   alt={selectedNews.title}
-                  className="w-full h-56 object-cover rounded-lg mt-4"
+                  className="w-full aspect-square object-cover rounded-lg mt-4"
                 />
               )}
 
