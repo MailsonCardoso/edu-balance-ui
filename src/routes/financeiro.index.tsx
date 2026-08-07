@@ -109,16 +109,24 @@ function Financeiro() {
     date: string;
     source_type?: string;
     source_id?: number;
-  }) => {
+  }): Promise<boolean> => {
     try {
       await createTransaction(params);
+      return true;
     } catch (err: unknown) {
       if (err && typeof err === "object" && "response" in err) {
         const axiosErr = err as { response?: { status?: number } };
-        if (axiosErr.response?.status === 409) return;
+        if (axiosErr.response?.status === 409) return false;
       }
       toast.error("Erro ao registrar no Fluxo de Caixa");
+      return false;
     }
+  };
+
+  const formataRefMes = () => {
+    const hoje = new Date();
+    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
+    return `${mm}/${hoje.getFullYear()}`;
   };
 
   const carregar = async () => {
@@ -152,6 +160,7 @@ function Financeiro() {
       const pagasSemTransacao = m.filter(
         (mens) =>
           mens.status === "pago" &&
+          mens.mesReferencia === formataRefMes() &&
           !transacoesPorSource.has(`mensalidade-${mens.id}`) &&
           !descricoesLegado.has(
             `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
@@ -160,7 +169,7 @@ function Financeiro() {
       let criadas = 0;
       for (const mens of pagasSemTransacao) {
         try {
-          await criarTransacaoNoCaixa({
+          const criouTransacao = await criarTransacaoNoCaixa({
             description: `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
             amount: mens.valor,
             type: "entrada",
@@ -170,6 +179,7 @@ function Financeiro() {
             source_type: "mensalidade",
             source_id: mens.id,
           });
+          if (!criouTransacao) continue;
           await updateMensalidade(mens.id, {
             status: "pago",
             dataPagamento: mens.dataPagamento,
