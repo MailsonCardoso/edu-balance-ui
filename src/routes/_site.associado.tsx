@@ -19,6 +19,41 @@ export const Route = createFileRoute("/_site/associado")({
   component: Associado,
 });
 
+function erroAmigavel(err: unknown): string {
+  const fallback = "Não foi possível concluir a ação. Tente novamente.";
+  if (!axios.isAxiosError(err)) return fallback;
+
+  const data = err.response?.data as { message?: string; errors?: Record<string, string[]> } | undefined;
+
+  if (err.response?.status === 401) {
+    return "E-mail ou senha inválidos. Verifique e tente novamente.";
+  }
+
+  const primeiroErro = data?.errors
+    ? Object.values(data.errors)
+        .flat()
+        .find((msg) => typeof msg === "string")
+    : undefined;
+
+  const msg = primeiroErro ?? data?.message;
+  if (!msg) return fallback;
+
+  const traducoes: Record<string, string> = {
+    "The password field is required.": "Informe seu CPF (senha de acesso) para entrar.",
+    "The email field is required.": "Informe seu e-mail para entrar.",
+    "The email must be a valid email address.": "Informe um e-mail válido.",
+    "The nome field is required.": "Informe seu nome completo.",
+    "The cpf field is required.": "Informe seu CPF.",
+    "The cpf field must be 11 characters.": "O CPF deve conter 11 números.",
+    "The cpf has already been taken.": "Este CPF já está cadastrado.",
+    "The email has already been taken.": "Este e-mail já está cadastrado.",
+    "The telefone field is required.": "Informe seu telefone.",
+    "The password must be at least 6 characters.": "A senha deve ter pelo menos 6 caracteres.",
+  };
+
+  return traducoes[msg] ?? fallback;
+}
+
 function Associado() {
   const navigate = useNavigate();
   const token = localStorage.getItem("associado_token");
@@ -125,8 +160,8 @@ function AssociadoCadastro() {
         toast.success(res.message);
         window.location.href = "/associado/painel";
       }
-    } catch {
-      toast.error("Erro ao cadastrar. Verifique os dados.");
+    } catch (err) {
+      toast.error(erroAmigavel(err));
     } finally {
       setLoading(false);
     }
@@ -204,13 +239,23 @@ function AssociadoLogin() {
 
   const handleLogin = async () => {
     if (loading) return;
+
+    const email = emailRef.current?.value.trim() ?? "";
+    const password = (passwordRef.current?.value ?? "").replace(/\D/g, "");
+
+    if (!email) {
+      toast.error("Informe seu e-mail para entrar.");
+      return;
+    }
+    if (!password) {
+      toast.error("Informe seu CPF (senha de acesso) para entrar.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await loginAssociado(
-        emailRef.current?.value ?? "",
-        (passwordRef.current?.value ?? "").replace(/\D/g, ""),
-      );
+      const res = await loginAssociado(email, password);
 
       if (res.success && res.token) {
         localStorage.setItem("associado_token", res.token);
@@ -220,11 +265,7 @@ function AssociadoLogin() {
       }
     } catch (err) {
       console.error("Erro no login do associado:", err);
-      const msg =
-        axios.isAxiosError(err) && err.response?.data?.message
-          ? err.response.data.message
-          : "E-mail ou senha inválidos.";
-      toast.error(msg);
+      toast.error(erroAmigavel(err));
     } finally {
       setLoading(false);
     }
