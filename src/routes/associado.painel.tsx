@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import {
   User,
   CreditCard,
@@ -86,10 +87,14 @@ function PainelAssociado() {
           localStorage.setItem("associado_data", JSON.stringify(data));
         }
       })
-      .catch(() => {
-        localStorage.removeItem("associado_token");
-        localStorage.removeItem("associado_data");
-        navigate({ to: "/associado", replace: true });
+      .catch((err) => {
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          localStorage.removeItem("associado_token");
+          localStorage.removeItem("associado_data");
+          navigate({ to: "/associado", replace: true });
+        } else {
+          toast.error("Não foi possível atualizar seus dados. Tente novamente.");
+        }
       })
       .finally(() => {
         if (!stored) setLoading(false);
