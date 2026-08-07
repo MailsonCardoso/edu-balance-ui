@@ -89,15 +89,28 @@ class AuditoriaController extends Controller
             'payment_method' => 'nullable|string',
         ]);
 
-        $pagamento = PagamentoTransacao::create([
-            'mensalidade_id' => $validated['mensalidade_id'],
-            'origem' => 'caixa',
-            'status' => $validated['status'],
-            'payment_method' => $validated['payment_method'] ?? null,
-            'data_aprovacao' => now(),
-        ]);
+        $pagamento = PagamentoTransacao::where('mensalidade_id', $validated['mensalidade_id'])
+            ->orderByDesc('id')
+            ->first();
 
-        $pagamento->load('mensalidade.aluno:id,nome,cpf,responsavel,cpf_responsavel');
+        if ($pagamento) {
+            if (!$pagamento->payment_method && !empty($validated['payment_method'])) {
+                $pagamento->update(['payment_method' => $validated['payment_method']]);
+                $pagamento->refresh();
+            }
+
+            $pagamento->load('mensalidade.aluno:id,nome,cpf,responsavel,cpf_responsavel');
+        } else {
+            $pagamento = PagamentoTransacao::create([
+                'mensalidade_id' => $validated['mensalidade_id'],
+                'origem' => 'caixa',
+                'status' => $validated['status'],
+                'payment_method' => $validated['payment_method'] ?? null,
+                'data_aprovacao' => now(),
+            ]);
+
+            $pagamento->load('mensalidade.aluno:id,nome,cpf,responsavel,cpf_responsavel');
+        }
 
         $t = $pagamento;
         return response()->json([
