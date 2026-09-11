@@ -640,17 +640,6 @@ function Financeiro() {
               <SelectItem value="atrasado">Atrasado</SelectItem>
             </SelectContent>
           </Select>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-10"
-            onClick={() => {
-              setQ("");
-              setStatusFilter("all");
-            }}
-          >
-            Limpar
-          </Button>
         </div>
 
         <div className="overflow-x-auto">
