@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 
 class PagamentoService
 {
+    private const TAXA_PIX_MERCADOPAGO = 0.59;
+
     public function __construct(
         private readonly MercadoPagoService $mercadopago,
     ) {}
@@ -127,8 +129,14 @@ class PagamentoService
 
                 if ($dto->status === MercadoPagoStatus::Approved->value) {
                     $dadosAtualizacao['data_pagamento'] = now();
-                    $dadosAtualizacao['forma_pagamento'] = $this->mapearFormaPagamento($dto->paymentMethod);
+                    $formaPagamento = $this->mapearFormaPagamento($dto->paymentMethod);
+                    $dadosAtualizacao['forma_pagamento'] = $formaPagamento;
                     $dadosAtualizacao['origem'] = PagamentoOrigem::MercadoPago->value;
+
+                    if ($formaPagamento === 'pix') {
+                        $valorCobrado = (float) ($dadosAtuais['transaction_amount'] ?? $transacao->mensalidade->valor);
+                        $dadosAtualizacao['valor'] = max(0, round($valorCobrado - self::TAXA_PIX_MERCADOPAGO, 2));
+                    }
                 }
 
                 $transacao->mensalidade->update($dadosAtualizacao);
