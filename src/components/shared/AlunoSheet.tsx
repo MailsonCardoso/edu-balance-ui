@@ -107,7 +107,7 @@ const emptyAluno: Aluno = {
   telefoneResponsavel: "",
   turma: "",
   status: "ativo",
-valorMensalidade: 1,
+valorMensalidade: 60,
   diaVencimento: 10,
   anoLetivo: "",
 };
@@ -151,7 +151,7 @@ export function AlunoSheet({
             ? current.dataNascimento
             : fmtDate(current.dataNascimento),
         },
-    defaultValues: isCreate ? { status: "ativo", sexo: "masculino", valorMensalidade: 1, diaVencimento: 10 } : undefined,
+    defaultValues: isCreate ? { status: "ativo", sexo: "masculino", valorMensalidade: 60, diaVencimento: 10 } : undefined,
   });
 
   const onSubmit = async (data: FormData) => {
