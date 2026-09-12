@@ -97,7 +97,7 @@ class FuncionarioController extends Controller
         return response()->json($funcionario);
     }
 
-    public function destroy(Request $request, User $funcionario): JsonResponse
+    public function destroy(Request $request, User $funcionario)
     {
         $this->authorizeAdmin($request);
 
