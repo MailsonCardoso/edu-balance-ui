@@ -37,13 +37,18 @@ function Login() {
   });
 
   const onSubmit = async (data: Data) => {
-    const ok = await login(data.email, data.senha);
-    if (!ok) {
+    const logged = await login(data.email, data.senha);
+    if (!logged) {
       toast.error("E-mail ou senha inválidos");
       return;
     }
     toast.success("Bem-vindo de volta!");
-    navigate({ to: "/dashboard" });
+    if (logged.must_change_password) {
+      navigate({ to: "/trocar-senha", replace: true });
+      return;
+    }
+    const home = logged.role === "secretaria" ? "/alunos" : "/dashboard";
+    navigate({ to: home, replace: true });
   };
 
   return (
@@ -57,9 +62,7 @@ function Login() {
           <span className="font-semibold text-lg">EduFinance</span>
         </div>
         <div className="relative">
-          <h2 className="text-4xl font-semibold leading-tight">
-            Gestão financeira escolar
-          </h2>
+          <h2 className="text-4xl font-semibold leading-tight">Gestão financeira escolar</h2>
           <p className="mt-4 text-primary-foreground/85 max-w-md">
             Controle de mensalidades, inadimplência e relatórios em uma plataforma elegante e
             moderna.
@@ -131,8 +134,6 @@ function Login() {
               {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </form>
-
-
         </div>
       </div>
     </div>

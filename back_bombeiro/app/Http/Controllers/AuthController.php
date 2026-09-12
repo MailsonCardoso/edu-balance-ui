@@ -33,7 +33,37 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'cpf' => $user->cpf,
+                'telefone' => $user->telefone,
                 'role' => $user->role,
+                'must_change_password' => (bool) $user->must_change_password,
+            ],
+        ]);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'password' => 'required|string|min:6',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'password' => $validated['password'],
+            'must_change_password' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Senha alterada com sucesso.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'cpf' => $user->cpf,
+                'telefone' => $user->telefone,
+                'role' => $user->role,
+                'must_change_password' => false,
             ],
         ]);
     }

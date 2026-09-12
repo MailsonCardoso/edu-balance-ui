@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrocarSenhaRouteImport } from './routes/trocar-senha'
 import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as LoginRouteImport } from './routes/login'
@@ -16,6 +17,7 @@ import { Route as InadimplentesRouteImport } from './routes/inadimplentes'
 import { Route as GestaoOuvidoriaRouteImport } from './routes/gestao-ouvidoria'
 import { Route as GestaoNoticiasRouteImport } from './routes/gestao-noticias'
 import { Route as GestaoInventarioRouteImport } from './routes/gestao-inventario'
+import { Route as GestaoFuncionariosRouteImport } from './routes/gestao-funcionarios'
 import { Route as GestaoEstatutoRouteImport } from './routes/gestao-estatuto'
 import { Route as GestaoDocumentosRouteImport } from './routes/gestao-documentos'
 import { Route as GestaoCategoriasRouteImport } from './routes/gestao-categorias'
@@ -40,6 +42,11 @@ import { Route as SiteInstitucionalRouteImport } from './routes/_site.institucio
 import { Route as SiteContatoRouteImport } from './routes/_site.contato'
 import { Route as SiteAssociadoRouteImport } from './routes/_site.associado'
 
+const TrocarSenhaRoute = TrocarSenhaRouteImport.update({
+  id: '/trocar-senha',
+  path: '/trocar-senha',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RelatoriosRoute = RelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -73,6 +80,11 @@ const GestaoNoticiasRoute = GestaoNoticiasRouteImport.update({
 const GestaoInventarioRoute = GestaoInventarioRouteImport.update({
   id: '/gestao-inventario',
   path: '/gestao-inventario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GestaoFuncionariosRoute = GestaoFuncionariosRouteImport.update({
+  id: '/gestao-funcionarios',
+  path: '/gestao-funcionarios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GestaoEstatutoRoute = GestaoEstatutoRouteImport.update({
@@ -201,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-funcionarios': typeof GestaoFuncionariosRoute
   '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
@@ -208,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/trocar-senha': typeof TrocarSenhaRoute
   '/associado': typeof SiteAssociadoRoute
   '/contato': typeof SiteContatoRoute
   '/institucional': typeof SiteInstitucionalRoute
@@ -229,6 +243,7 @@ export interface FileRoutesByTo {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-funcionarios': typeof GestaoFuncionariosRoute
   '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
@@ -236,6 +251,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/trocar-senha': typeof TrocarSenhaRoute
   '/associado': typeof SiteAssociadoRoute
   '/contato': typeof SiteContatoRoute
   '/institucional': typeof SiteInstitucionalRoute
@@ -262,6 +278,7 @@ export interface FileRoutesById {
   '/gestao-categorias': typeof GestaoCategoriasRoute
   '/gestao-documentos': typeof GestaoDocumentosRoute
   '/gestao-estatuto': typeof GestaoEstatutoRoute
+  '/gestao-funcionarios': typeof GestaoFuncionariosRoute
   '/gestao-inventario': typeof GestaoInventarioRoute
   '/gestao-noticias': typeof GestaoNoticiasRoute
   '/gestao-ouvidoria': typeof GestaoOuvidoriaRoute
@@ -269,6 +286,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/perfil': typeof PerfilRoute
   '/relatorios': typeof RelatoriosRoute
+  '/trocar-senha': typeof TrocarSenhaRoute
   '/_site/associado': typeof SiteAssociadoRoute
   '/_site/contato': typeof SiteContatoRoute
   '/_site/institucional': typeof SiteInstitucionalRoute
@@ -296,6 +314,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-funcionarios'
     | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
@@ -303,6 +322,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/trocar-senha'
     | '/associado'
     | '/contato'
     | '/institucional'
@@ -324,6 +344,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-funcionarios'
     | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
@@ -331,6 +352,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/trocar-senha'
     | '/associado'
     | '/contato'
     | '/institucional'
@@ -356,6 +378,7 @@ export interface FileRouteTypes {
     | '/gestao-categorias'
     | '/gestao-documentos'
     | '/gestao-estatuto'
+    | '/gestao-funcionarios'
     | '/gestao-inventario'
     | '/gestao-noticias'
     | '/gestao-ouvidoria'
@@ -363,6 +386,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/perfil'
     | '/relatorios'
+    | '/trocar-senha'
     | '/_site/associado'
     | '/_site/contato'
     | '/_site/institucional'
@@ -389,6 +413,7 @@ export interface RootRouteChildren {
   GestaoCategoriasRoute: typeof GestaoCategoriasRoute
   GestaoDocumentosRoute: typeof GestaoDocumentosRoute
   GestaoEstatutoRoute: typeof GestaoEstatutoRoute
+  GestaoFuncionariosRoute: typeof GestaoFuncionariosRoute
   GestaoInventarioRoute: typeof GestaoInventarioRoute
   GestaoNoticiasRoute: typeof GestaoNoticiasRoute
   GestaoOuvidoriaRoute: typeof GestaoOuvidoriaRoute
@@ -396,11 +421,19 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PerfilRoute: typeof PerfilRoute
   RelatoriosRoute: typeof RelatoriosRoute
+  TrocarSenhaRoute: typeof TrocarSenhaRoute
   AssociadoPainelRoute: typeof AssociadoPainelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trocar-senha': {
+      id: '/trocar-senha'
+      path: '/trocar-senha'
+      fullPath: '/trocar-senha'
+      preLoaderRoute: typeof TrocarSenhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/relatorios': {
       id: '/relatorios'
       path: '/relatorios'
@@ -448,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/gestao-inventario'
       fullPath: '/gestao-inventario'
       preLoaderRoute: typeof GestaoInventarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gestao-funcionarios': {
+      id: '/gestao-funcionarios'
+      path: '/gestao-funcionarios'
+      fullPath: '/gestao-funcionarios'
+      preLoaderRoute: typeof GestaoFuncionariosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gestao-estatuto': {
@@ -677,6 +717,7 @@ const rootRouteChildren: RootRouteChildren = {
   GestaoCategoriasRoute: GestaoCategoriasRoute,
   GestaoDocumentosRoute: GestaoDocumentosRoute,
   GestaoEstatutoRoute: GestaoEstatutoRoute,
+  GestaoFuncionariosRoute: GestaoFuncionariosRoute,
   GestaoInventarioRoute: GestaoInventarioRoute,
   GestaoNoticiasRoute: GestaoNoticiasRoute,
   GestaoOuvidoriaRoute: GestaoOuvidoriaRoute,
@@ -684,6 +725,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PerfilRoute: PerfilRoute,
   RelatoriosRoute: RelatoriosRoute,
+  TrocarSenhaRoute: TrocarSenhaRoute,
   AssociadoPainelRoute: AssociadoPainelRoute,
 }
 export const routeTree = rootRouteImport

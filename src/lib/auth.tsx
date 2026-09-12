@@ -5,14 +5,19 @@ type User = {
   id: number;
   name: string;
   email: string;
+  cpf?: string | null;
+  telefone?: string | null;
   role: string;
+  must_change_password?: boolean;
 };
 
 type AuthContext = {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
+  changePassword: (password: string, passwordConfirmation: string) => Promise<boolean>;
+  setUser: (user: User | null) => void;
 };
 
 const Ctx = createContext<AuthContext | null>(null);
@@ -24,7 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem("edu_token");
     if (token) {
-      api.get("/auth/me")
+      api
+        .get("/auth/me")
         .then((r) => setUser(r.data))
         .catch(() => localStorage.removeItem("edu_token"))
         .finally(() => setLoading(false));
@@ -38,9 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data } = await api.post("/auth/login", { email, password });
       localStorage.setItem("edu_token", data.token);
       setUser(data.user);
-      return true;
+      return data.user as User;
     } catch {
-      return false;
+      return null;
     }
   }, []);
 
@@ -54,7 +60,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  return <Ctx.Provider value={{ user, loading, login, logout }}>{children}</Ctx.Provider>;
+  const changePassword = useCallback(async (password: string, passwordConfirmation: string) => {
+    try {
+      const { data } = await api.put("/auth/password", {
+        password,
+        password_confirmation: passwordConfirmation,
+      });
+      setUser(data.user);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  return (
+    <Ctx.Provider value={{ user, loading, login, logout, changePassword, setUser }}>
+      {children}
+    </Ctx.Provider>
+  );
 }
 
 export function useAuth() {

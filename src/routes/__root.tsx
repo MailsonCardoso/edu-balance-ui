@@ -11,6 +11,7 @@ import { AppLayout } from "../components/layout/AppLayout";
 import { ThemeProvider } from "../lib/theme";
 import { AuthProvider, useAuth } from "../lib/auth";
 import { Toaster } from "../components/ui/sonner";
+import { canAccess, homeFor } from "../lib/access";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: RootComponent,
@@ -23,7 +24,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const isSiteRoute = pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const isSiteRoute =
+    pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const isAssociadoRoute = pathname.startsWith("/associado");
   const isPublicRoute = pathname === "/login" || isSiteRoute || isAssociadoRoute;
 
@@ -33,6 +35,16 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
     if (!user) {
       navigate({ to: "/login", replace: true });
+      return;
+    }
+
+    if (user.must_change_password && pathname !== "/trocar-senha") {
+      navigate({ to: "/trocar-senha", replace: true });
+      return;
+    }
+
+    if (!canAccess(user.role, pathname)) {
+      navigate({ to: homeFor(user.role), replace: true });
     }
   }, [user, loading, pathname, isPublicRoute, navigate]);
 
@@ -45,7 +57,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isSiteRoute = pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const isSiteRoute =
+    pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
   const isAuthRoute = pathname === "/login" || pathname.startsWith("/associado") || isSiteRoute;
 
   return (

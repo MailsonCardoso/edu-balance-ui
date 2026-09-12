@@ -47,6 +47,9 @@ Route::get('/mensalidades/{mensalidade}/status-pagamento', [CobrancaController::
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::put('/auth/password', [AuthController::class, 'changePassword']);
+
+    Route::apiResource('funcionarios', App\Http\Controllers\FuncionarioController::class);
 
     Route::get('/dashboard/financeiro', [App\Http\Controllers\DashboardController::class, 'financeiro']);
     Route::apiResource('alunos', AlunoController::class);

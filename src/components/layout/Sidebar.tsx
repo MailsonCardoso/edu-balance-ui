@@ -19,18 +19,23 @@ import {
   TrendingUp,
   TrendingDown,
   ShieldCheck,
+  KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
+import { isSecretaria } from "@/lib/access";
 
 interface NavItem {
   to: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  secretaria?: boolean;
 }
 
 interface NavSection {
   title: string;
   items: NavItem[];
+  secretaria?: boolean;
 }
 
 const sections: NavSection[] = [
@@ -47,35 +52,51 @@ const sections: NavSection[] = [
   },
   {
     title: "Cadastros",
+    secretaria: true,
     items: [
-      { to: "/alunos", label: "Alunos", icon: Users },
-      { to: "/gestao-associados", label: "Associados", icon: Users },
+      { to: "/alunos", label: "Alunos", icon: Users, secretaria: true },
+      { to: "/gestao-associados", label: "Associados", icon: Users, secretaria: true },
       { to: "/gestao-categorias", label: "Categorias", icon: Tags },
     ],
   },
   {
     title: "Administração",
+    secretaria: true,
     items: [
-      { to: "/gestao-inventario", label: "Inventário", icon: Package },
-      { to: "/gestao-noticias", label: "Notícias", icon: Newspaper },
-      { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle },
+      { to: "/gestao-inventario", label: "Inventário", icon: Package, secretaria: true },
+      { to: "/gestao-noticias", label: "Notícias", icon: Newspaper, secretaria: true },
+      { to: "/gestao-ouvidoria", label: "Ouvidoria", icon: MessageCircle, secretaria: true },
       { to: "/gestao-documentos", label: "Documentos", icon: FileText },
       { to: "/gestao-estatuto", label: "Estatuto", icon: ScrollText },
       { to: "/gestao-auditoria", label: "Auditoria", icon: ShieldCheck },
+      { to: "/gestao-funcionarios", label: "Funcionários", icon: Users },
     ],
   },
   {
     title: "Pessoal",
+    secretaria: true,
     items: [
-      { to: "/perfil", label: "Perfil", icon: UserCircle },
+      { to: "/perfil", label: "Perfil", icon: UserCircle, secretaria: true },
+      { to: "/trocar-senha", label: "Alterar Senha", icon: KeyRound, secretaria: true },
     ],
   },
 ];
 
-const allNav = sections.flatMap((s) => s.items);
+function visibleSections(role: string | undefined): NavSection[] {
+  const isSec = isSecretaria(role);
+  return sections
+    .map((section) => {
+      const items = section.items.filter((item) => (isSec ? item.secretaria : true));
+      return { ...section, items };
+    })
+    .filter((section) => !isSec || (section.secretaria && section.items.length > 0));
+}
 
 export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navSections = visibleSections(user?.role);
+  const allNav = navSections.flatMap((s) => s.items);
 
   return (
     <aside
@@ -105,41 +126,43 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
 
       <ScrollArea className="flex-1 bg-sidebar" type="hover">
         <nav className="px-2 py-4">
-        {sections.map((section) => (
-          <div key={section.title} className="mb-4 last:mb-0">
-            {!collapsed && (
-              <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
-                {section.title}
+          {navSections.map((section) => (
+            <div key={section.title} className="mb-4 last:mb-0">
+              {!collapsed && (
+                <div className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                  {section.title}
+                </div>
+              )}
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const sorted = [...allNav].sort((a, b) => b.to.length - a.to.length);
+                  const best = sorted.find(
+                    (i) => pathname === i.to || pathname.startsWith(i.to + "/"),
+                  );
+                  const active = best?.to === item.to;
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors group",
+                        active
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                          : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                      )}
+                      title={collapsed ? item.label : undefined}
+                    >
+                      <Icon className="size-[18px] shrink-0" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </Link>
+                  );
+                })}
               </div>
-            )}
-            <div className="space-y-0.5">
-              {section.items.map((item) => {
-                const sorted = [...allNav].sort((a, b) => b.to.length - a.to.length);
-                const best = sorted.find((i) => pathname === i.to || pathname.startsWith(i.to + "/"));
-                const active = best?.to === item.to;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors group",
-                      active
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
-                    )}
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <Icon className="size-[18px] shrink-0" />
-                    {!collapsed && <span>{item.label}</span>}
-                  </Link>
-                );
-              })}
             </div>
-          </div>
-        ))}
-      </nav>
-    </ScrollArea>
+          ))}
+        </nav>
+      </ScrollArea>
 
       <div className="p-2 border-t border-sidebar-border">
         <Link
