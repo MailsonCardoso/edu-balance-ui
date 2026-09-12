@@ -42,7 +42,7 @@ function TrocarSenha() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
           <div className="mb-6 flex flex-col items-center text-center">

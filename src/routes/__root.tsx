@@ -59,7 +59,11 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isSiteRoute =
     pathname === "/" || sitePaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-  const isAuthRoute = pathname === "/login" || pathname.startsWith("/associado") || isSiteRoute;
+  const isAuthRoute =
+    pathname === "/login" ||
+    pathname === "/trocar-senha" ||
+    pathname.startsWith("/associado") ||
+    isSiteRoute;
 
   return (
     <QueryClientProvider client={queryClient}>
