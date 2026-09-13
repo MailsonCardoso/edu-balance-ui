@@ -341,7 +341,7 @@ function Financeiro() {
     doc.text("Recibo do pagamento do Associado", ml + cw / 2, y, { align: "center" });
 
     y += 10;
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.text("ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)", ml + cw / 2, y, { align: "center" });
 
     y += 6;
