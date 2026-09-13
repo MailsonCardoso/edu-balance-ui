@@ -49,8 +49,6 @@ function formatMoney(v: number | null): string {
 function methodIcon(method: string | null) {
   if (method === "bank_transfer" || method === "pix")
     return <Smartphone className="size-3.5 text-emerald-500" />;
-  if (method === "ticket" || method === "boleto")
-    return <Receipt className="size-3.5 text-blue-500" />;
   return null;
 }
 
@@ -91,10 +89,8 @@ function GestaoAuditoria() {
       item.mes_referencia || "-",
       formatMoney(item.valor),
       formatMoney(item.valor_pago),
-      formatMoney(item.taxa_mp),
       statusBadge[item.status]?.label || item.status,
       item.payment_method || "-",
-      item.banco_nome || item.issuer_id || "-",
       item.payment_id || "-",
       item.e2e_id || "-",
       formatDate(item.data_criacao),
@@ -122,10 +118,8 @@ function GestaoAuditoria() {
           "Mês",
           "Valor",
           "Valor Pago",
-          "Taxa MP",
           "Status",
           "Método",
-          "Banco",
           "ID Transação",
           "ID Pix",
           "Criação",
@@ -141,14 +135,12 @@ function GestaoAuditoria() {
         2: { cellWidth: 14 },
         3: { cellWidth: 18, halign: "right" },
         4: { cellWidth: 20, halign: "right" },
-        5: { cellWidth: 14, halign: "right" },
-        6: { cellWidth: 16 },
-        7: { cellWidth: 14 },
-        8: { cellWidth: 12 },
+        5: { cellWidth: 16 },
+        6: { cellWidth: 14 },
+        7: { cellWidth: 22 },
+        8: { cellWidth: 36 },
         9: { cellWidth: 22 },
-        10: { cellWidth: 36 },
-        11: { cellWidth: 22 },
-        12: { cellWidth: 16 },
+        10: { cellWidth: 16 },
       },
     });
 
@@ -212,7 +204,6 @@ function GestaoAuditoria() {
             >
               <option value="">Todos os métodos</option>
               <option value="bank_transfer">PIX</option>
-              <option value="ticket">Boleto</option>
             </select>
             <Button
               variant="outline"
@@ -270,17 +261,11 @@ function GestaoAuditoria() {
                     <th className="text-right py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                       Valor Pago
                     </th>
-                    <th className="text-right py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
-                      Taxa MP
-                    </th>
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                       Status
                     </th>
                     <th className="text-center py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                       Método
-                    </th>
-                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
-                      Banco
                     </th>
                     <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                       ID Transação
@@ -325,9 +310,6 @@ function GestaoAuditoria() {
                         <td className="py-3 px-3 text-right text-muted-foreground">
                           {item.valor_pago != null ? formatMoney(item.valor_pago) : "—"}
                         </td>
-                        <td className="py-3 px-3 text-right text-muted-foreground">
-                          {item.taxa_mp != null ? formatMoney(item.taxa_mp) : "—"}
-                        </td>
                         <td className="py-3 px-3">
                           <div className="flex justify-center">
                             <span
@@ -347,9 +329,6 @@ function GestaoAuditoria() {
                                 : item.payment_method || "-"}
                             </span>
                           </div>
-                        </td>
-                        <td className="py-3 px-3 text-xs text-muted-foreground">
-                          {item.banco_nome || item.issuer_id || "-"}
                         </td>
                         <td
                           className="py-3 px-3 font-mono text-xs text-muted-foreground"

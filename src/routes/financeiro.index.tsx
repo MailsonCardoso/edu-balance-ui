@@ -71,26 +71,28 @@ export const Route = createFileRoute("/financeiro/")({
 
 const formaPagamentoLabel: Record<string, string> = {
   pix: "Pix",
-  debito: "Débito",
-  credito: "Crédito",
 };
 
 const origemPagamentoLabel: Record<string, string> = {
-  mercadopago: "Mercado Pago",
-  caixa: "Caixa",
-  admin: "Admin",
   pix_manual: "PIX",
   dinheiro: "Dinheiro",
-  transferencia: "Transferência",
 };
+
+const rotuloDesconhecido = (v: string) =>
+  v.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 const formaPagamentoExibida = (m: {
   formaPagamento?: string | null;
   origem?: string | null;
 }) => {
   if (m.origem === "dinheiro" && !m.formaPagamento) return "Dinheiro";
-  return m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—";
+  return m.formaPagamento
+    ? (formaPagamentoLabel[m.formaPagamento] ?? rotuloDesconhecido(m.formaPagamento))
+    : "—";
 };
+
+const origemPagamentoExibida = (origem?: string | null) =>
+  origem ? (origemPagamentoLabel[origem] ?? rotuloDesconhecido(origem)) : "—";
 
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
@@ -401,13 +403,13 @@ function Financeiro() {
       ["Valor pago pelo associado:", `${brl(valorCobrado)} (${valorExtensoCobrado})`],
       ...(temTaxa
         ? ([
-            ["Tarifa do meio de pagamento (Mercado Pago):", `- ${brl(valorCobrado - m.valor)}`],
+            ["Tarifa do meio de pagamento:", `- ${brl(valorCobrado - m.valor)}`],
             ["Valor líquido recebido pela associação:", brl(m.valor)],
           ] as [string, string][])
         : []),
       ["Data do Pagamento:", m.dataPagamento ? fmtDate(m.dataPagamento) : "—"],
       ["Forma de Pagamento:", formaPagamentoExibida(m)],
-      ["Origem:", m.origem ? origemPagamentoLabel[m.origem] : "—"],
+      ["Origem:", origemPagamentoExibida(m.origem)],
     ];
     const boxH = info.length * 7 + 12;
     doc.roundedRect(ml, y, cw, boxH, 3, 3, "FD");
@@ -635,7 +637,7 @@ function Financeiro() {
                           </span>
                           {m.origem && m.origem !== "dinheiro" && (
                             <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border bg-blue-50 text-blue-700 border-blue-100">
-                              {origemPagamentoLabel[m.origem]}
+                              {origemPagamentoExibida(m.origem)}
                             </span>
                           )}
                         </div>
@@ -1022,7 +1024,7 @@ function Financeiro() {
                 reciboMensalidade.valorCobrado > reciboMensalidade.valor + 0.004 ? (
                   <>
                     <span className="text-muted-foreground">
-                      Tarifa do meio de pagamento (Mercado Pago):
+                      Tarifa do meio de pagamento:
                     </span>
                     <span className="font-medium">
                       - {brl(reciboMensalidade.valorCobrado - reciboMensalidade.valor)}
@@ -1045,7 +1047,7 @@ function Financeiro() {
                 </span>
                 <span className="text-muted-foreground">Origem:</span>
                 <span className="font-medium capitalize">
-                  {reciboMensalidade?.origem ? origemPagamentoLabel[reciboMensalidade.origem] : "—"}
+                  {origemPagamentoExibida(reciboMensalidade?.origem)}
                 </span>
               </div>
             </div>

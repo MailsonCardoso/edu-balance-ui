@@ -84,13 +84,15 @@ const meses = [
 ];
 
 const origemConfig: Record<string, { label: string; className: string }> = {
-  mercadopago: { label: "Mercado Pago", className: "bg-sky-50 text-sky-700" },
-  caixa: { label: "Caixa", className: "bg-blue-50 text-blue-700" },
-  admin: { label: "Admin", className: "bg-gray-100 text-gray-600" },
   pix_manual: { label: "PIX", className: "bg-emerald-50 text-emerald-700" },
   dinheiro: { label: "Dinheiro", className: "bg-amber-50 text-amber-700" },
-  transferencia: { label: "Transferência", className: "bg-purple-50 text-purple-700" },
 };
+
+const rotuloDesconhecido = (v: string) =>
+  v.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const origemLabelExibido = (o?: string) =>
+  o ? (origemConfig[o]?.label ?? rotuloDesconhecido(o)) : "";
 
 const mesesNomes = [
   "janeiro",
@@ -218,7 +220,7 @@ function FluxoCaixaPage() {
         Tipo: t.type === "entrada" ? "Entrada" : "Saída",
         Origem:
           t.source_type === "mensalidade" && t.source_id
-            ? (origemConfig[origemPorId.get(t.source_id) ?? ""]?.label ?? "")
+            ? origemLabelExibido(origemPorId.get(t.source_id))
             : "",
         Valor: Number(t.amount),
       })),
@@ -555,7 +557,7 @@ function FluxoCaixaPage() {
                               const orig = origemPorId.get(t.source_id);
                               if (!orig) return null;
                               const cfg = origemConfig[orig] ?? {
-                                label: orig,
+                                label: rotuloDesconhecido(orig),
                                 className: "bg-gray-100 text-gray-600",
                               };
                               return (
