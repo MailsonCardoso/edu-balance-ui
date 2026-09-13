@@ -344,9 +344,14 @@ function Financeiro() {
     doc.text("CNPJ nº 50.264.838/0001-60", ml + cw / 2, y, { align: "center" });
 
     y += 6;
-    doc.text("Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000", ml + cw / 2, y, {
-      align: "center",
-    });
+    doc.text(
+      "Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000",
+      ml + cw / 2,
+      y,
+      {
+        align: "center",
+      },
+    );
 
     y += 8;
     doc.setDrawColor(200);
@@ -468,11 +473,7 @@ function Financeiro() {
         description="Mensalidades, pagamentos e histórico"
         actions={
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={sincronizarCaixa}
-              disabled={sincronizando}
-            >
+            <Button variant="outline" onClick={sincronizarCaixa} disabled={sincronizando}>
               {sincronizando ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
@@ -480,11 +481,7 @@ function Financeiro() {
               )}
               Sincronizar caixa
             </Button>
-            <Button
-              variant="outline"
-              onClick={gerarProximoMes}
-              disabled={gerando}
-            >
+            <Button variant="outline" onClick={gerarProximoMes} disabled={gerando}>
               {gerando ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
@@ -504,13 +501,9 @@ function Financeiro() {
           <div className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center gap-2 text-success mb-1">
               <TrendingUp className="size-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">
-                Recebido no Mês
-              </span>
+              <span className="text-xs font-medium uppercase tracking-wide">Recebido no Mês</span>
             </div>
-            <p className="text-2xl font-semibold text-success">
-              {brl(dashboard.receita_mes)}
-            </p>
+            <p className="text-2xl font-semibold text-success">{brl(dashboard.receita_mes)}</p>
             <p className="text-xs text-muted-foreground mt-1">
               {dashboard.qtd_pagas} mensalidade(s) paga(s)
             </p>
@@ -518,13 +511,9 @@ function Financeiro() {
           <div className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center gap-2 text-warning mb-1">
               <Wallet className="size-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">
-                A Receber
-              </span>
+              <span className="text-xs font-medium uppercase tracking-wide">A Receber</span>
             </div>
-            <p className="text-2xl font-semibold text-warning">
-              {brl(dashboard.total_pendente)}
-            </p>
+            <p className="text-2xl font-semibold text-warning">{brl(dashboard.total_pendente)}</p>
             <p className="text-xs text-muted-foreground mt-1">
               {dashboard.qtd_pendentes} pendentes
             </p>
@@ -532,27 +521,19 @@ function Financeiro() {
           <div className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center gap-2 text-destructive mb-1">
               <AlertTriangle className="size-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">
-                Vencidos
-              </span>
+              <span className="text-xs font-medium uppercase tracking-wide">Vencidos</span>
             </div>
             <p className="text-2xl font-semibold text-destructive">
               {brl(dashboard.total_vencido)}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {dashboard.qtd_vencidas} em atraso
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">{dashboard.qtd_vencidas} em atraso</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-center gap-2 text-info mb-1">
               <UserX className="size-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">
-                Inadimplência
-              </span>
+              <span className="text-xs font-medium uppercase tracking-wide">Inadimplência</span>
             </div>
-            <p className="text-2xl font-semibold text-info">
-              {dashboard.perc_inadimplencia}%
-            </p>
+            <p className="text-2xl font-semibold text-info">{dashboard.perc_inadimplencia}%</p>
             <p className="text-xs text-muted-foreground mt-1">
               {dashboard.alunos_inadimplentes} de {dashboard.alunos_ativos} alunos
             </p>
@@ -650,8 +631,8 @@ function Financeiro() {
           <div className="flex items-center justify-between px-4 py-3 border-t border-border">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>
-                Exibindo {(page - 1) * perPage + 1}-
-                {Math.min(page * perPage, filtered.length)} de {filtered.length}
+                Exibindo {(page - 1) * perPage + 1}-{Math.min(page * perPage, filtered.length)} de{" "}
+                {filtered.length}
               </span>
               <Select
                 value={String(perPage)}
@@ -979,9 +960,7 @@ function Financeiro() {
                     onChange={() => setPagamentoOrigem(v)}
                     className="size-4 accent-primary"
                   />
-                  <span className="text-sm font-medium">
-                    {origemPagamentoOption[v]}
-                  </span>
+                  <span className="text-sm font-medium">{origemPagamentoOption[v]}</span>
                 </label>
               ))}
             </div>
@@ -1014,8 +993,8 @@ function Financeiro() {
               </p>
             </div>
             <p className="text-justify text-muted-foreground border-t border-border pt-4">
-              Declaro, para os devidos fins, que recebi Mensalidade/Contribuição Associativa
-              abaixo discriminada:
+              Declaro, para os devidos fins, que recebi Mensalidade/Contribuição Associativa abaixo
+              discriminada:
             </p>
             <div className="space-y-2 bg-muted/30 rounded-lg p-4">
               <div className="grid grid-cols-[140px_1fr] gap-x-2">
@@ -1047,9 +1026,7 @@ function Financeiro() {
                 </span>
                 <span className="text-muted-foreground">Origem:</span>
                 <span className="font-medium capitalize">
-                  {reciboMensalidade?.origem
-                    ? origemPagamentoLabel[reciboMensalidade.origem]
-                    : "—"}
+                  {reciboMensalidade?.origem ? origemPagamentoLabel[reciboMensalidade.origem] : "—"}
                 </span>
               </div>
             </div>

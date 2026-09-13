@@ -60,10 +60,7 @@ import {
   type Transaction,
   type TransactionsResponse,
 } from "@/lib/api/transactions";
-import {
-  fetchCategories,
-  type FinancialCategory,
-} from "@/lib/api/financial-categories";
+import { fetchCategories, type FinancialCategory } from "@/lib/api/financial-categories";
 import { fetchMensalidades } from "@/lib/api/mensalidades";
 import type { Mensalidade, OrigemPagamento } from "@/lib/mock-data";
 
@@ -72,8 +69,18 @@ export const Route = createFileRoute("/financeiro/fluxo-caixa")({
 });
 
 const meses = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];
 
 const origemConfig: Record<string, { label: string; className: string }> = {
@@ -84,6 +91,34 @@ const origemConfig: Record<string, { label: string; className: string }> = {
   dinheiro: { label: "Dinheiro", className: "bg-amber-50 text-amber-700" },
   transferencia: { label: "Transferência", className: "bg-purple-50 text-purple-700" },
 };
+
+const mesesNomes = [
+  "janeiro",
+  "fevereiro",
+  "março",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
+];
+
+function normalizaMesRef(ref: string): string {
+  const trim = ref.trim();
+  if (/^\d{2}\/\d{4}$/.test(trim)) return trim;
+  const lower = trim.toLowerCase();
+  for (let i = 0; i < mesesNomes.length; i++) {
+    if (lower.startsWith(mesesNomes[i])) {
+      const ano = lower.match(/\d{4}/)?.[0];
+      if (ano) return `${String(i + 1).padStart(2, "0")}/${ano}`;
+    }
+  }
+  return trim;
+}
 
 function FluxoCaixaPage() {
   const hoje = new Date();
@@ -123,11 +158,15 @@ function FluxoCaixaPage() {
   }, [mes, ano]);
 
   useEffect(() => {
-    fetchCategories().then(setCategories).catch(() => {});
+    fetchCategories()
+      .then(setCategories)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
-    fetchMensalidades().then(setMensalidades).catch(() => {});
+    fetchMensalidades()
+      .then(setMensalidades)
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -147,7 +186,7 @@ function FluxoCaixaPage() {
     return mensalidades
       .filter(
         (m) =>
-          m.mesReferencia === refMes &&
+          normalizaMesRef(m.mesReferencia) === refMes &&
           (m.status === "pendente" || m.status === "atrasado"),
       )
       .reduce((s, m) => s + m.valor, 0);
@@ -242,18 +281,21 @@ function FluxoCaixaPage() {
   };
 
   const totais = useMemo(() => {
-    const entradas = data?.transactions
-      .filter((t) => t.type === "entrada")
-      .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
-    const saidas = data?.transactions
-      .filter((t) => t.type === "saida")
-      .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
+    const entradas =
+      data?.transactions
+        .filter((t) => t.type === "entrada")
+        .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
+    const saidas =
+      data?.transactions
+        .filter((t) => t.type === "saida")
+        .reduce((s, t) => s + Number(t.amount), 0) ?? 0;
     return { entradas, saidas };
   }, [data]);
 
-  const saldoAtual = data?.is_closed && data?.closing_balance != null
-    ? data.closing_balance
-    : (data?.previous_balance ?? 0) + totais.entradas - totais.saidas;
+  const saldoAtual =
+    data?.is_closed && data?.closing_balance != null
+      ? data.closing_balance
+      : (data?.previous_balance ?? 0) + totais.entradas - totais.saidas;
 
   const anos = useMemo(() => {
     const atual = hoje.getFullYear();
@@ -331,11 +373,7 @@ function FluxoCaixaPage() {
                 Mês Finalizado
               </span>
             ) : (
-              <Button
-                variant="outline"
-                onClick={finalizarMes}
-                disabled={finalizando || loading}
-              >
+              <Button variant="outline" onClick={finalizarMes} disabled={finalizando || loading}>
                 {finalizando ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
@@ -388,36 +426,28 @@ function FluxoCaixaPage() {
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Wallet className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">
-                  Saldo Anterior
-                </span>
+                <span className="text-xs font-medium uppercase tracking-wide">Saldo Anterior</span>
               </div>
               <p className="text-2xl font-semibold">{brl(data?.previous_balance ?? 0)}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-success mb-1">
                 <TrendingUp className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">
-                  Entradas
-                </span>
+                <span className="text-xs font-medium uppercase tracking-wide">Entradas</span>
               </div>
               <p className="text-2xl font-semibold text-success">{brl(totais.entradas)}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-destructive mb-1">
                 <TrendingDown className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">
-                  Saídas
-                </span>
+                <span className="text-xs font-medium uppercase tracking-wide">Saídas</span>
               </div>
               <p className="text-2xl font-semibold text-destructive">{brl(totais.saidas)}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-info mb-1">
                 <PiggyBank className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">
-                  Saldo Atual
-                </span>
+                <span className="text-xs font-medium uppercase tracking-wide">Saldo Atual</span>
               </div>
               <p
                 className={`text-2xl font-semibold ${
@@ -430,14 +460,10 @@ function FluxoCaixaPage() {
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-info mb-1">
                 <HandCoins className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">
-                  A Receber
-                </span>
+                <span className="text-xs font-medium uppercase tracking-wide">A Receber</span>
               </div>
               <p className="text-2xl font-semibold text-info">{brl(aReceber)}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Mensalidades pendentes do mês
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Mensalidades pendentes do mês</p>
             </div>
           </div>
 
@@ -482,10 +508,10 @@ function FluxoCaixaPage() {
             </div>
 
             <div className="overflow-x-auto">
-{filtered.length === 0 ? (
-                      <EmptyState title="Nenhuma transação neste mês" />
-                    ) : (
-                      <table className="w-full text-sm">
+              {filtered.length === 0 ? (
+                <EmptyState title="Nenhuma transação neste mês" />
+              ) : (
+                <table className="w-full text-sm">
                   <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <tr>
                       <th className="px-4 py-3 font-medium">Data</th>
@@ -499,9 +525,7 @@ function FluxoCaixaPage() {
                   <tbody className="divide-y divide-border">
                     {paged.map((t) => (
                       <tr key={t.id} className="hover:bg-muted/30">
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {fmtDate(t.date)}
-                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{fmtDate(t.date)}</td>
                         <td className="px-4 py-3 font-medium">{t.description}</td>
                         <td className="px-4 py-3 text-muted-foreground">
                           {t.category?.nome || "—"}
@@ -515,9 +539,7 @@ function FluxoCaixaPage() {
                         <td className="px-4 py-3">
                           <span
                             className={`inline-flex items-center gap-1 text-xs font-medium ${
-                              t.type === "entrada"
-                                ? "text-success"
-                                : "text-destructive"
+                              t.type === "entrada" ? "text-success" : "text-destructive"
                             }`}
                           >
                             {t.type === "entrada" ? (
@@ -527,24 +549,27 @@ function FluxoCaixaPage() {
                             )}
                             {t.type === "entrada" ? "Entrada" : "Saída"}
                           </span>
-                          {t.source_type === "mensalidade" && t.source_id && (() => {
-                            const orig = origemPorId.get(t.source_id);
-                            if (!orig) return null;
-                            const cfg = origemConfig[orig] ?? { label: orig, className: "bg-gray-100 text-gray-600" };
-                            return (
-                              <span className={`ml-2 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border ${cfg.className}`}>
-                                {cfg.label}
-                              </span>
-                            );
-                          })()}
+                          {t.source_type === "mensalidade" &&
+                            t.source_id &&
+                            (() => {
+                              const orig = origemPorId.get(t.source_id);
+                              if (!orig) return null;
+                              const cfg = origemConfig[orig] ?? {
+                                label: orig,
+                                className: "bg-gray-100 text-gray-600",
+                              };
+                              return (
+                                <span
+                                  className={`ml-2 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border ${cfg.className}`}
+                                >
+                                  {cfg.label}
+                                </span>
+                              );
+                            })()}
                         </td>
                         <td className="px-4 py-3 text-right font-medium tabular-nums">
                           <span
-                            className={
-                              t.type === "entrada"
-                                ? "text-success"
-                                : "text-destructive"
-                            }
+                            className={t.type === "entrada" ? "text-success" : "text-destructive"}
                           >
                             {t.type === "entrada" ? "+" : "-"}
                             {brl(t.amount)}
@@ -636,9 +661,7 @@ function FluxoCaixaPage() {
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <SheetHeader className="pr-8">
             <SheetTitle>Nova transação</SheetTitle>
-            <SheetDescription>
-              Registre uma entrada ou saída no fluxo de caixa
-            </SheetDescription>
+            <SheetDescription>Registre uma entrada ou saída no fluxo de caixa</SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-4">
             <div className="space-y-1.5">
@@ -675,9 +698,7 @@ function FluxoCaixaPage() {
               </label>
               <Select
                 value={form.financial_category_id}
-                onValueChange={(v) =>
-                  setForm((f) => ({ ...f, financial_category_id: v }))
-                }
+                onValueChange={(v) => setForm((f) => ({ ...f, financial_category_id: v }))}
               >
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="Selecione uma categoria" />
@@ -685,9 +706,7 @@ function FluxoCaixaPage() {
                 <SelectContent>
                   {categories
                     .filter((c) =>
-                      form.type === "entrada"
-                        ? c.tipo === "receita"
-                        : c.tipo === "despesa",
+                      form.type === "entrada" ? c.tipo === "receita" : c.tipo === "despesa",
                     )
                     .map((cat) => (
                       <SelectItem key={cat.id} value={String(cat.id)}>
@@ -705,9 +724,7 @@ function FluxoCaixaPage() {
                 className="h-10"
                 placeholder="Ex: Pagamento mensalidade"
                 value={form.description}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, description: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               />
             </div>
             <div className="space-y-1.5">
@@ -721,9 +738,7 @@ function FluxoCaixaPage() {
                 className="h-10"
                 placeholder="0,00"
                 value={form.amount || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, amount: Number(e.target.value) || 0 }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, amount: Number(e.target.value) || 0 }))}
               />
             </div>
             <div className="space-y-1.5">
@@ -734,9 +749,7 @@ function FluxoCaixaPage() {
                 type="date"
                 className="h-10"
                 value={form.date}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, date: e.target.value }))
-                }
+                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
               />
             </div>
           </div>
@@ -760,8 +773,7 @@ function FluxoCaixaPage() {
             <AlertDialogTitle>Excluir transação</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir a transação{" "}
-              <strong>{deleteTarget?.description}</strong>? Esta ação não pode
-              ser desfeita.
+              <strong>{deleteTarget?.description}</strong>? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
