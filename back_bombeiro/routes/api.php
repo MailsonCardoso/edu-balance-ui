@@ -4,6 +4,7 @@ use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CobrancaController;
 use App\Http\Controllers\MensalidadeController;
+use App\Models\Mensalidade;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FinancialCategoryController;
 use App\Http\Controllers\MercadoPagoWebhookController;
@@ -42,6 +43,20 @@ Route::post('/webhooks/mercadopago', MercadoPagoWebhookController::class);
 // Cobrança Mercado Pago (usando token do associado)
 Route::post('/mensalidades/{mensalidade}/gerar-cobranca', [CobrancaController::class, 'gerar']);
 Route::get('/mensalidades/{mensalidade}/status-pagamento', [CobrancaController::class, 'status']);
+
+// Fallback: responde JSON limpo quando um GET cai na rota /pagar (redirecionamentos)
+Route::get('/mensalidades/{mensalidade}/pagar', function (Mensalidade $mensalidade) {
+    return response()->json([
+        'success' => true,
+        'message' => 'Pagamento deve ser confirmado via POST.',
+        'data' => [
+            'mensalidade_id' => $mensalidade->id,
+            'status' => $mensalidade->status,
+            'forma_pagamento' => $mensalidade->forma_pagamento,
+            'origem' => $mensalidade->origem,
+        ],
+    ]);
+});
 
 // Rotas protegidas
 Route::middleware('auth:sanctum')->group(function () {

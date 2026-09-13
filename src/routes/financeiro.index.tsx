@@ -84,10 +84,12 @@ const origemPagamentoLabel: Record<string, string> = {
   transferencia: "Transferência",
 };
 
-const origemPagamentoOption: Record<string, string> = {
-  caixa: "Caixa",
-  dinheiro: "Dinheiro",
-  transferencia: "Transferência",
+const formaPagamentoExibida = (m: {
+  formaPagamento?: string | null;
+  origem?: string | null;
+}) => {
+  if (m.origem === "dinheiro" && !m.formaPagamento) return "Dinheiro";
+  return m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—";
 };
 
 function Financeiro() {
@@ -114,10 +116,10 @@ function Financeiro() {
   const [pagamentoOpen, setPagamentoOpen] = useState(false);
   const [pagamentoId, setPagamentoId] = useState("");
   const [pagamentoForma, setPagamentoForma] = useState("");
-  const [pagamentoOrigem, setPagamentoOrigem] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
   const [sincronizando, setSincronizando] = useState(false);
+  const [confirmando, setConfirmando] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
@@ -287,18 +289,35 @@ function Financeiro() {
   };
 
   const confirmarPagamento = async () => {
+    if (confirmando) return;
+    setConfirmando(true);
     try {
+      const ehPix = pagamentoForma === "pix";
       const updated = await pagarMensalidade(pagamentoId, {
-        formaPagamento: pagamentoForma || null,
-        origem: pagamentoOrigem || undefined,
+        formaPagamento: ehPix ? "pix" : null,
+        origem: ehPix ? "pix_manual" : "dinheiro",
       });
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
-      setData(await fetchMensalidades());
-      setReciboMensalidade(updated);
+      const todas = await fetchMensalidades();
+      setData(todas);
+      const atual = todas.find((m) => m.id === pagamentoId);
+      setReciboMensalidade(atual ?? updated);
     } catch {
-      toast.error("Erro ao registrar pagamento");
+      const todas = await fetchMensalidades().catch(() => null);
+      const atual = (todas ?? []).find((m) => m.id === pagamentoId);
+      if (atual?.status === "pago") {
+        toast.success("Pagamento registrado!");
+        setPagamentoOpen(false);
+        setSelectedMensalidade(null);
+        if (todas) setData(todas);
+        setReciboMensalidade(atual);
+      } else {
+        toast.error("Erro ao registrar pagamento");
+      }
+    } finally {
+      setConfirmando(false);
     }
   };
 
@@ -387,7 +406,7 @@ function Financeiro() {
           ] as [string, string][])
         : []),
       ["Data do Pagamento:", m.dataPagamento ? fmtDate(m.dataPagamento) : "—"],
-      ["Forma de Pagamento:", m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"],
+      ["Forma de Pagamento:", formaPagamentoExibida(m)],
       ["Origem:", m.origem ? origemPagamentoLabel[m.origem] : "—"],
     ];
     const boxH = info.length * 7 + 12;
@@ -609,12 +628,12 @@ function Financeiro() {
                       <StatusBadge status={m.status} />
                     </td>
                     <td className="px-4 py-3 text-sm">
-                      {m.formaPagamento ? (
+                      {m.formaPagamento || m.origem === "dinheiro" ? (
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span className="capitalize">
-                            {formaPagamentoLabel[m.formaPagamento]}
+                            {formaPagamentoExibida(m)}
                           </span>
-                          {m.origem && (
+                          {m.origem && m.origem !== "dinheiro" && (
                             <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border bg-blue-50 text-blue-700 border-blue-100">
                               {origemPagamentoLabel[m.origem]}
                             </span>
@@ -740,8 +759,7 @@ function Financeiro() {
                         icon: <CheckCircle2 className="size-5" />,
                         onClick: () => {
                           setPagamentoId(selectedMensalidade.id);
-                          setPagamentoForma(selectedMensalidade.formaPagamento ?? "");
-                          setPagamentoOrigem(selectedMensalidade.origem ?? "");
+                          setPagamentoForma("pix");
                           setPagamentoOpen(true);
                         },
                       },
@@ -863,8 +881,6 @@ function Financeiro() {
                 <SelectContent>
                   <SelectItem value="nenhuma">Sem forma</SelectItem>
                   <SelectItem value="pix">Pix</SelectItem>
-                  <SelectItem value="debito">Débito</SelectItem>
-                  <SelectItem value="credito">Crédito</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -923,7 +939,7 @@ function Financeiro() {
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
                 Forma de pagamento
               </label>
-              {(["", "pix", "debito", "credito"] as const).map((v) => (
+              {(["pix", "dinheiro"] as const).map((v) => (
                 <label
                   key={v}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
@@ -941,46 +957,17 @@ function Financeiro() {
                     className="size-4 accent-primary"
                   />
                   <span className="text-sm font-medium">
-                    {v === ""
-                      ? "Sem forma"
-                      : v === "pix"
-                        ? "Pix"
-                        : v === "debito"
-                          ? "Débito"
-                          : "Crédito"}
+                    {v === "pix" ? "Pix" : "Dinheiro"}
                   </span>
-                </label>
-              ))}
-            </div>
-            <div className="space-y-3 border-t border-border pt-4">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
-                Origem do pagamento
-              </label>
-              {(["caixa", "dinheiro", "transferencia"] as const).map((v) => (
-                <label
-                  key={v}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
-                    pagamentoOrigem === v
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:bg-accent"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="origemPagamento"
-                    value={v}
-                    checked={pagamentoOrigem === v}
-                    onChange={() => setPagamentoOrigem(v)}
-                    className="size-4 accent-primary"
-                  />
-                  <span className="text-sm font-medium">{origemPagamentoOption[v]}</span>
                 </label>
               ))}
             </div>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmarPagamento}>Confirmar pagamento</AlertDialogAction>
+            <AlertDialogAction onClick={confirmarPagamento} disabled={confirmando}>
+            {confirmando ? "Processando..." : "Confirmar pagamento"}
+          </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1054,9 +1041,7 @@ function Financeiro() {
                 </span>
                 <span className="text-muted-foreground">Forma de Pagamento:</span>
                 <span className="font-medium capitalize">
-                  {reciboMensalidade?.formaPagamento
-                    ? formaPagamentoLabel[reciboMensalidade.formaPagamento]
-                    : "—"}
+                  {reciboMensalidade ? formaPagamentoExibida(reciboMensalidade) : "—"}
                 </span>
                 <span className="text-muted-foreground">Origem:</span>
                 <span className="font-medium capitalize">
