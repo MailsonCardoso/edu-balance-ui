@@ -25,6 +25,9 @@ export function ReciboModal({
 }) {
   const rotulo = mensalidade.alunoSexo === "feminino" ? "Aluna" : "Aluno";
   const dataPg = mensalidade.dataPagamento ? fmtDateFull(mensalidade.dataPagamento) : "—";
+  const cobrado = mensalidade.valorCobrado != null ? mensalidade.valorCobrado : mensalidade.valor;
+  const temTaxa =
+    mensalidade.valorCobrado != null && mensalidade.valorCobrado > mensalidade.valor + 0.004;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
@@ -42,10 +45,16 @@ export function ReciboModal({
         </button>
 
         <div className="pt-4 text-center">
-          <p className="text-xs uppercase tracking-wide text-gray-400">Recibo do pagamento do Associado</p>
-          <p className="mt-1 text-lg font-bold text-gray-900">ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)</p>
+          <p className="text-xs uppercase tracking-wide text-gray-400">
+            Recibo do pagamento do Associado
+          </p>
+          <p className="mt-1 text-lg font-bold text-gray-900">
+            ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)
+          </p>
           <p className="text-[11px] text-gray-400">CNPJ nº 50.264.838/0001-60</p>
-          <p className="text-[11px] text-gray-400">Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000</p>
+          <p className="text-[11px] text-gray-400">
+            Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000
+          </p>
         </div>
 
         <div className="mt-5 space-y-3 rounded-2xl bg-gray-50 p-4 text-sm">
@@ -56,20 +65,31 @@ export function ReciboModal({
             <span className="font-medium text-gray-900">{mensalidade.alunoResponsavel || "—"}</span>
             <span className="text-gray-400">Mês:</span>
             <span className="font-medium text-gray-900">{mensalidade.mesReferencia}</span>
-            <span className="text-gray-400">Valor:</span>
+            <span className="text-gray-400">Valor pago pelo associado:</span>
             <span className="font-medium text-gray-900">
-              {brl(mensalidade.valor)} <span className="text-[11px] text-gray-400">({numeroExtenso(mensalidade.valor)})</span>
+              {brl(cobrado)}{" "}
+              <span className="text-[11px] text-gray-400">({numeroExtenso(cobrado)})</span>
             </span>
+            {temTaxa ? (
+              <>
+                <span className="text-gray-400">Tarifa do meio de pagamento (Mercado Pago):</span>
+                <span className="font-medium text-gray-900">
+                  - {brl(mensalidade.valorCobrado! - mensalidade.valor)}
+                </span>
+                <span className="text-gray-400">Valor líquido recebido pela associação:</span>
+                <span className="font-medium text-gray-900">{brl(mensalidade.valor)}</span>
+              </>
+            ) : null}
             <span className="text-gray-400">Pagamento:</span>
             <span className="font-medium text-gray-900">{dataPg}</span>
             <span className="text-gray-400">Forma:</span>
-            <span className="font-medium capitalize text-gray-900">{labelPagamento(mensalidade)}</span>
+            <span className="font-medium capitalize text-gray-900">
+              {labelPagamento(mensalidade)}
+            </span>
           </div>
         </div>
 
-        <p className="mt-4 text-center text-xs text-gray-400">
-          Paranã, {dataPg}.
-        </p>
+        <p className="mt-4 text-center text-xs text-gray-400">Paranã, {dataPg}.</p>
 
         <div className="mt-5 text-center border-t border-gray-100 pt-4">
           <div className="inline-block border-t border-gray-300 pt-2 px-10">

@@ -17,7 +17,9 @@ function labelPagamento(m: Mensalidade): string {
 
 export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
   const dataPg = m.dataPagamento ? fmtDateFull(m.dataPagamento) : "—";
-  const valorExtenso = numeroExtenso(m.valor);
+  const valorCobrado = m.valorCobrado != null ? m.valorCobrado : m.valor;
+  const temTaxa = valorCobrado > m.valor + 0.004;
+  const valorExtensoCobrado = numeroExtenso(valorCobrado);
   const rotulo = m.alunoSexo === "feminino" ? "Aluna" : "Aluno";
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const ml = 25;
@@ -38,7 +40,12 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
   doc.text("CNPJ nº 50.264.838/0001-60", ml + cw / 2, y, { align: "center" });
 
   y += 6;
-  doc.text("Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000", ml + cw / 2, y, { align: "center" });
+  doc.text(
+    "Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000",
+    ml + cw / 2,
+    y,
+    { align: "center" },
+  );
 
   y += 8;
   doc.setDrawColor(200);
@@ -47,20 +54,26 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
   y += 12;
   doc.setDrawColor(220);
   doc.setFillColor(248, 248, 248);
-  doc.roundedRect(ml, y, cw, 44, 3, 3, "FD");
-
-  const ix = ml + 6;
-  let iy = y + 7;
-  const labelW = 42;
-
   const info: [string, string][] = [
     [`${rotulo}:`, m.alunoNome || "—"],
     ["Responsável:", m.alunoResponsavel || "—"],
     ["Mês:", m.mesReferencia],
-    ["Valor:", `${brl(m.valor)} (${valorExtenso})`],
+    ["Valor pago pelo associado:", `${brl(valorCobrado)} (${valorExtensoCobrado})`],
+    ...(temTaxa
+      ? ([
+          ["Tarifa do meio de pagamento (Mercado Pago):", `- ${brl(valorCobrado - m.valor)}`],
+          ["Valor líquido recebido pela associação:", brl(m.valor)],
+        ] as [string, string][])
+      : []),
     ["Pagamento:", dataPg],
     ["Forma:", labelPagamento(m)],
   ];
+  const boxH = info.length * 7 + 12;
+  doc.roundedRect(ml, y, cw, boxH, 3, 3, "FD");
+
+  const ix = ml + 6;
+  let iy = y + 7;
+  const labelW = 60;
 
   for (const [label, value] of info) {
     doc.setFont("times", "bold");
