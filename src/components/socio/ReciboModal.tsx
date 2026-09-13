@@ -43,8 +43,9 @@ export function ReciboModal({
 
         <div className="pt-4 text-center">
           <p className="text-xs uppercase tracking-wide text-gray-400">Recibo do pagamento do Associado</p>
-          <p className="mt-1 text-lg font-bold text-gray-900">APACMCBXII</p>
-          <p className="text-[11px] text-gray-400">Associação de pais e amigos do CMCBXII</p>
+          <p className="mt-1 text-lg font-bold text-gray-900">ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)</p>
+          <p className="text-[11px] text-gray-400">CNPJ nº 50.264.838/0001-60</p>
+          <p className="text-[11px] text-gray-400">Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000</p>
         </div>
 
         <div className="mt-5 space-y-3 rounded-2xl bg-gray-50 p-4 text-sm">

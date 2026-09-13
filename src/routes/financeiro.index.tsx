@@ -439,12 +439,15 @@ function Financeiro() {
 
     y += 10;
     doc.setFontSize(12);
-    doc.text("APACMCBXII", ml + cw / 2, y, { align: "center" });
+    doc.text("ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)", ml + cw / 2, y, { align: "center" });
 
     y += 6;
     doc.setFont("times", "normal");
     doc.setFontSize(10);
-    doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y, {
+    doc.text("CNPJ nº 50.264.838/0001-60", ml + cw / 2, y, { align: "center" });
+
+    y += 6;
+    doc.text("Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000", ml + cw / 2, y, {
       align: "center",
     });
 
@@ -455,7 +458,7 @@ function Financeiro() {
     y += 8;
     doc.setFontSize(10);
     doc.text(
-      "Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar abaixo discriminada:",
+      "Declaro, para os devidos fins, que recebi Mensalidade/Contribuição Associativa abaixo discriminada:",
       ml,
       y,
       { maxWidth: cw, align: "justify" },
@@ -1026,13 +1029,14 @@ function Financeiro() {
           </AlertDialogHeader>
           <div className="py-4 space-y-4 text-sm">
             <div className="text-center pb-3">
-              <p className="font-bold text-base">APACMCBXII</p>
+              <p className="font-bold text-base">ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)</p>
+              <p className="text-muted-foreground">CNPJ nº 50.264.838/0001-60</p>
               <p className="text-muted-foreground">
-                Associação de pais e amigos do CMCBXII
+                Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000
               </p>
             </div>
             <p className="text-justify text-muted-foreground border-t border-border pt-4">
-              Declaro, para os devidos fins, que recebi o pagamento referente à mensalidade escolar
+              Declaro, para os devidos fins, que recebi Mensalidade/Contribuição Associativa
               abaixo discriminada:
             </p>
             <div className="space-y-2 bg-muted/30 rounded-lg p-4">

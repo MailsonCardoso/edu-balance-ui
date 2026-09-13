@@ -1,1 +1,0 @@
-import{a0 as r}from"./index-DxV493Dw.js";async function s(t){const a=new URLSearchParams;Object.entries(t).forEach(([o,i])=>{i!==void 0&&i!==""&&a.set(o,String(i))});const{data:n}=await r.get(`/admin/auditoria/pagamentos?${a}`);return n}async function c(t){const{data:a}=await r.post("/admin/auditoria/pagamentos",t);return a}export{c,s as f};

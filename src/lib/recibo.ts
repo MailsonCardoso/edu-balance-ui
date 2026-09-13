@@ -30,12 +30,15 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
 
   y += 9;
   doc.setFontSize(12);
-  doc.text("APACMCBXII", ml + cw / 2, y, { align: "center" });
+  doc.text("ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)", ml + cw / 2, y, { align: "center" });
 
   y += 6;
   doc.setFont("times", "normal");
   doc.setFontSize(9);
-  doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y, { align: "center" });
+  doc.text("CNPJ nº 50.264.838/0001-60", ml + cw / 2, y, { align: "center" });
+
+  y += 6;
+  doc.text("Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000", ml + cw / 2, y, { align: "center" });
 
   y += 8;
   doc.setDrawColor(200);
