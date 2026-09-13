@@ -26,16 +26,16 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
 
   doc.setFont("times", "bold");
   doc.setFontSize(16);
-  doc.text("Comprovante de Pagamento", ml + cw / 2, y, { align: "center" });
+  doc.text("Recibo do pagamento do Associado", ml + cw / 2, y, { align: "center" });
 
   y += 9;
   doc.setFontSize(12);
-  doc.text("Bombeiro Paranã", ml + cw / 2, y, { align: "center" });
+  doc.text("APACMCBXII", ml + cw / 2, y, { align: "center" });
 
   y += 6;
   doc.setFont("times", "normal");
   doc.setFontSize(9);
-  doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y, { align: "center" });
+  doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y, { align: "center" });
 
   y += 8;
   doc.setDrawColor(200);
@@ -80,7 +80,7 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
   doc.text("Responsável pelo Recebimento", ml + cw / 2, y + 4, { align: "center" });
   doc.setFont("times", "normal");
   doc.setFontSize(9);
-  doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y + 10, { align: "center" });
+  doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y + 10, { align: "center" });
 
   doc.setFontSize(8);
   doc.setTextColor(150);

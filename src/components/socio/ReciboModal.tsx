@@ -42,9 +42,9 @@ export function ReciboModal({
         </button>
 
         <div className="pt-4 text-center">
-          <p className="text-xs uppercase tracking-wide text-gray-400">Comprovante de Pagamento</p>
-          <p className="mt-1 text-lg font-bold text-gray-900">Bombeiro Paranã</p>
-          <p className="text-[11px] text-gray-400">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+          <p className="text-xs uppercase tracking-wide text-gray-400">Recibo do pagamento do Associado</p>
+          <p className="mt-1 text-lg font-bold text-gray-900">APACMCBXII</p>
+          <p className="text-[11px] text-gray-400">Associação de pais e amigos do CMCBXII</p>
         </div>
 
         <div className="mt-5 space-y-3 rounded-2xl bg-gray-50 p-4 text-sm">
@@ -73,7 +73,7 @@ export function ReciboModal({
         <div className="mt-5 text-center border-t border-gray-100 pt-4">
           <div className="inline-block border-t border-gray-300 pt-2 px-10">
             <p className="text-xs font-semibold text-gray-600">Responsável pelo Recebimento</p>
-            <p className="text-[10px] text-gray-400">Colégio Militar 2 de Julho – Unidade XII – Paranã</p>
+            <p className="text-[10px] text-gray-400">Associação de pais e amigos do CMCBXII</p>
           </div>
         </div>
 

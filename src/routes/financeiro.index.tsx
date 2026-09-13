@@ -419,7 +419,7 @@ function Financeiro() {
     const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
     if (!phone) return null;
     const msg = encodeURIComponent(
-      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição!\n\nAtenciosamente,\nAssociação Bombeiro Paranã`,
+      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição!\n\nAtenciosamente,\nAssociação de pais e amigos do CMCBXII`,
     );
     return `https://wa.me/55${phone}?text=${msg}`;
   };
@@ -435,16 +435,16 @@ function Financeiro() {
 
     doc.setFont("times", "bold");
     doc.setFontSize(14);
-    doc.text("Recibo de Pagamento de Mensalidade Escolar", ml + cw / 2, y, { align: "center" });
+    doc.text("Recibo do pagamento do Associado", ml + cw / 2, y, { align: "center" });
 
     y += 10;
     doc.setFontSize(12);
-    doc.text("Bombeiro Paranã", ml + cw / 2, y, { align: "center" });
+    doc.text("APACMCBXII", ml + cw / 2, y, { align: "center" });
 
     y += 6;
     doc.setFont("times", "normal");
     doc.setFontSize(10);
-    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y, {
+    doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y, {
       align: "center",
     });
 
@@ -508,7 +508,7 @@ function Financeiro() {
     doc.text("Responsável pelo Recebimento", ml + cw / 2, y + 4, { align: "center" });
     doc.setFont("times", "normal");
     doc.setFontSize(9);
-    doc.text("Colégio Militar 2 de Julho – Unidade XII – Paranã", ml + cw / 2, y + 10, {
+    doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y + 10, {
       align: "center",
     });
 
@@ -540,7 +540,7 @@ function Financeiro() {
     const file = new File([blob], `recibo-${m.id}.pdf`, { type: "application/pdf" });
 
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: "Recibo de Pagamento" });
+      await navigator.share({ files: [file], title: "Recibo do pagamento do Associado" });
     } else {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -1021,14 +1021,14 @@ function Financeiro() {
         <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center text-base uppercase tracking-wide">
-              Recibo de Pagamento de Mensalidade Escolar
+              Recibo do pagamento do Associado
             </AlertDialogTitle>
           </AlertDialogHeader>
           <div className="py-4 space-y-4 text-sm">
             <div className="text-center pb-3">
-              <p className="font-bold text-base">Bombeiro Paranã</p>
+              <p className="font-bold text-base">APACMCBXII</p>
               <p className="text-muted-foreground">
-                Colégio Militar 2 de Julho – Unidade XII – Paranã
+                Associação de pais e amigos do CMCBXII
               </p>
             </div>
             <p className="text-justify text-muted-foreground border-t border-border pt-4">
@@ -1079,7 +1079,7 @@ function Financeiro() {
               <div className="inline-block border-t border-foreground pt-2 px-12">
                 <p className="text-sm font-semibold">Responsável pelo Recebimento</p>
                 <p className="text-xs text-muted-foreground">
-                  Colégio Militar 2 de Julho – Unidade XII – Paranã
+                  Associação de pais e amigos do CMCBXII
                 </p>
               </div>
             </div>
