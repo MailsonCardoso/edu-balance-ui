@@ -978,14 +978,14 @@ function Financeiro() {
           if (!o) setReciboMensalidade(null);
         }}
       >
-        <AlertDialogContent className="max-w-lg">
-          <AlertDialogHeader>
+        <AlertDialogContent className="max-w-lg max-h-[90dvh] flex flex-col p-4 sm:p-6">
+          <AlertDialogHeader className="shrink-0">
             <AlertDialogTitle className="text-center text-base uppercase tracking-wide">
               Recibo do pagamento do Associado
             </AlertDialogTitle>
           </AlertDialogHeader>
-          <div className="py-4 space-y-4 text-sm">
-            <div className="text-center pb-3">
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-3 text-sm py-2 pr-1">
+            <div className="text-center pb-2">
               <p className="font-bold text-base">ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)</p>
               <p className="text-muted-foreground">CNPJ nº 50.264.838/0001-60</p>
               <p className="text-muted-foreground">
@@ -1068,7 +1068,7 @@ function Financeiro() {
               </div>
             </div>
           </div>
-          <AlertDialogFooter className="sm:justify-center gap-2">
+          <AlertDialogFooter className="shrink-0 sm:justify-center gap-2">
             <Button variant="outline" onClick={() => setReciboMensalidade(null)}>
               Fechar
             </Button>
