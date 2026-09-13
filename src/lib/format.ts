@@ -19,6 +19,8 @@ export const todayStr = () => {
 
 export const fmtDate = (iso: string) => {
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(iso)) return iso;
+  const match = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
   const d = new Date(iso);
   return isNaN(d.getTime()) ? iso : d.toLocaleDateString("pt-BR");
 };
@@ -112,6 +114,11 @@ export const fmtDateFull = (dateStr: string): string => {
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
     const [d, m, y] = dateStr.split("/");
     const dt = new Date(+y, +m - 1, +d);
+    return dt.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
+  }
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const dt = new Date(+match[1], +match[2] - 1, +match[3]);
     return dt.toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
   }
   const d = new Date(dateStr);
