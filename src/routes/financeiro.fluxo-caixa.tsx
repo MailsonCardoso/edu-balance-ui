@@ -15,6 +15,10 @@ import {
   Lock,
   LockKeyhole,
   Link2,
+  Download,
+  FileText,
+  FileSpreadsheet,
+  HandCoins,
 } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
@@ -45,6 +49,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { brl, fmtDate } from "@/lib/format";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import {
   fetchTransactions,
   createTransaction,
@@ -57,6 +64,8 @@ import {
   fetchCategories,
   type FinancialCategory,
 } from "@/lib/api/financial-categories";
+import { fetchMensalidades } from "@/lib/api/mensalidades";
+import type { Mensalidade, OrigemPagamento } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/financeiro/fluxo-caixa")({
   component: FluxoCaixaPage,
@@ -67,14 +76,26 @@ const meses = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
+const origemConfig: Record<string, { label: string; className: string }> = {
+  mercadopago: { label: "Mercado Pago", className: "bg-sky-50 text-sky-700" },
+  caixa: { label: "Caixa", className: "bg-blue-50 text-blue-700" },
+  admin: { label: "Admin", className: "bg-gray-100 text-gray-600" },
+  pix_manual: { label: "PIX", className: "bg-emerald-50 text-emerald-700" },
+  dinheiro: { label: "Dinheiro", className: "bg-amber-50 text-amber-700" },
+  transferencia: { label: "Transferência", className: "bg-purple-50 text-purple-700" },
+};
+
 function FluxoCaixaPage() {
   const hoje = new Date();
   const [mes, setMes] = useState(String(hoje.getMonth() + 1).padStart(2, "0"));
   const [ano, setAno] = useState(String(hoje.getFullYear()));
   const [data, setData] = useState<TransactionsResponse | null>(null);
   const [categories, setCategories] = useState<FinancialCategory[]>([]);
+  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState({
@@ -105,6 +126,33 @@ function FluxoCaixaPage() {
     fetchCategories().then(setCategories).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    fetchMensalidades().then(setMensalidades).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setPage(1);
+  }, [q, mes, ano]);
+
+  const origemPorId = useMemo(() => {
+    const map = new Map<number, OrigemPagamento>();
+    for (const m of mensalidades) {
+      if (m.origem) map.set(Number(m.id), m.origem);
+    }
+    return map;
+  }, [mensalidades]);
+
+  const refMes = `${mes}/${ano}`;
+  const aReceber = useMemo(() => {
+    return mensalidades
+      .filter(
+        (m) =>
+          m.mesReferencia === refMes &&
+          (m.status === "pendente" || m.status === "atrasado"),
+      )
+      .reduce((s, m) => s + m.valor, 0);
+  }, [mensalidades, refMes]);
+
   const filtered = useMemo(
     () =>
       data?.transactions.filter(
@@ -115,6 +163,83 @@ function FluxoCaixaPage() {
       ) ?? [],
     [data, q],
   );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paged = useMemo(
+    () => filtered.slice((page - 1) * perPage, page * perPage),
+    [filtered, page, perPage],
+  );
+
+  const linhasExport = useMemo(
+    () =>
+      filtered.map((t) => ({
+        Data: t.date,
+        Descricao: t.description,
+        Categoria: t.category?.nome ?? t.category_name ?? "",
+        Tipo: t.type === "entrada" ? "Entrada" : "Saída",
+        Origem:
+          t.source_type === "mensalidade" && t.source_id
+            ? (origemConfig[origemPorId.get(t.source_id) ?? ""]?.label ?? "")
+            : "",
+        Valor: Number(t.amount),
+      })),
+    [filtered, origemPorId],
+  );
+
+  const exportarPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(12);
+    doc.text(`Fluxo de Caixa - ${meses[Number(mes) - 1]} ${ano}`, 14, 16);
+    autoTable(doc, {
+      head: [["Data", "Descrição", "Categoria", "Tipo", "Origem", "Valor (R$)"]],
+      body: linhasExport.map((l) => [
+        l.Data,
+        l.Descricao,
+        l.Categoria,
+        l.Tipo,
+        l.Origem,
+        l.Valor.toFixed(2).replace(".", ","),
+      ]),
+      startY: 24,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [15, 118, 110] },
+    });
+    doc.save(`fluxo-caixa-${mes}-${ano}.pdf`);
+  };
+
+  const exportarXLSX = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      linhasExport.map((l) => ({
+        ...l,
+        Valor: l.Valor.toFixed(2).replace(".", ","),
+      })),
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Fluxo de Caixa");
+    XLSX.writeFile(wb, `fluxo-caixa-${mes}-${ano}.xlsx`);
+  };
+
+  const exportarCSV = () => {
+    const rows = linhasExport.map((l) => ({
+      Data: l.Data,
+      Descrição: l.Descricao,
+      Categoria: l.Categoria,
+      Tipo: l.Tipo,
+      Origem: l.Origem,
+      Valor: l.Valor.toFixed(2).replace(".", ","),
+    }));
+    const csv = [
+      Object.keys(rows[0] ?? {}).join(";"),
+      ...rows.map((r) => Object.values(r).join(";")),
+    ].join("\n");
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fluxo-caixa-${mes}-${ano}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const totais = useMemo(() => {
     const entradas = data?.transactions
@@ -259,7 +384,7 @@ function FluxoCaixaPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-4 mb-6">
             <div className="bg-card border border-border rounded-xl p-5">
               <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Wallet className="size-4" />
@@ -302,11 +427,23 @@ function FluxoCaixaPage() {
                 {brl(saldoAtual)}
               </p>
             </div>
+            <div className="bg-card border border-border rounded-xl p-5">
+              <div className="flex items-center gap-2 text-info mb-1">
+                <HandCoins className="size-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">
+                  A Receber
+                </span>
+              </div>
+              <p className="text-2xl font-semibold text-info">{brl(aReceber)}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Mensalidades pendentes do mês
+              </p>
+            </div>
           </div>
 
           <div className="bg-card rounded-xl border border-border">
-            <div className="p-4 flex gap-3 border-b border-border">
-              <div className="relative flex-1">
+            <div className="p-4 flex flex-wrap gap-3 border-b border-border">
+              <div className="relative flex-1 min-w-[220px]">
                 <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
                 <Input
                   value={q}
@@ -315,13 +452,40 @@ function FluxoCaixaPage() {
                   className="pl-9 h-10"
                 />
               </div>
+              <Button
+                variant="outline"
+                onClick={exportarPDF}
+                disabled={!filtered.length}
+                className="shrink-0"
+                title="Exportar PDF"
+              >
+                <FileText className="size-4" /> PDF
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportarXLSX}
+                disabled={!filtered.length}
+                className="shrink-0"
+                title="Exportar Excel"
+              >
+                <FileSpreadsheet className="size-4" /> Excel
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportarCSV}
+                disabled={!filtered.length}
+                className="shrink-0"
+                title="Exportar CSV"
+              >
+                <Download className="size-4" /> CSV
+              </Button>
             </div>
 
             <div className="overflow-x-auto">
-              {filtered.length === 0 ? (
-                <EmptyState title="Nenhuma transação neste mês" />
-              ) : (
-                <table className="w-full text-sm">
+{filtered.length === 0 ? (
+                      <EmptyState title="Nenhuma transação neste mês" />
+                    ) : (
+                      <table className="w-full text-sm">
                   <thead className="bg-muted/40 text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <tr>
                       <th className="px-4 py-3 font-medium">Data</th>
@@ -333,7 +497,7 @@ function FluxoCaixaPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {filtered.map((t) => (
+                    {paged.map((t) => (
                       <tr key={t.id} className="hover:bg-muted/30">
                         <td className="px-4 py-3 text-muted-foreground">
                           {fmtDate(t.date)}
@@ -363,6 +527,16 @@ function FluxoCaixaPage() {
                             )}
                             {t.type === "entrada" ? "Entrada" : "Saída"}
                           </span>
+                          {t.source_type === "mensalidade" && t.source_id && (() => {
+                            const orig = origemPorId.get(t.source_id);
+                            if (!orig) return null;
+                            const cfg = origemConfig[orig] ?? { label: orig, className: "bg-gray-100 text-gray-600" };
+                            return (
+                              <span className={`ml-2 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border ${cfg.className}`}>
+                                {cfg.label}
+                              </span>
+                            );
+                          })()}
                         </td>
                         <td className="px-4 py-3 text-right font-medium tabular-nums">
                           <span
@@ -405,6 +579,55 @@ function FluxoCaixaPage() {
                 </table>
               )}
             </div>
+            {filtered.length > perPage && (
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  {paged.length > 0 &&
+                    `${(page - 1) * perPage + 1}-${Math.min(page * perPage, filtered.length)} de ${filtered.length} transações`}
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select
+                    value={String(perPage)}
+                    onValueChange={(v) => {
+                      setPerPage(Number(v));
+                      setPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-[90px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[10, 20, 50].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} / pág
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                    >
+                      Anterior
+                    </Button>
+                    <span className="px-2 text-xs text-muted-foreground">
+                      {page} / {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

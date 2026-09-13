@@ -15,7 +15,10 @@ import {
   Search,
   Trash2,
   X,
-  Users,
+  TrendingUp,
+  Wallet,
+  AlertTriangle,
+  UserX,
 } from "lucide-react";
 import { PageHeader, StatusBadge, EmptyState } from "@/components/shared/Primitives";
 import { ActionSheet } from "@/components/shared/ActionSheet";
@@ -45,7 +48,7 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import type { Mensalidade, Aluno, FormaPagamento } from "@/lib/mock-data";
+import type { Mensalidade, Aluno, FormaPagamento, OrigemPagamento } from "@/lib/mock-data";
 import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
@@ -72,6 +75,21 @@ const formaPagamentoLabel: Record<string, string> = {
   credito: "Crédito",
 };
 
+const origemPagamentoLabel: Record<string, string> = {
+  mercadopago: "Mercado Pago",
+  caixa: "Caixa",
+  admin: "Admin",
+  pix_manual: "PIX",
+  dinheiro: "Dinheiro",
+  transferencia: "Transferência",
+};
+
+const origemPagamentoOption: Record<string, string> = {
+  caixa: "Caixa",
+  dinheiro: "Dinheiro",
+  transferencia: "Transferência",
+};
+
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [data, setData] = useState<Mensalidade[]>([]);
@@ -96,6 +114,7 @@ function Financeiro() {
   const [pagamentoOpen, setPagamentoOpen] = useState(false);
   const [pagamentoId, setPagamentoId] = useState("");
   const [pagamentoForma, setPagamentoForma] = useState("");
+  const [pagamentoOrigem, setPagamentoOrigem] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
   const [sincronizando, setSincronizando] = useState(false);
@@ -183,15 +202,6 @@ function Financeiro() {
     setPage(1);
   }, [q, statusFilter]);
 
-  const totals = useMemo(
-    () => ({
-      pago: filtered.filter((m) => m.status === "pago").reduce((s, m) => s + m.valor, 0),
-      pendente: filtered.filter((m) => m.status === "pendente").reduce((s, m) => s + m.valor, 0),
-      vencido: filtered.filter((m) => m.status === "atrasado").reduce((s, m) => s + m.valor, 0),
-    }),
-    [filtered],
-  );
-
   const mesCorrente = () => {
     const hoje = new Date();
     const mes = hoje.toLocaleDateString("pt-BR", { month: "long" });
@@ -276,6 +286,7 @@ function Financeiro() {
     try {
       const updated = await pagarMensalidade(pagamentoId, {
         formaPagamento: pagamentoForma || null,
+        origem: pagamentoOrigem || undefined,
       });
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
@@ -353,7 +364,7 @@ function Financeiro() {
     y += 14;
     doc.setDrawColor(220);
     doc.setFillColor(248, 248, 248);
-    doc.roundedRect(ml, y, cw, 50, 3, 3, "FD");
+    doc.roundedRect(ml, y, cw, 55, 3, 3, "FD");
     const ix = ml + 6;
     let iy = y + 7;
     const labelW = 42;
@@ -366,6 +377,7 @@ function Financeiro() {
       ["Valor Pago:", `${brl(m.valor)} (${valorExtenso})`],
       ["Data do Pagamento:", m.dataPagamento ? fmtDate(m.dataPagamento) : "—"],
       ["Forma de Pagamento:", m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"],
+      ["Origem:", m.origem ? origemPagamentoLabel[m.origem] : "—"],
     ];
     for (const [label, value] of info) {
       doc.setFont("times", "bold");
@@ -488,36 +500,65 @@ function Financeiro() {
       />
 
       {dashboard && (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <div className="bg-card border border-border rounded-xl p-4 md:col-span-4">
-              <div className="flex items-center gap-2 text-info mb-1">
-                <Users className="size-4" />
-                <span className="text-xs font-medium uppercase tracking-wide">Mensalidades</span>
-              </div>
-              <p className="text-xl font-semibold">
-                {dashboard.qtd_pagas} / {dashboard.qtd_pendentes + dashboard.qtd_vencidas}
-              </p>
-              <p className="text-xs text-muted-foreground">pagas / pendentes</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          <div className="bg-card border border-border rounded-xl p-5">
+            <div className="flex items-center gap-2 text-success mb-1">
+              <TrendingUp className="size-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">
+                Recebido no Mês
+              </span>
             </div>
+            <p className="text-2xl font-semibold text-success">
+              {brl(dashboard.receita_mes)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dashboard.qtd_pagas} mensalidade(s) paga(s)
+            </p>
           </div>
-        </>
+          <div className="bg-card border border-border rounded-xl p-5">
+            <div className="flex items-center gap-2 text-warning mb-1">
+              <Wallet className="size-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">
+                A Receber
+              </span>
+            </div>
+            <p className="text-2xl font-semibold text-warning">
+              {brl(dashboard.total_pendente)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dashboard.qtd_pendentes} pendentes
+            </p>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5">
+            <div className="flex items-center gap-2 text-destructive mb-1">
+              <AlertTriangle className="size-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">
+                Vencidos
+              </span>
+            </div>
+            <p className="text-2xl font-semibold text-destructive">
+              {brl(dashboard.total_vencido)}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dashboard.qtd_vencidas} em atraso
+            </p>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-5">
+            <div className="flex items-center gap-2 text-info mb-1">
+              <UserX className="size-4" />
+              <span className="text-xs font-medium uppercase tracking-wide">
+                Inadimplência
+              </span>
+            </div>
+            <p className="text-2xl font-semibold text-info">
+              {dashboard.perc_inadimplencia}%
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {dashboard.alunos_inadimplentes} de {dashboard.alunos_ativos} alunos
+            </p>
+          </div>
+        </div>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-card border border-border rounded-xl p-5">
-          <p className="text-sm text-muted-foreground">Recebido (filtro)</p>
-          <p className="text-2xl font-semibold mt-1 text-success">{brl(totals.pago)}</p>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-5">
-          <p className="text-sm text-muted-foreground">A receber</p>
-          <p className="text-2xl font-semibold mt-1 text-warning">{brl(totals.pendente)}</p>
-        </div>
-        <div className="bg-card border border-border rounded-xl p-5">
-          <p className="text-sm text-muted-foreground">Vencido</p>
-          <p className="text-2xl font-semibold mt-1 text-destructive">{brl(totals.vencido)}</p>
-        </div>
-      </div>
 
       <div className="bg-card rounded-xl border border-border">
         <div className="p-4 flex flex-col md:flex-row gap-3 border-b border-border">
@@ -575,7 +616,16 @@ function Financeiro() {
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {m.formaPagamento ? (
-                        <span className="capitalize">{formaPagamentoLabel[m.formaPagamento]}</span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="capitalize">
+                            {formaPagamentoLabel[m.formaPagamento]}
+                          </span>
+                          {m.origem && (
+                            <span className="inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium border bg-blue-50 text-blue-700 border-blue-100">
+                              {origemPagamentoLabel[m.origem]}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-muted-foreground">—</span>
                       )}
@@ -697,6 +747,7 @@ function Financeiro() {
                         onClick: () => {
                           setPagamentoId(selectedMensalidade.id);
                           setPagamentoForma(selectedMensalidade.formaPagamento ?? "");
+                          setPagamentoOrigem(selectedMensalidade.origem ?? "");
                           setPagamentoOpen(true);
                         },
                       },
@@ -873,38 +924,67 @@ function Financeiro() {
               Confirme o registro do pagamento e informe a forma de pagamento.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4 space-y-3">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
-              Forma de pagamento
-            </label>
-            {(["", "pix", "debito", "credito"] as const).map((v) => (
-              <label
-                key={v}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
-                  pagamentoForma === v
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:bg-accent"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="formaPagamento"
-                  value={v}
-                  checked={pagamentoForma === v}
-                  onChange={() => setPagamentoForma(v)}
-                  className="size-4 accent-primary"
-                />
-                <span className="text-sm font-medium">
-                  {v === ""
-                    ? "Sem forma"
-                    : v === "pix"
-                      ? "Pix"
-                      : v === "debito"
-                        ? "Débito"
-                        : "Crédito"}
-                </span>
+          <div className="py-4 space-y-4">
+            <div className="space-y-3">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+                Forma de pagamento
               </label>
-            ))}
+              {(["", "pix", "debito", "credito"] as const).map((v) => (
+                <label
+                  key={v}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
+                    pagamentoForma === v
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-accent"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="formaPagamento"
+                    value={v}
+                    checked={pagamentoForma === v}
+                    onChange={() => setPagamentoForma(v)}
+                    className="size-4 accent-primary"
+                  />
+                  <span className="text-sm font-medium">
+                    {v === ""
+                      ? "Sem forma"
+                      : v === "pix"
+                        ? "Pix"
+                        : v === "debito"
+                          ? "Débito"
+                          : "Crédito"}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div className="space-y-3 border-t border-border pt-4">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block">
+                Origem do pagamento
+              </label>
+              {(["caixa", "dinheiro", "transferencia"] as const).map((v) => (
+                <label
+                  key={v}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-colors ${
+                    pagamentoOrigem === v
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:bg-accent"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="origemPagamento"
+                    value={v}
+                    checked={pagamentoOrigem === v}
+                    onChange={() => setPagamentoOrigem(v)}
+                    className="size-4 accent-primary"
+                  />
+                  <span className="text-sm font-medium">
+                    {origemPagamentoOption[v]}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -963,6 +1043,12 @@ function Financeiro() {
                 <span className="font-medium capitalize">
                   {reciboMensalidade?.formaPagamento
                     ? formaPagamentoLabel[reciboMensalidade.formaPagamento]
+                    : "—"}
+                </span>
+                <span className="text-muted-foreground">Origem:</span>
+                <span className="font-medium capitalize">
+                  {reciboMensalidade?.origem
+                    ? origemPagamentoLabel[reciboMensalidade.origem]
                     : "—"}
                 </span>
               </div>
