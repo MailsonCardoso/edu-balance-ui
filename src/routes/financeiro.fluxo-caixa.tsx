@@ -14,6 +14,7 @@ import {
   PiggyBank,
   Lock,
   LockKeyhole,
+  Link2,
 } from "lucide-react";
 import { PageHeader, EmptyState } from "@/components/shared/Primitives";
 import { Input } from "@/components/ui/input";
@@ -340,6 +341,12 @@ function FluxoCaixaPage() {
                         <td className="px-4 py-3 font-medium">{t.description}</td>
                         <td className="px-4 py-3 text-muted-foreground">
                           {t.category?.nome || "—"}
+                          {t.source_type === "mensalidade" && (
+                            <span className="ml-2 inline-flex items-center gap-1 rounded-md bg-info/10 px-1.5 py-0.5 text-[10px] font-medium text-info border border-info/20">
+                              <Link2 className="size-2.5" />
+                              Mensalidade
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -372,9 +379,21 @@ function FluxoCaixaPage() {
                         <td className="px-4 py-3">
                           {!data?.is_closed && (
                             <button
-                              onClick={() => setDeleteTarget(t)}
+                              onClick={() => {
+                                if (t.source_type === "mensalidade") {
+                                  toast.info(
+                                    "Esta entrada é gerada pelo pagamento de uma mensalidade. Exclua a mensalidade em Financeiro para removê-la.",
+                                  );
+                                  return;
+                                }
+                                setDeleteTarget(t);
+                              }}
                               className="p-1.5 rounded hover:bg-accent text-destructive"
-                              title="Excluir"
+                              title={
+                                t.source_type === "mensalidade"
+                                  ? "Vinculada a mensalidade"
+                                  : "Excluir"
+                              }
                             >
                               <Trash2 className="size-4" />
                             </button>

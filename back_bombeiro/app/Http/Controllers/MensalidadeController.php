@@ -2,13 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MensalidadeStatus;
+use App\Enums\PagamentoOrigem;
 use App\Models\Aluno;
 use App\Models\Mensalidade;
+use App\Models\MonthlyClosure;
+use App\Models\PagamentoTransacao;
+use App\Models\Transaction;
+use App\Services\PagamentoService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MensalidadeController extends Controller
 {
+    public function __construct(
+        private readonly PagamentoService $pagamentoService,
+    ) {}
+
     public function index()
     {
         return Mensalidade::with('aluno')->orderBy('created_at', 'desc')->get();
@@ -106,6 +118,106 @@ class MensalidadeController extends Controller
         ]);
     }
 
+    public function pagar(Request $request, Mensalidade $mensalidade): JsonResponse
+    {
+        if ($mensalidade->isPago()) {
+            return response()->json(['message' => 'Mensalidade já está paga.'], 409);
+        }
+
+        $validated = $request->validate([
+            'forma_pagamento' => 'nullable|in:pix,debito,credito',
+            'origem' => 'nullable|in:mercadopago,caixa,admin,pix_manual,dinheiro,transferencia',
+            'data_pagamento' => 'nullable|date',
+        ]);
+
+        $dataPagamento = $validated['data_pagamento'] ?? now()->format('Y-m-d');
+
+        $mesFechado = MonthlyClosure::where('month', Carbon::parse($dataPagamento)->month)
+            ->where('year', Carbon::parse($dataPagamento)->year)
+            ->exists();
+
+        if ($mesFechado) {
+            return response()->json([
+                'message' => 'O mês do pagamento já foi finalizado. Não é possível registrar recebimentos neste mês.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($mensalidade, $validated, $dataPagamento) {
+            $mensalidade->update([
+                'status' => MensalidadeStatus::Pago->value,
+                'data_pagamento' => $dataPagamento,
+                'forma_pagamento' => $validated['forma_pagamento'] ?? null,
+                'origem' => $validated['origem'] ?? PagamentoOrigem::Caixa->value,
+            ]);
+
+            $mensalidade->fresh()->loadMissing('aluno');
+            $this->pagamentoService->sincronizarMensalidadeNoCaixa($mensalidade);
+
+            $pagamento = PagamentoTransacao::where('mensalidade_id', $mensalidade->id)
+                ->orderByDesc('id')
+                ->first();
+
+            if ($pagamento) {
+                $pagamento->update([
+                    'status' => 'approved',
+                    'payment_method' => $validated['forma_pagamento']
+                        ?? $pagamento->payment_method,
+                ]);
+            } else {
+                PagamentoTransacao::create([
+                    'mensalidade_id' => $mensalidade->id,
+                    'origem' => $validated['origem'] ?? PagamentoOrigem::Caixa->value,
+                    'status' => 'approved',
+                    'payment_method' => $this->pagamentoService->formaPagamentoParaAuditoria(
+                        $validated['forma_pagamento'] ?? null,
+                    ),
+                    'data_aprovacao' => now(),
+                ]);
+            }
+        });
+
+        return $mensalidade->fresh()->load('aluno');
+    }
+
+    public function sincronizarFluxoCaixa(): JsonResponse
+    {
+        $mensalidadesPagas = Mensalidade::with('aluno')
+            ->where('status', MensalidadeStatus::Pago->value)
+            ->get();
+
+        $sincronizadas = 0;
+        $ignoradas = 0;
+
+        foreach ($mensalidadesPagas as $mensalidade) {
+            $jaExiste = Transaction::where('source_type', 'mensalidade')
+                ->where('source_id', $mensalidade->id)
+                ->exists();
+
+            if ($jaExiste) {
+                continue;
+            }
+
+            $dataPagamento = $mensalidade->data_pagamento?->format('Y-m-d') ?? now()->format('Y-m-d');
+
+            $mesFechado = MonthlyClosure::where('month', Carbon::parse($dataPagamento)->month)
+                ->where('year', Carbon::parse($dataPagamento)->year)
+                ->exists();
+
+            if ($mesFechado) {
+                $ignoradas++;
+                continue;
+            }
+
+            $this->pagamentoService->sincronizarMensalidadeNoCaixa($mensalidade);
+            $sincronizadas++;
+        }
+
+        return response()->json([
+            'sincronizadas' => $sincronizadas,
+            'ignoradas' => $ignoradas,
+        ]);
+    }
+
     public function verificarVencidas(): JsonResponse
     {
         $hoje = now()->format('Y-m-d');
@@ -155,7 +267,14 @@ class MensalidadeController extends Controller
 
     public function destroy(Mensalidade $mensalidade)
     {
-        $mensalidade->delete();
+        DB::transaction(function () use ($mensalidade) {
+            Transaction::where('source_type', 'mensalidade')
+                ->where('source_id', $mensalidade->id)
+                ->delete();
+
+            $mensalidade->delete();
+        });
+
         return response()->noContent();
     }
 }

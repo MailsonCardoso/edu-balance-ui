@@ -82,6 +82,30 @@ export async function deleteMensalidade(id: string): Promise<void> {
   await api.delete(`/mensalidades/${id}`);
 }
 
+export async function pagarMensalidade(
+  id: string,
+  params: {
+    formaPagamento?: string | null;
+    origem?: string;
+    dataPagamento?: string;
+  } = {},
+): Promise<Mensalidade> {
+  const { data } = await api.post(`/mensalidades/${id}/pagar`, {
+    forma_pagamento: params.formaPagamento || null,
+    origem: params.origem,
+    data_pagamento: params.dataPagamento,
+  });
+  return mensalidadeFromApi(data as Record<string, unknown>);
+}
+
+export async function sincronizarMensalidadesNoCaixa(): Promise<{
+  sincronizadas: number;
+  ignoradas: number;
+}> {
+  const { data } = await api.post("/mensalidades/sincronizar-fluxo-caixa");
+  return { sincronizadas: data.sincronizadas ?? 0, ignoradas: data.ignoradas ?? 0 };
+}
+
 export async function gerarMensalidadesDoMes(
   mesReferencia: string,
   diaVencimento = 10,

@@ -11,6 +11,7 @@ import {
   Pencil,
   CalendarClock,
   Printer,
+  RefreshCw,
   Search,
   Trash2,
   X,
@@ -45,7 +46,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import type { Mensalidade, Aluno, FormaPagamento } from "@/lib/mock-data";
-import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso, todayStr } from "@/lib/format";
+import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
@@ -55,11 +56,11 @@ import {
   updateMensalidade,
   deleteMensalidade,
   gerarProximoMesFaltante,
+  pagarMensalidade,
+  sincronizarMensalidadesNoCaixa,
 } from "@/lib/api/mensalidades";
 import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
 import { fetchCategories } from "@/lib/api/financial-categories";
-import { createTransaction, fetchTransactions } from "@/lib/api/transactions";
-import { createAuditoria } from "@/lib/api/auditoria";
 
 export const Route = createFileRoute("/financeiro/")({
   component: Financeiro,
@@ -97,115 +98,22 @@ function Financeiro() {
   const [pagamentoForma, setPagamentoForma] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
+  const [sincronizando, setSincronizando] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
-  const criarTransacaoNoCaixa = async (params: {
-    description: string;
-    amount: number;
-    type: "entrada" | "saida";
-    category_name: string;
-    financial_category_id: number | null;
-    date: string;
-    source_type?: string;
-    source_id?: number;
-  }): Promise<boolean> => {
-    try {
-      await createTransaction(params);
-      return true;
-    } catch (err: unknown) {
-      if (err && typeof err === "object" && "response" in err) {
-        const axiosErr = err as { response?: { status?: number } };
-        if (axiosErr.response?.status === 409) return false;
-      }
-      toast.error("Erro ao registrar no Fluxo de Caixa");
-      return false;
-    }
-  };
-
-  const formataRefMes = () => {
-    const hoje = new Date();
-    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
-    return `${mm}/${hoje.getFullYear()}`;
-  };
-
   const carregar = async () => {
     try {
-      const now = new Date();
-      const [m, a, d, c, t] = await Promise.all([
+      const [m, a, d, c] = await Promise.all([
         fetchMensalidades(),
         fetchAlunos(),
         fetchDashboardFinanceiro(),
         fetchCategories(),
-        fetchTransactions(now.getMonth() + 1, now.getFullYear()).catch(() => ({
-          transactions: [],
-        })),
       ]);
       setData(m);
       setAlunos(a);
       setDashboard(d);
       setCategories(c);
-
-      const transacoesPorSource = new Map(
-        t.transactions
-          .filter((tx) => tx.source_type && tx.source_id)
-          .map((tx) => [`${tx.source_type}-${tx.source_id}`, tx]),
-      );
-      const descricoesLegado = new Set(
-        t.transactions
-          .filter((tx) => !tx.source_type)
-          .map((tx) => tx.description),
-      );
-      const catMensalidade = c.find((cat) => cat.nome === "Mensalidades");
-      const pagasSemTransacao = m.filter(
-        (mens) =>
-          mens.status === "pago" &&
-          mens.mesReferencia === formataRefMes() &&
-          !transacoesPorSource.has(`mensalidade-${mens.id}`) &&
-          !descricoesLegado.has(
-            `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
-          ),
-      );
-      let criadas = 0;
-      for (const mens of pagasSemTransacao) {
-        try {
-          const criouTransacao = await criarTransacaoNoCaixa({
-            description: `Mensalidade - ${mens.alunoNome || "—"} - ${mens.mesReferencia}`,
-            amount: mens.valor,
-            type: "entrada",
-            category_name: "Mensalidades",
-            financial_category_id: catMensalidade ? catMensalidade.id : null,
-            date: todayStr(),
-            source_type: "mensalidade",
-            source_id: mens.id,
-          });
-          if (!criouTransacao) continue;
-          await updateMensalidade(mens.id, {
-            status: "pago",
-            dataPagamento: mens.dataPagamento,
-            formaPagamento: (mens.formaPagamento || null) as FormaPagamento | null,
-          });
-          const aluno = a.find((al) => al.id === mens.alunoId);
-          await createAuditoria({
-            mensalidade_id: mens.id,
-            aluno_nome: mens.alunoNome,
-            aluno_cpf: aluno?.cpf || null,
-            responsavel: aluno?.responsavel || null,
-            cpf_responsavel: aluno?.cpfResponsavel || null,
-            mes_referencia: mens.mesReferencia,
-            valor: mens.valor,
-            status: "approved",
-            payment_method: formaParaMetodo(mens.formaPagamento),
-            mensalidade_status: "pago",
-          });
-          criadas++;
-        } catch {
-          /* ignora falha isolada */
-        }
-      }
-      if (criadas > 0) {
-        toast.success(`${criadas} entrada(s) de mensalidade(s) criada(s) no Fluxo de Caixa`);
-      }
     } catch {
       toast.error("Erro ao carregar dados");
     } finally {
@@ -231,6 +139,25 @@ function Financeiro() {
       toast.error("Erro ao gerar mensalidades");
     } finally {
       setGerando(false);
+    }
+  };
+
+  const sincronizarCaixa = async () => {
+    setSincronizando(true);
+    try {
+      const res = await sincronizarMensalidadesNoCaixa();
+      toast.success(
+        res.sincronizadas > 0
+          ? `${res.sincronizadas} entrada(s) criada(s) no Fluxo de Caixa`
+          : res.ignoradas > 0
+            ? `Nenhuma entrada pendente. ${res.ignoradas} ignorada(s) por mês finalizado.`
+            : "Nenhuma entrada pendente de sincronização",
+      );
+      await carregar();
+    } catch {
+      toast.error("Erro ao sincronizar caixa");
+    } finally {
+      setSincronizando(false);
     }
   };
 
@@ -345,57 +272,16 @@ function Financeiro() {
     }
   };
 
-  const formaParaMetodo = (fp: string | null): string => {
-    if (fp === "pix") return "bank_transfer";
-    if (fp === "debito") return "debit";
-    if (fp === "credito") return "credit";
-    return "manual";
-  };
-
   const confirmarPagamento = async () => {
     try {
-      await updateMensalidade(pagamentoId, {
-        status: "pago",
-        dataPagamento: todayStr(),
-        formaPagamento: (pagamentoForma || null) as FormaPagamento | null,
+      const updated = await pagarMensalidade(pagamentoId, {
+        formaPagamento: pagamentoForma || null,
       });
-
-      const mensalidade = data.find((x) => x.id === pagamentoId);
-      if (mensalidade) {
-        const catMensalidade = categories.find((c) => c.nome === "Mensalidades");
-        await criarTransacaoNoCaixa({
-          description: `Mensalidade - ${mensalidade.alunoNome || "—"} - ${mensalidade.mesReferencia}`,
-          amount: mensalidade.valor,
-          type: "entrada",
-          category_name: "Mensalidades",
-          financial_category_id: catMensalidade ? catMensalidade.id : null,
-          date: todayStr(),
-          source_type: "mensalidade",
-          source_id: mensalidade.id,
-        });
-
-        const aluno = alunos.find((a) => a.id === mensalidade.alunoId);
-        await createAuditoria({
-          mensalidade_id: mensalidade.id,
-          aluno_nome: mensalidade.alunoNome,
-          aluno_cpf: aluno?.cpf || null,
-          responsavel: aluno?.responsavel || null,
-          cpf_responsavel: aluno?.cpfResponsavel || null,
-          mes_referencia: mensalidade.mesReferencia,
-          valor: mensalidade.valor,
-          status: "approved",
-          payment_method: formaParaMetodo(pagamentoForma),
-          mensalidade_status: "pago",
-        });
-      }
-
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
-      const [m] = await Promise.all([fetchMensalidades(), fetchAlunos()]);
-      setData(m);
-      const updated = m.find((x) => x.id === pagamentoId);
-      if (updated) setReciboMensalidade(updated);
+      setData(await fetchMensalidades());
+      setReciboMensalidade(updated);
     } catch {
       toast.error("Erro ao registrar pagamento");
     }
@@ -570,6 +456,18 @@ function Financeiro() {
         description="Mensalidades, pagamentos e histórico"
         actions={
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={sincronizarCaixa}
+              disabled={sincronizando}
+            >
+              {sincronizando ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
+              Sincronizar caixa
+            </Button>
             <Button
               variant="outline"
               onClick={gerarProximoMes}

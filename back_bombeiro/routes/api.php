@@ -55,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('alunos', AlunoController::class);
     Route::get('/alunos/{aluno}/extrato', [AlunoController::class, 'extrato']);
     Route::post('/mensalidades/gerar-proximo-mes', [MensalidadeController::class, 'gerarProximoMes']);
+    Route::post('/mensalidades/sincronizar-fluxo-caixa', [MensalidadeController::class, 'sincronizarFluxoCaixa']);
+    Route::post('/mensalidades/{mensalidade}/pagar', [MensalidadeController::class, 'pagar']);
     Route::post('/mensalidades/verificar-vencidas', [MensalidadeController::class, 'verificarVencidas']);
     Route::apiResource('mensalidades', MensalidadeController::class);
     Route::apiResource('financial-categories', FinancialCategoryController::class)->except(['show']);

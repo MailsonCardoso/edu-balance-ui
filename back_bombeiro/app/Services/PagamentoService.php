@@ -4,11 +4,16 @@ namespace App\Services;
 
 use App\DTOs\AtualizarStatusDTO;
 use App\DTOs\GerarCobrancaDTO;
+use App\Enums\MensalidadeStatus;
 use App\Enums\MercadoPagoStatus;
 use App\Enums\PagamentoOrigem;
 use App\Events\MensalidadeStatusUpdated;
+use App\Models\FinancialCategory;
 use App\Models\Mensalidade;
+use App\Models\MonthlyClosure;
 use App\Models\PagamentoTransacao;
+use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -140,6 +145,12 @@ class PagamentoService
                 }
 
                 $transacao->mensalidade->update($dadosAtualizacao);
+
+                if ($mensalidadeStatus?->value === MensalidadeStatus::Pago->value) {
+                    $this->sincronizarMensalidadeNoCaixa(
+                        $transacao->mensalidade->refresh()->loadMissing('aluno'),
+                    );
+                }
             }
 
             event(new MensalidadeStatusUpdated(
@@ -200,6 +211,62 @@ class PagamentoService
             'pix' => 'pix',
             'ticket', 'boleto' => 'debito',
             default => 'pix',
+        };
+    }
+
+    public function sincronizarMensalidadeNoCaixa(Mensalidade $mensalidade): void
+    {
+        if (!$mensalidade->isPago()) {
+            return;
+        }
+
+        $dataPagamento = $mensalidade->data_pagamento?->format('Y-m-d') ?? now()->format('Y-m-d');
+
+        $mesFechado = MonthlyClosure::where('month', Carbon::parse($dataPagamento)->month)
+            ->where('year', Carbon::parse($dataPagamento)->year)
+            ->exists();
+
+        if ($mesFechado) {
+            Log::warning('FluxoCaixa: mês de pagamento já finalizado, entrada não criada', [
+                'mensalidade_id' => $mensalidade->id,
+                'data_pagamento' => $dataPagamento,
+            ]);
+            return;
+        }
+
+        $categoria = FinancialCategory::where('nome', 'Mensalidades')->first();
+
+        Transaction::updateOrCreate(
+            [
+                'source_type' => 'mensalidade',
+                'source_id' => $mensalidade->id,
+            ],
+            [
+                'description' => $this->descricaoMensalidade($mensalidade),
+                'amount' => (float) $mensalidade->valor,
+                'type' => 'entrada',
+                'category_name' => $categoria?->nome ?? 'Mensalidades',
+                'date' => $dataPagamento,
+            ]
+        );
+    }
+
+    private function descricaoMensalidade(Mensalidade $mensalidade): string
+    {
+        return sprintf(
+            'Mensalidade - %s - %s',
+            $mensalidade->aluno?->nome ?? '—',
+            $mensalidade->mes_referencia,
+        );
+    }
+
+    public function formaPagamentoParaAuditoria(?string $forma): ?string
+    {
+        return match ($forma) {
+            'pix' => 'bank_transfer',
+            'debito' => 'debit',
+            'credito' => 'credit',
+            default => null,
         };
     }
 }

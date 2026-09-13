@@ -84,6 +84,12 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction): JsonResponse
     {
+        if ($transaction->source_type === 'mensalidade') {
+            return response()->json([
+                'message' => 'Esta entrada está vinculada a uma mensalidade. Exclua a mensalidade para remover a entrada.',
+            ], 422);
+        }
+
         $transactionDate = Carbon::parse($transaction->date);
         $isClosed = MonthlyClosure::where('month', $transactionDate->month)
             ->where('year', $transactionDate->year)
