@@ -122,21 +122,25 @@ function Financeiro() {
   const [perPage, setPerPage] = useState(20);
 
   const carregar = async () => {
+    carregarComplementares();
     try {
-      const [m, a, d, c] = await Promise.all([
-        fetchMensalidades(),
-        fetchAlunos(),
-        fetchDashboardFinanceiro(),
-        fetchCategories(),
-      ]);
+      const [m, a] = await Promise.all([fetchMensalidades(), fetchAlunos()]);
       setData(m);
       setAlunos(a);
+      setLoading(false);
+    } catch {
+      toast.error("Erro ao carregar dados");
+      setLoading(false);
+    }
+  };
+
+  const carregarComplementares = async () => {
+    try {
+      const [d, c] = await Promise.all([fetchDashboardFinanceiro(), fetchCategories()]);
       setDashboard(d);
       setCategories(c);
     } catch {
-      toast.error("Erro ao carregar dados");
-    } finally {
-      setLoading(false);
+      toast.error("Erro ao carregar saldos");
     }
   };
 

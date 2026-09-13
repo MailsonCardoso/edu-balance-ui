@@ -16,31 +16,66 @@ class DashboardController extends Controller
     public function financeiro(Request $request): JsonResponse
     {
         $hoje = now();
-        $inicioMes = $hoje->copy()->startOfMonth();
-        $fimMes = $hoje->copy()->endOfMonth();
+        $inicioJanela = $hoje->copy()->subMonths(5)->startOfMonth();
+        $fimJanela = $hoje->copy()->endOfMonth();
 
-        $mensalidadesPagas = Mensalidade::where('status', 'pago')->get();
-        $mensalidadesPendentes = Mensalidade::where('status', 'pendente')->get();
-        $mensalidadesVencidas = Mensalidade::where('status', 'atrasado')->get();
+        $resumo = [
+            'pago' => ['qtd' => 0, 'total' => 0],
+            'pendente' => ['qtd' => 0, 'total' => 0],
+            'atrasado' => ['qtd' => 0, 'total' => 0],
+        ];
+        Mensalidade::query()
+            ->selectRaw("status, COUNT(*) as qtd, COALESCE(SUM(valor), 0) as total")
+            ->whereIn('status', ['pago', 'pendente', 'atrasado'])
+            ->groupBy('status')
+            ->get()
+            ->each(function ($item) use (&$resumo) {
+                $resumo[$item->status] = [
+                    'qtd' => (int) $item->qtd,
+                    'total' => (float) $item->total,
+                ];
+            });
+
         $alunosAtivos = Aluno::where('status', 'ativo')->count();
         $alunosInadimplentes = Aluno::whereIn('situacao', ['inadimplente', 'em_atraso'])->count();
 
-        $receitaMensalidades = Mensalidade::where('status', 'pago')
-            ->whereBetween('data_pagamento', [$inicioMes, $fimMes])
-            ->sum('valor');
+        $mensalidadesPorMes = Mensalidade::query()
+            ->selectRaw("DATE_FORMAT(data_pagamento, '%Y-%m') as mes, COALESCE(SUM(valor), 0) as total")
+            ->where('status', 'pago')
+            ->whereNotNull('data_pagamento')
+            ->whereBetween('data_pagamento', [$inicioJanela, $fimJanela])
+            ->groupByRaw("DATE_FORMAT(data_pagamento, '%Y-%m')")
+            ->pluck('total', 'mes')
+            ->map(fn ($valor) => (float) $valor)
+            ->toArray();
 
-        $receitaOutras = Transaction::where('type', 'entrada')
-            ->whereBetween('date', [$inicioMes, $fimMes])
+        $entradasPorMes = Transaction::query()
+            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as mes, COALESCE(SUM(amount), 0) as total")
+            ->where('type', 'entrada')
+            ->whereBetween('date', [$inicioJanela, $fimJanela])
             ->where(function ($q) {
                 $q->whereNull('source_type')->orWhere('source_type', '!=', 'mensalidade');
             })
-            ->sum('amount');
+            ->groupByRaw("DATE_FORMAT(date, '%Y-%m')")
+            ->pluck('total', 'mes')
+            ->map(fn ($valor) => (float) $valor)
+            ->toArray();
 
-        $despesasMes = Transaction::where('type', 'saida')
-            ->whereBetween('date', [$inicioMes, $fimMes])
-            ->sum('amount');
+        $saidasPorMes = Transaction::query()
+            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as mes, COALESCE(SUM(amount), 0) as total")
+            ->where('type', 'saida')
+            ->whereBetween('date', [$inicioJanela, $fimJanela])
+            ->groupByRaw("DATE_FORMAT(date, '%Y-%m')")
+            ->pluck('total', 'mes')
+            ->map(fn ($valor) => (float) $valor)
+            ->toArray();
 
-        $receitaPrevista = Mensalidade::whereIn('status', ['pendente', 'atrasado'])->sum('valor');
+        $chaveAtual = $hoje->format('Y-m');
+        $receitaMensalidades = $mensalidadesPorMes[$chaveAtual] ?? 0;
+        $receitaOutras = $entradasPorMes[$chaveAtual] ?? 0;
+        $despesasMes = $saidasPorMes[$chaveAtual] ?? 0;
+
+        $receitaPrevista = $resumo['pendente']['total'] + $resumo['atrasado']['total'];
 
         $receitaPendenteOutras = Revenue::where('status', 'pendente')->sum('valor');
 
@@ -48,39 +83,22 @@ class DashboardController extends Controller
 
         $receitasMensais = [];
         for ($i = 5; $i >= 0; $i--) {
-            $mes = now()->subMonths($i);
-            $inicio = $mes->copy()->startOfMonth();
-            $fim = $mes->copy()->endOfMonth();
-
-            $mensalidades = Mensalidade::where('status', 'pago')
-                ->whereBetween('data_pagamento', [$inicio, $fim])
-                ->sum('valor');
-
-            $entradas = Transaction::where('type', 'entrada')
-                ->whereBetween('date', [$inicio, $fim])
-                ->where(function ($q) {
-                    $q->whereNull('source_type')->orWhere('source_type', '!=', 'mensalidade');
-                })
-                ->sum('amount');
-
-            $saidas = Transaction::where('type', 'saida')
-                ->whereBetween('date', [$inicio, $fim])
-                ->sum('amount');
-
+            $mes = $hoje->copy()->subMonths($i);
+            $chave = $mes->format('Y-m');
             $receitasMensais[] = [
                 'mes' => $mes->format('M/Y'),
-                'receita' => $mensalidades + $entradas,
-                'despesa' => $saidas,
+                'receita' => ($mensalidadesPorMes[$chave] ?? 0) + ($entradasPorMes[$chave] ?? 0),
+                'despesa' => $saidasPorMes[$chave] ?? 0,
             ];
         }
 
         return response()->json([
-            'total_pago' => $mensalidadesPagas->sum('valor') + Revenue::where('status', 'recebido')->sum('valor'),
+            'total_pago' => $resumo['pago']['total'] + Revenue::where('status', 'recebido')->sum('valor'),
             'total_pendente' => $receitaPrevista + $receitaPendenteOutras,
-            'total_vencido' => $mensalidadesVencidas->sum('valor'),
-            'qtd_pagas' => $mensalidadesPagas->count(),
-            'qtd_pendentes' => $mensalidadesPendentes->count(),
-            'qtd_vencidas' => $mensalidadesVencidas->count(),
+            'total_vencido' => $resumo['atrasado']['total'],
+            'qtd_pagas' => $resumo['pago']['qtd'],
+            'qtd_pendentes' => $resumo['pendente']['qtd'],
+            'qtd_vencidas' => $resumo['atrasado']['qtd'],
             'receita_mes' => $receitaMensalidades + $receitaOutras,
             'despesa_mes' => $despesasMes,
             'saldo_mes' => ($receitaMensalidades + $receitaOutras) - $despesasMes,
