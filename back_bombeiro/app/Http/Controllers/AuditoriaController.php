@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PagamentoOrigem;
 use App\Models\PagamentoTransacao;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -56,6 +57,14 @@ class AuditoriaController extends Controller
                 $bancoNome = self::getNomeBanco($issuerId);
             }
 
+            $ehMercadoPago = $t->origem === PagamentoOrigem::MercadoPago->value;
+            $valorLiquido = (float) ($t->mensalidade?->valor ?? 0);
+            $transactionAmount = (float) data_get($payload, 'transaction_amount', 0);
+            $valorPago = $ehMercadoPago && $transactionAmount > 0 ? $transactionAmount : null;
+            $taxaMp = $ehMercadoPago && $transactionAmount > 0 && $transactionAmount >= $valorLiquido
+                ? round($transactionAmount - $valorLiquido, 2)
+                : null;
+
             return [
                 'id' => $t->id,
                 'payment_id' => $t->payment_id,
@@ -74,6 +83,8 @@ class AuditoriaController extends Controller
                 'cpf_responsavel' => $t->mensalidade?->aluno?->cpf_responsavel,
                 'mes_referencia' => $t->mensalidade?->mes_referencia,
                 'valor' => $t->mensalidade?->valor,
+                'valor_pago' => $valorPago,
+                'taxa_mp' => $taxaMp,
                 'mensalidade_status' => $t->mensalidade?->status,
             ];
         });
@@ -131,6 +142,8 @@ class AuditoriaController extends Controller
             'cpf_responsavel' => $t->mensalidade?->aluno?->cpf_responsavel,
             'mes_referencia' => $t->mensalidade?->mes_referencia,
             'valor' => $t->mensalidade?->valor,
+            'valor_pago' => null,
+            'taxa_mp' => null,
             'mensalidade_status' => $t->mensalidade?->status,
         ], 201);
     }

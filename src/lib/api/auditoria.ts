@@ -19,6 +19,8 @@ export interface AuditoriaItem {
   cpf_responsavel: string | null;
   mes_referencia: string | null;
   valor: number | null;
+  valor_pago?: number | null;
+  taxa_mp?: number | null;
   mensalidade_status: string | null;
 }
 
@@ -53,11 +55,7 @@ export async function deleteAuditoria(id: number): Promise<void> {
   await api.delete(`/admin/auditoria/pagamentos/${id}`);
 }
 
-export async function createAuditoria(
-  data: Partial<AuditoriaItem>,
-): Promise<AuditoriaItem> {
+export async function createAuditoria(data: Partial<AuditoriaItem>): Promise<AuditoriaItem> {
   const { data: result } = await api.post("/admin/auditoria/pagamentos", data);
   return result;
 }
-
-
