@@ -31,6 +31,9 @@ class DashboardController extends Controller
 
         $receitaOutras = Transaction::where('type', 'entrada')
             ->whereBetween('date', [$inicioMes, $fimMes])
+            ->where(function ($q) {
+                $q->whereNull('source_type')->orWhere('source_type', '!=', 'mensalidade');
+            })
             ->sum('amount');
 
         $despesasMes = Transaction::where('type', 'saida')
@@ -55,6 +58,9 @@ class DashboardController extends Controller
 
             $entradas = Transaction::where('type', 'entrada')
                 ->whereBetween('date', [$inicio, $fim])
+                ->where(function ($q) {
+                    $q->whereNull('source_type')->orWhere('source_type', '!=', 'mensalidade');
+                })
                 ->sum('amount');
 
             $saidas = Transaction::where('type', 'saida')
