@@ -97,7 +97,7 @@ function Financeiro() {
   const [categories, setCategories] = useState<{ id: number; nome: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("pago");
   const [selectedMensalidade, setSelectedMensalidade] = useState<Mensalidade | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Mensalidade | null>(null);
 
