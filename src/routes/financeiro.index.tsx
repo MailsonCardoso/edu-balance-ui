@@ -339,7 +339,7 @@ function Financeiro() {
     const phone = a?.telefoneResponsavel?.replace(/\D/g, "") || a?.telefone?.replace(/\D/g, "");
     if (!phone) return null;
     const msg = encodeURIComponent(
-      `Olá ${m.alunoResponsavel || a?.responsavel || "Responsável"}, tudo bem?\n\nPassando para lembrar gentilmente que a mensalidade do(a) ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} referente a ${m.mesReferencia} no valor de ${brl(m.valor)} venceu em ${fmtDate(m.dataVencimento)} e está ${m.status === "atrasado" ? "em atraso" : "pendente"}.\n\nQuando puder, dê uma olhadinha e nos procure para regularizar. Estamos à disposição!\n\nAtenciosamente,\nAssociação de pais e amigos do CMCBXII`,
+      `Olá! ${m.alunoResponsavel || a?.responsavel || "Responsável"}\n\nLembramos que a fatura referente ao ${m.alunoSexo === "feminino" ? "aluna" : "aluno"} ${m.alunoNome || a?.nome || ""} abaixo encontra-se em aberto. Caso já tenha pago, desconsidere esta mensagem.\n\nDetalhes da fatura:\n• Referência: ${m.mesReferencia}\n• Valor: ${brl(m.valor)}\n• Vencimento: ${fmtDate(m.dataVencimento)}\n• Situação: ${m.status === "atrasado" ? "Em atraso" : "Pendente"}\n\nQualquer dúvida, estamos à disposição!\n\nAtenciosamente,\nAssociação de pais e amigos do CMCBXII`,
     );
     return `https://wa.me/55${phone}?text=${msg}`;
   };
