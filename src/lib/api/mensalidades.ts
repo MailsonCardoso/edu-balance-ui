@@ -32,6 +32,7 @@ function mensalidadeFromApi(raw: Record<string, unknown>): Mensalidade {
   mapped.id = String(mapped.id);
   mapped.alunoId = String(mapped.alunoId);
   mapped.valor = Number(mapped.valor) || 0;
+  if (mapped.valorCobrado != null) mapped.valorCobrado = Number(mapped.valorCobrado) || null;
   if (mapped.dataVencimento && typeof mapped.dataVencimento === "string") {
     mapped.dataVencimento = toDDMMYYYY(mapped.dataVencimento);
   }
@@ -154,16 +155,11 @@ export async function aplicarMensalidadeEmMassa(
   valor = 60,
   atualizarValorAluno = true,
 ): Promise<{ criadas: number; alunosAtualizados: number }> {
-  const [alunos, existentes] = await Promise.all([
-    fetchAlunos(),
-    fetchMensalidades(),
-  ]);
+  const [alunos, existentes] = await Promise.all([fetchAlunos(), fetchMensalidades()]);
 
   const ativos = alunos.filter((a) => a.status === "ativo");
   const jaExistentes = new Set(
-    existentes
-      .filter((m) => m.mesReferencia === mesReferencia)
-      .map((m) => m.alunoId),
+    existentes.filter((m) => m.mesReferencia === mesReferencia).map((m) => m.alunoId),
   );
 
   const [mes, ano] = mesReferencia.split("/");
@@ -200,10 +196,7 @@ export async function resetMensalidadesEmMassa(
 ): Promise<void> {
   const id = toast.loading("Limpando mensalidades existentes...");
   const removidas = await limparMensalidades();
-  toast.loading(
-    `Aplicando R$ ${valor} e gerando mensalidades de ${mesReferencia}...`,
-    { id },
-  );
+  toast.loading(`Aplicando R$ ${valor} e gerando mensalidades de ${mesReferencia}...`, { id });
   const { criadas, alunosAtualizados } = await aplicarMensalidadeEmMassa(
     mesReferencia,
     diaVencimento,

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Mensalidade extends Model
 {
     protected $fillable = [
-        'aluno_id', 'mes_referencia', 'valor',
+        'aluno_id', 'mes_referencia', 'valor', 'valor_cobrado',
         'data_vencimento', 'data_pagamento', 'status',
         'forma_pagamento', 'origem',
     ];
@@ -20,6 +20,7 @@ class Mensalidade extends Model
     {
         return [
             'valor' => 'decimal:2',
+            'valor_cobrado' => 'decimal:2',
             'data_vencimento' => 'date',
             'data_pagamento' => 'date',
             'status' => 'string',

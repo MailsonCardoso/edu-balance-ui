@@ -49,6 +49,8 @@ class MensalidadeController extends Controller
             ], 409);
         }
 
+        $validated['valor_cobrado'] = $validated['valor_cobrado'] ?? $validated['valor'];
+
         return Mensalidade::create($validated);
     }
 
@@ -69,6 +71,11 @@ class MensalidadeController extends Controller
             'forma_pagamento' => 'nullable|in:pix,debito,credito',
             'origem' => 'nullable|in:mercadopago,caixa,admin,pix_manual,dinheiro,transferencia',
         ]);
+
+        if (array_key_exists('valor', $validated)
+            && ($mensalidade->origem !== PagamentoOrigem::MercadoPago->value || $mensalidade->valor_cobrado === null)) {
+            $validated['valor_cobrado'] = $validated['valor'];
+        }
 
         $mensalidade->update($validated);
         return $mensalidade;
@@ -105,6 +112,7 @@ class MensalidadeController extends Controller
                 'aluno_id' => $aluno->id,
                 'mes_referencia' => $mes,
                 'valor' => $aluno->valor_mensalidade,
+                'valor_cobrado' => $aluno->valor_mensalidade,
                 'data_vencimento' => $vencimento,
                 'status' => 'pendente',
             ]);
@@ -148,6 +156,7 @@ class MensalidadeController extends Controller
                 'data_pagamento' => $dataPagamento,
                 'forma_pagamento' => $validated['forma_pagamento'] ?? null,
                 'origem' => $validated['origem'] ?? PagamentoOrigem::Caixa->value,
+                'valor_cobrado' => $mensalidade->valor_cobrado ?? $mensalidade->valor,
             ]);
 
             $mensalidade->fresh()->loadMissing('aluno');

@@ -138,9 +138,15 @@ class PagamentoService
                     $dadosAtualizacao['forma_pagamento'] = $formaPagamento;
                     $dadosAtualizacao['origem'] = PagamentoOrigem::MercadoPago->value;
 
+                    $valorCobrado = (float) ($dadosAtuais['transaction_amount']
+                        ?? $transacao->mensalidade->valor_cobrado
+                        ?? $transacao->mensalidade->valor);
+                    $dadosAtualizacao['valor_cobrado'] = $valorCobrado;
+
                     if ($formaPagamento === 'pix') {
-                        $valorCobrado = (float) ($dadosAtuais['transaction_amount'] ?? $transacao->mensalidade->valor);
                         $dadosAtualizacao['valor'] = max(0, round($valorCobrado - self::TAXA_PIX_MERCADOPAGO, 2));
+                    } else {
+                        $dadosAtualizacao['valor'] = $valorCobrado;
                     }
                 }
 

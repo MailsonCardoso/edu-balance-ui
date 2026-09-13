@@ -327,7 +327,9 @@ function Financeiro() {
 
   const gerarPdfBlob = (m: Mensalidade): Promise<Blob> => {
     const dataPg = m.dataPagamento ? fmtDateFull(m.dataPagamento) : "—";
-    const valorExtenso = numeroExtenso(m.valor);
+    const valorCobrado = m.valorCobrado != null ? m.valorCobrado : m.valor;
+    const temTaxa = valorCobrado > m.valor + 0.004;
+    const valorExtensoCobrado = numeroExtenso(valorCobrado);
     const rotuloAluno = m.alunoSexo === "feminino" ? "Aluna" : "Aluno";
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const ml = 25;
@@ -373,21 +375,28 @@ function Financeiro() {
     y += 14;
     doc.setDrawColor(220);
     doc.setFillColor(248, 248, 248);
-    doc.roundedRect(ml, y, cw, 55, 3, 3, "FD");
-    const ix = ml + 6;
-    let iy = y + 7;
-    const labelW = 42;
-    doc.setFont("times", "bold");
-    doc.setFontSize(10);
     const info: [string, string][] = [
       [`${rotuloAluno}:`, m.alunoNome || "—"],
       ["Responsável:", m.alunoResponsavel || "—"],
       ["Mês de Referência:", m.mesReferencia],
-      ["Valor Pago:", `${brl(m.valor)} (${valorExtenso})`],
+      ["Valor pago pelo associado:", `${brl(valorCobrado)} (${valorExtensoCobrado})`],
+      ...(temTaxa
+        ? ([
+            ["Tarifa do meio de pagamento (Mercado Pago):", `- ${brl(valorCobrado - m.valor)}`],
+            ["Valor líquido recebido pela associação:", brl(m.valor)],
+          ] as [string, string][])
+        : []),
       ["Data do Pagamento:", m.dataPagamento ? fmtDate(m.dataPagamento) : "—"],
       ["Forma de Pagamento:", m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—"],
       ["Origem:", m.origem ? origemPagamentoLabel[m.origem] : "—"],
     ];
+    const boxH = info.length * 7 + 12;
+    doc.roundedRect(ml, y, cw, boxH, 3, 3, "FD");
+    const ix = ml + 6;
+    let iy = y + 7;
+    const labelW = 58;
+    doc.setFont("times", "bold");
+    doc.setFontSize(10);
     for (const [label, value] of info) {
       doc.setFont("times", "bold");
       doc.text(label, ix, iy);
@@ -1010,12 +1019,33 @@ function Financeiro() {
                 <span className="font-medium">{reciboMensalidade?.alunoResponsavel || "—"}</span>
                 <span className="text-muted-foreground">Mês de Referência:</span>
                 <span className="font-medium">{reciboMensalidade?.mesReferencia}</span>
-                <span className="text-muted-foreground">Valor Pago:</span>
+                <span className="text-muted-foreground">Valor pago pelo associado:</span>
                 <span className="font-medium">
                   {reciboMensalidade
-                    ? `${brl(reciboMensalidade.valor)} (${numeroExtenso(reciboMensalidade.valor)})`
+                    ? (() => {
+                        const cobrado =
+                          reciboMensalidade.valorCobrado != null
+                            ? reciboMensalidade.valorCobrado
+                            : reciboMensalidade.valor;
+                        return `${brl(cobrado)} (${numeroExtenso(cobrado)})`;
+                      })()
                     : "—"}
                 </span>
+                {reciboMensalidade?.valorCobrado != null &&
+                reciboMensalidade.valorCobrado > reciboMensalidade.valor + 0.004 ? (
+                  <>
+                    <span className="text-muted-foreground">
+                      Tarifa do meio de pagamento (Mercado Pago):
+                    </span>
+                    <span className="font-medium">
+                      - {brl(reciboMensalidade.valorCobrado - reciboMensalidade.valor)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      Valor líquido recebido pela associação:
+                    </span>
+                    <span className="font-medium">{brl(reciboMensalidade.valor)}</span>
+                  </>
+                ) : null}
                 <span className="text-muted-foreground">Data do Pagamento:</span>
                 <span className="font-medium">
                   {reciboMensalidade?.dataPagamento

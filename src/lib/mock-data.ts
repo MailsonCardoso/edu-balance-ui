@@ -44,6 +44,7 @@ export interface Mensalidade {
   alunoId: string;
   mesReferencia: string;
   valor: number;
+  valorCobrado?: number | null;
   dataVencimento: string;
   dataPagamento: string | null;
   status: MensalidadeStatus;
