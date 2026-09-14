@@ -89,14 +89,7 @@ export function ReciboModal({
           </div>
         </div>
 
-        <p className="mt-4 text-center text-xs text-gray-400">Paranã, {dataPg}.</p>
-
-        <div className="mt-5 text-center border-t border-gray-100 pt-4">
-          <div className="inline-block border-t border-gray-300 pt-2 px-10">
-            <p className="text-xs font-semibold text-gray-600">Responsável pelo Recebimento</p>
-            <p className="text-[10px] text-gray-400">Associação de pais e amigos do CMCBXII</p>
-          </div>
-        </div>
+        <p className="mt-4 text-center text-xs text-gray-400">Paço do Lumiar, {dataPg}.</p>
 
         <div className="mt-6 flex gap-2">
           <button

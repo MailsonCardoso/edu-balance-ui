@@ -447,20 +447,7 @@ function Financeiro() {
     );
 
     y += 12;
-    doc.text(`Paranã, ${dataPg}.`, ml + cw / 2, y, { align: "center" });
-
-    y += 30;
-    doc.setDrawColor(0);
-    doc.line(ml + 30, y, ml + cw - 30, y);
-    y += 2;
-    doc.setFont("times", "bold");
-    doc.setFontSize(10);
-    doc.text("Responsável pelo Recebimento", ml + cw / 2, y + 4, { align: "center" });
-    doc.setFont("times", "normal");
-    doc.setFontSize(9);
-    doc.text("Associação de pais e amigos do CMCBXII", ml + cw / 2, y + 10, {
-      align: "center",
-    });
+    doc.text(`Paço do Lumiar, ${dataPg}.`, ml + cw / 2, y, { align: "center" });
 
     doc.setFontSize(8);
     doc.setTextColor(150);
@@ -1065,20 +1052,12 @@ function Financeiro() {
               Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
             </p>
             <p className="text-center font-medium">
-              Paranã,{" "}
+              Paço do Lumiar,{" "}
               {reciboMensalidade?.dataPagamento
                 ? fmtDateFull(reciboMensalidade.dataPagamento)
                 : "—"}
               .
             </p>
-            <div className="text-center pt-4 border-t border-border">
-              <div className="inline-block border-t border-foreground pt-2 px-12">
-                <p className="text-sm font-semibold">Responsável pelo Recebimento</p>
-                <p className="text-xs text-muted-foreground">
-                  Associação de pais e amigos do CMCBXII
-                </p>
-              </div>
-            </div>
           </div>
           <AlertDialogFooter className="shrink-0 sm:justify-center gap-2">
             <Button variant="outline" onClick={() => setReciboMensalidade(null)}>
