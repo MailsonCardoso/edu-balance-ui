@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Wallet, CalendarClock, Users, UserX, TrendingUp, Percent, TrendingDown } from "lucide-react";
+import { Loader2, Wallet, CalendarClock, Users, UserX, TrendingUp, Percent, TrendingDown, Cake } from "lucide-react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -65,6 +65,23 @@ function parseDataBr(dateStr: string): Date {
 
 function mesAno(d: Date): string {
   return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }).replace(" de ", "/");
+}
+
+function parseDataNasc(data: string): Date | null {
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
+    const [d, m, y] = data.split("/").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return null;
+}
+
+function idadeNoDia(nasc: Date, ref: Date = new Date()): number {
+  let idade = ref.getFullYear() - nasc.getFullYear();
+  const aindaNaoFez =
+    ref.getMonth() < nasc.getMonth() ||
+    (ref.getMonth() === nasc.getMonth() && ref.getDate() < nasc.getDate());
+  if (aindaNaoFez) idade -= 1;
+  return idade;
 }
 
 function Dashboard() {
@@ -179,6 +196,24 @@ function Dashboard() {
       })) ?? []
     );
   }, [dashboard]);
+
+  const aniversariantes = useMemo(() => {
+    const agora = new Date();
+    return alunos
+      .map((a) => {
+        const nasc = parseDataNasc(a.dataNascimento);
+        return nasc && nasc.getMonth() === agora.getMonth()
+          ? {
+              nome: a.nome,
+              turma: a.turma,
+              dia: nasc.getDate(),
+              idade: idadeNoDia(nasc, agora),
+            }
+          : null;
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null)
+      .sort((a, b) => a.dia - b.dia);
+  }, [alunos]);
 
   if (loading) {
     return (
@@ -298,7 +333,7 @@ function Dashboard() {
         </ChartCard>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ChartCard title="Ticket médio" subtitle="Valor médio por aluno ativo" index={2}>
           <StatCard
             label="Ticket médio"
@@ -322,6 +357,49 @@ function Dashboard() {
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
+
+        <div
+          className="bg-card rounded-xl border border-border p-5 hover:shadow-lg hover:border-primary/20 transition-all duration-300 animate-in"
+          style={{ animationDelay: "0.4s" }}
+        >
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div>
+              <h3 className="font-semibold">Aniversariantes do mês</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {new Date().toLocaleDateString("pt-BR", { month: "long" })} ·{" "}
+                {aniversariantes.length}{" "}
+                {aniversariantes.length === 1 ? "aluno" : "alunos"}
+              </p>
+            </div>
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Cake className="size-5" />
+            </div>
+          </div>
+          {aniversariantes.length === 0 ? (
+            <div className="flex h-64 flex-col items-center justify-center text-center">
+              <Cake className="mb-3 size-8 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">Nenhum aniversariante este mês</p>
+            </div>
+          ) : (
+            <ul className="h-64 divide-y divide-border overflow-y-auto pr-1">
+              {aniversariantes.map((b) => (
+                <li key={`${b.nome}-${b.dia}`} className="py-2.5">
+                  <div className="flex items-center gap-3">
+                    <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {b.dia}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{b.nome}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Completa {b.idade} anos · {b.turma}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </>
   );
