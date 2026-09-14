@@ -58,6 +58,20 @@ function ChartCard({
 
 const axisStyle = { fontSize: 12, fill: "var(--muted-foreground)" };
 
+function parseDataNasc(data: string): Date | null {
+  if (!data) return null;
+  const [dia, mes, ano] = data.split("/").map(Number);
+  if (!dia || !mes || !ano) return null;
+  return new Date(ano, mes - 1, dia);
+}
+
+function idadeNoDia(nasc: Date, ref: Date = new Date()): number {
+  let idade = ref.getFullYear() - nasc.getFullYear();
+  if (ref.getMonth() < nasc.getMonth()) idade--;
+  else if (ref.getMonth() === nasc.getMonth() && ref.getDate() < nasc.getDate()) idade--;
+  return idade;
+}
+
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
