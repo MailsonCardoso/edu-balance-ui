@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
   FileText,
@@ -54,7 +54,8 @@ import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { fetchAlunos } from "@/lib/api/alunos";
 import {
-  fetchMensalidades,
+  fetchMensalidade,
+  fetchMensalidadesPage,
   createMensalidade,
   updateMensalidade,
   deleteMensalidade,
@@ -95,10 +96,12 @@ const formaPagamentoExibida = (m: {
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [data, setData] = useState<Mensalidade[]>([]);
+  const [total, setTotal] = useState(0);
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [categories, setCategories] = useState<{ id: number; nome: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [statusFilter, setStatusFilter] = useState("pago");
   const [selectedMensalidade, setSelectedMensalidade] = useState<Mensalidade | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Mensalidade | null>(null);
@@ -126,15 +129,29 @@ function Financeiro() {
   const carregar = async () => {
     carregarComplementares();
     try {
-      const [m, a] = await Promise.all([fetchMensalidades(), fetchAlunos()]);
-      setData(m);
-      setAlunos(a);
-      setLoading(false);
+      setAlunos(await fetchAlunos());
     } catch {
       toast.error("Erro ao carregar dados");
-      setLoading(false);
     }
   };
+
+  const carregarLista = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchMensalidadesPage({
+        status: statusFilter === "all" ? undefined : statusFilter,
+        q: debouncedQ || undefined,
+        page,
+        perPage,
+      });
+      setData(res.data);
+      setTotal(res.total);
+    } catch {
+      toast.error("Erro ao carregar dados");
+    } finally {
+      setLoading(false);
+    }
+  }, [statusFilter, debouncedQ, page, perPage]);
 
   const carregarComplementares = async () => {
     try {
@@ -150,6 +167,19 @@ function Financeiro() {
     carregar();
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q), 350);
+    return () => clearTimeout(t);
+  }, [q]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedQ, statusFilter]);
+
+  useEffect(() => {
+    carregarLista();
+  }, [carregarLista]);
+
   const gerarProximoMes = async () => {
     setGerando(true);
     try {
@@ -159,7 +189,8 @@ function Financeiro() {
           ? `${criadas} mensalidade(s) de ${mesReferencia} criada(s)`
           : `Mês ${mesReferencia} já está completo`,
       );
-      await carregar();
+      carregar();
+      carregarLista();
     } catch {
       toast.error("Erro ao gerar mensalidades");
     } finally {
@@ -178,7 +209,8 @@ function Financeiro() {
             ? `Nenhuma entrada pendente. ${res.ignoradas} ignorada(s) por mês finalizado.`
             : "Nenhuma entrada pendente de sincronização",
       );
-      await carregar();
+      carregar();
+      carregarLista();
     } catch {
       toast.error("Erro ao sincronizar caixa");
     } finally {
@@ -186,27 +218,7 @@ function Financeiro() {
     }
   };
 
-  const filtered = useMemo(
-    () =>
-      data.filter(
-        (m) =>
-          (!q ||
-            (m.alunoNome || "").toLowerCase().includes(q.toLowerCase()) ||
-            m.mesReferencia.includes(q)) &&
-          (statusFilter === "all" || m.status === statusFilter),
-      ),
-    [data, q, statusFilter],
-  );
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
-  const paged = useMemo(
-    () => filtered.slice((page - 1) * perPage, page * perPage),
-    [filtered, page, perPage],
-  );
-
-  useEffect(() => {
-    setPage(1);
-  }, [q, statusFilter]);
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   const mesCorrente = () => {
     const hoje = new Date();
@@ -282,7 +294,8 @@ function Financeiro() {
       }
       setFormOpen(false);
       setSelectedMensalidade(null);
-      await carregar();
+      carregar();
+      carregarLista();
     } catch {
       toast.error("Erro ao salvar mensalidade");
     }
@@ -300,19 +313,17 @@ function Financeiro() {
       toast.success("Pagamento registrado!");
       setPagamentoOpen(false);
       setSelectedMensalidade(null);
-      const todas = await fetchMensalidades();
-      setData(todas);
-      const atual = todas.find((m) => m.id === pagamentoId);
+      const atual = await fetchMensalidade(pagamentoId).catch(() => null);
       setReciboMensalidade(atual ?? updated);
+      setData((prev) => prev.map((m) => (m.id === pagamentoId ? atual ?? updated : m)));
     } catch {
-      const todas = await fetchMensalidades().catch(() => null);
-      const atual = (todas ?? []).find((m) => m.id === pagamentoId);
+      const atual = await fetchMensalidade(pagamentoId).catch(() => null);
       if (atual?.status === "pago") {
         toast.success("Pagamento registrado!");
         setPagamentoOpen(false);
         setSelectedMensalidade(null);
-        if (todas) setData(todas);
         setReciboMensalidade(atual);
+        setData((prev) => prev.map((m) => (m.id === pagamentoId ? atual : m)));
       } else {
         toast.error("Erro ao registrar pagamento");
       }
@@ -328,7 +339,8 @@ function Financeiro() {
       toast.success("Mensalidade excluída");
       setDeleteTarget(null);
       setSelectedMensalidade(null);
-      await carregar();
+      carregar();
+      carregarLista();
     } catch {
       toast.error("Erro ao excluir mensalidade");
     }
@@ -602,7 +614,7 @@ function Financeiro() {
             <div className="flex items-center justify-center py-16">
               <Loader2 className="size-6 animate-spin text-muted-foreground" />
             </div>
-          ) : filtered.length === 0 ? (
+          ) : data.length === 0 ? (
             <EmptyState title="Sem mensalidades" />
           ) : (
             <table className="w-full text-sm">
@@ -618,7 +630,7 @@ function Financeiro() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {paged.map((m) => (
+                {data.map((m) => (
                   <tr key={m.id} className="hover:bg-muted/30">
                     <td className="px-4 py-3 font-medium">{m.alunoNome || "—"}</td>
                     <td className="px-4 py-3">{m.mesReferencia}</td>
@@ -659,12 +671,12 @@ function Financeiro() {
           )}
         </div>
 
-        {!loading && filtered.length > 0 && (
+        {!loading && data.length > 0 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-border">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>
-                Exibindo {(page - 1) * perPage + 1}-{Math.min(page * perPage, filtered.length)} de{" "}
-                {filtered.length}
+                Exibindo {(page - 1) * perPage + 1}-{Math.min(page * perPage, total)} de{" "}
+                {total}
               </span>
               <Select
                 value={String(perPage)}

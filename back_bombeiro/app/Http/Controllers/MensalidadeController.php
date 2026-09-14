@@ -21,9 +21,41 @@ class MensalidadeController extends Controller
         private readonly PagamentoService $pagamentoService,
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        return Mensalidade::with('aluno')->orderBy('created_at', 'desc')->get();
+        $query = Mensalidade::with('aluno')->orderBy('created_at', 'desc');
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('mes')) {
+            $query->where('mes_referencia', $request->mes);
+        }
+
+        if ($request->filled('q')) {
+            $q = $request->input('q');
+            $query->where(function ($w) use ($q) {
+                $w->where('mes_referencia', 'like', "%{$q}%")
+                    ->orWhereHas('aluno', function ($aluno) use ($q) {
+                        $aluno->where('nome', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        if ($request->has('page')) {
+            $paginated = $query->paginate((int) $request->input('per_page', 20))->withQueryString();
+
+            return response()->json([
+                'data' => $paginated->items(),
+                'total' => $paginated->total(),
+                'page' => $paginated->currentPage(),
+                'per_page' => $paginated->perPage(),
+                'last_page' => $paginated->lastPage(),
+            ]);
+        }
+
+        return $query->get();
     }
 
     public function store(Request $request)

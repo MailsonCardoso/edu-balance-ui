@@ -64,6 +64,44 @@ export async function fetchMensalidades(): Promise<Mensalidade[]> {
   return (data as unknown[]).map((m) => mensalidadeFromApi(m as Record<string, unknown>));
 }
 
+export interface MensalidadePage {
+  data: Mensalidade[];
+  total: number;
+  page: number;
+  per_page: number;
+  last_page: number;
+}
+
+export async function fetchMensalidadesPage(params: {
+  status?: string;
+  q?: string;
+  page?: number;
+  perPage?: number;
+} = {}): Promise<MensalidadePage> {
+  const { data } = await api.get("/mensalidades", {
+    params: {
+      status: params.status,
+      q: params.q,
+      page: params.page ?? 1,
+      per_page: params.perPage ?? 20,
+    },
+  });
+  return {
+    data: (data.data as unknown[]).map((m) =>
+      mensalidadeFromApi(m as Record<string, unknown>),
+    ),
+    total: data.total,
+    page: data.page,
+    per_page: data.per_page,
+    last_page: data.last_page,
+  };
+}
+
+export async function fetchMensalidade(id: string): Promise<Mensalidade> {
+  const { data } = await api.get(`/mensalidades/${id}`);
+  return mensalidadeFromApi(data as Record<string, unknown>);
+}
+
 export async function createMensalidade(m: Partial<Mensalidade>): Promise<Mensalidade> {
   const { data } = await api.post("/mensalidades", mensalidadeToApi(m));
   return mensalidadeFromApi(data as Record<string, unknown>);
