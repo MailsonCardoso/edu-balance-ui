@@ -296,13 +296,12 @@ function PainelTab({ associado }: { associado: AssociadoData }) {
   const infoTiles = [
     { icon: Mail, label: "E-mail", value: associado.email },
     { icon: Phone, label: "Telefone", value: associado.telefone },
-    { icon: Calendar, label: "Sócio desde", value: associado.created_at },
     { icon: User, label: "CPF", value: associado.cpf },
   ];
 
   return (
     <div className="space-y-6">
-      <ProfileCard nome={associado.nome} status={associado.status} desde={associado.created_at} />
+      <ProfileCard nome={associado.nome} status={associado.status} />
 
       <div className="grid grid-cols-2 gap-3">
         {infoTiles.map((t) => (

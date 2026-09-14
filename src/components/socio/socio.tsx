@@ -9,11 +9,9 @@ import { cn } from "@/lib/utils";
 export function ProfileCard({
   nome,
   status,
-  desde,
 }: {
   nome: string;
   status: string;
-  desde: string;
 }) {
   const iniciais = nome
     .split(" ")
@@ -37,7 +35,6 @@ export function ProfileCard({
               <span className="size-1.5 rounded-full bg-emerald-300" />
               {status === "ativo" ? "Ativo" : status}
             </span>
-            <span className="text-xs text-white/70">Sócio desde {desde}</span>
           </div>
         </div>
       </div>
