@@ -489,7 +489,7 @@ function HistoricoTab({ onRecibo }: { onRecibo: (m: Mensalidade) => void }) {
 
   useEffect(() => {
     fetchAssociadoMensalidades()
-      .then(setMensalidades)
+      .then((data) => setMensalidades(data.filter((m) => m.status === "pago")))
       .catch(() => toast.error("Erro ao carregar histórico"))
       .finally(() => setLoading(false));
   }, []);
