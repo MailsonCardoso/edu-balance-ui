@@ -6,6 +6,7 @@ export interface AssociadoMensalidade {
   aluno_id: string;
   mes_referencia: string;
   valor: number;
+  valor_cobrado?: number | null;
   data_vencimento: string;
   data_pagamento: string | null;
   status: string;
@@ -39,6 +40,7 @@ export function mensalidadeFromApi(raw: AssociadoMensalidade): Mensalidade {
   mapped.id = String(mapped.id);
   mapped.alunoId = String(mapped.alunoId);
   mapped.valor = Number(mapped.valor) || 0;
+  if (mapped.valorCobrado != null) mapped.valorCobrado = Number(mapped.valorCobrado) || null;
   return mapped as unknown as Mensalidade;
 }
 

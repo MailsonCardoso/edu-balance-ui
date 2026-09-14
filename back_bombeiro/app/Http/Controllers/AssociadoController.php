@@ -221,6 +221,7 @@ class AssociadoController extends Controller
                     'aluno_id' => $m->aluno_id,
                     'mes_referencia' => $m->mes_referencia,
                     'valor' => $m->valor,
+                    'valor_cobrado' => $m->valor_cobrado,
                     'data_vencimento' => $m->data_vencimento->format('d/m/Y'),
                     'data_pagamento' => $m->data_pagamento?->format('d/m/Y'),
                     'status' => $m->status,
