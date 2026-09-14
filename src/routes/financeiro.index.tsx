@@ -369,7 +369,7 @@ function Financeiro() {
 
     doc.setFont("times", "bold");
     doc.setFontSize(14);
-    doc.text("Recibo do pagamento do Associado", ml + cw / 2, y, { align: "center" });
+    doc.text("Recibo de Pagamento do Associado", ml + cw / 2, y, { align: "center" });
 
     y += 10;
     doc.setFontSize(8);

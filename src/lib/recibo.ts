@@ -28,7 +28,7 @@ export function gerarPdfBlob(m: Mensalidade): Promise<Blob> {
 
   doc.setFont("times", "bold");
   doc.setFontSize(16);
-  doc.text("Recibo do pagamento do Associado", ml + cw / 2, y, { align: "center" });
+  doc.text("Recibo de Pagamento do Associado", ml + cw / 2, y, { align: "center" });
 
   y += 9;
   doc.setFontSize(8);
