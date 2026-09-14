@@ -207,7 +207,9 @@ function Dashboard() {
               nome: a.nome,
               turma: a.turma,
               dia: nasc.getDate(),
+              mes: nasc.toLocaleDateString("pt-BR", { month: "long" }),
               idade: idadeNoDia(nasc, agora),
+              ehHoje: nasc.getDate() === agora.getDate() && nasc.getMonth() === agora.getMonth(),
             }
           : null;
       })
@@ -388,10 +390,17 @@ function Dashboard() {
                     <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                       {b.dia}
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{b.nome}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-2 truncate text-sm font-medium">
+                        {b.nome}
+                        {b.ehHoje && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                            É hoje!
+                          </span>
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        Completa {b.idade} anos · {b.turma}
+                        {b.dia} de {b.mes} · Completa {b.idade} anos · {b.turma}
                       </p>
                     </div>
                   </div>
