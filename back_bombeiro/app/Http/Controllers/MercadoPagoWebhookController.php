@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\DTOs\WebhookNotificationDTO;
 use App\Http\Requests\WebhookRequest;
-use App\Jobs\ProcessMercadoPagoWebhookJob;
 use App\Services\MercadoPagoService;
+use App\Services\PagamentoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +14,7 @@ class MercadoPagoWebhookController extends Controller
 {
     public function __construct(
         private readonly MercadoPagoService $mercadopago,
+        private readonly PagamentoService $pagamentoService,
     ) {}
 
     public function __invoke(WebhookRequest $request): JsonResponse
@@ -52,9 +53,22 @@ class MercadoPagoWebhookController extends Controller
             }
         }
 
-        ProcessMercadoPagoWebhookJob::dispatch($paymentId, $payload);
+        try {
+            $this->pagamentoService->processarNotificacaoWebhook(
+                paymentId: $paymentId,
+                payloadWebhook: $payload,
+            );
+        } catch (\Throwable $e) {
+            Log::error('Webhook: Erro ao processar notificacao', [
+                'payment_id' => $paymentId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-        Log::info('Webhook: Job dispatchado', ['payment_id' => $paymentId]);
+            return response()->json(['status' => 'error'], 500);
+        }
+
+        Log::info('Webhook: Notificacao processada', ['payment_id' => $paymentId]);
 
         return response()->json(['status' => 'accepted']);
     }

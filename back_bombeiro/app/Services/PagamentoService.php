@@ -89,9 +89,11 @@ class PagamentoService
         $dto = AtualizarStatusDTO::fromMercadoPagoResponse($dadosAtuais);
 
         DB::transaction(function () use ($dto, $dadosAtuais, $payloadWebhook, $paymentId) {
-            $transacao = PagamentoTransacao::where('payment_id', $paymentId)
-                ->orWhere('external_reference', $dadosAtuais['external_reference'] ?? '')
-                ->first();
+            $query = PagamentoTransacao::where('payment_id', $paymentId);
+            if (!empty($dadosAtuais['external_reference'])) {
+                $query->orWhere('external_reference', $dadosAtuais['external_reference']);
+            }
+            $transacao = $query->first();
 
             if (!$transacao && !empty($dadosAtuais['external_reference'])) {
                 $transacao = $this->criarTransacaoDeWebhook($dadosAtuais);
@@ -125,7 +127,15 @@ class PagamentoService
             ]);
 
             $mensalidadeStatus = MercadoPagoStatus::tryFrom($dto->status)?->mensalidadeStatus();
-            $statusAnteriorMensalidade = $transacao->mensalidade->status;
+            $statusAnteriorMensalidade = $transacao->mensalidade?->status;
+
+            if ($mensalidadeStatus && !$transacao->mensalidade) {
+                Log::warning('Pagamento: Mensalidade ausente para transacao, ignorando update', [
+                    'transacao_id' => $transacao->id,
+                    'payment_id' => $paymentId,
+                ]);
+                return;
+            }
 
             if ($mensalidadeStatus && $statusAnteriorMensalidade !== $mensalidadeStatus->value) {
                 $dadosAtualizacao = [
