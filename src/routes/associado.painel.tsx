@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { brl } from "@/lib/format";
-import { getAssociado, updateAssociado, type AssociadoData } from "@/lib/api/associado";
+import { getAssociado, type AssociadoData } from "@/lib/api/associado";
 import {
   fetchAssociadoMensalidades,
   gerarCobrancaMensalidade,
@@ -578,45 +578,11 @@ function HistoricoTab({ onRecibo }: { onRecibo: (m: Mensalidade) => void }) {
 }
 
 function DadosTab({ associado }: { associado: AssociadoData }) {
-  const [editing, setEditing] = useState(false);
-  const [nome, setNome] = useState(associado.nome);
-  const [telefone, setTelefone] = useState(associado.telefone);
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await updateAssociado({ nome, telefone });
-      const updated = { ...associado, nome, telefone };
-      localStorage.setItem("associado_data", JSON.stringify(updated));
-      toast.success("Dados atualizados com sucesso!");
-      setEditing(false);
-    } catch {
-      toast.error("Erro ao atualizar dados.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const fields = [
-    {
-      label: "Nome completo",
-      value: associado.nome,
-      icon: User,
-      editable: true,
-      state: nome,
-      set: setNome,
-    },
-    { label: "E-mail", value: associado.email, icon: Mail, editable: false },
-    {
-      label: "Telefone",
-      value: associado.telefone,
-      icon: Phone,
-      editable: true,
-      state: telefone,
-      set: setTelefone,
-    },
-    { label: "CPF", value: associado.cpf, icon: User, editable: false },
+    { label: "Nome completo", value: associado.nome, icon: User },
+    { label: "E-mail", value: associado.email, icon: Mail },
+    { label: "Telefone", value: associado.telefone, icon: Phone },
+    { label: "CPF", value: associado.cpf, icon: User },
   ] as const;
 
   return (
@@ -640,34 +606,6 @@ function DadosTab({ associado }: { associado: AssociadoData }) {
           </div>
         ))}
       </div>
-      {editing ? (
-        <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex-1 rounded-2xl bg-brand py-3 text-sm font-semibold text-white shadow-[0_8px_20px_-8px_var(--color-brand)] transition-transform active:scale-[0.98] disabled:opacity-60"
-          >
-            {saving ? "Salvando..." : "Salvar"}
-          </button>
-          <button
-            onClick={() => {
-              setEditing(false);
-              setNome(associado.nome);
-              setTelefone(associado.telefone);
-            }}
-            className="rounded-2xl bg-gray-100 px-6 py-3 text-sm font-semibold text-gray-600 transition-transform active:scale-[0.98]"
-          >
-            Cancelar
-          </button>
-        </div>
-      ) : (
-        <button
-          onClick={() => setEditing(true)}
-          className="w-full rounded-2xl bg-brand-light py-3 text-sm font-semibold text-brand transition-transform active:scale-[0.98]"
-        >
-          Editar dados
-        </button>
-      )}
     </div>
   );
 }
