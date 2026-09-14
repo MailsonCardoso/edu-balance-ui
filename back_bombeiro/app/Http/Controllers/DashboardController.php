@@ -112,4 +112,58 @@ class DashboardController extends Controller
                 : 0,
         ]);
     }
+
+    public function mensalidades(): JsonResponse
+    {
+        $hoje = now();
+        $diasNoMes = $hoje->daysInMonth;
+
+        $porDiaQuery = Mensalidade::query()
+            ->selectRaw("DAY(data_vencimento) as dia, status, COUNT(*) as qtd")
+            ->whereYear('data_vencimento', $hoje->year)
+            ->whereMonth('data_vencimento', $hoje->month)
+            ->groupByRaw('DAY(data_vencimento), status')
+            ->get()
+            ->groupBy('dia');
+
+        $pagamentosPorDia = [];
+        for ($i = 1; $i <= $diasNoMes; $i++) {
+            $dia = (string) $i;
+            $linhas = $porDiaQuery[$dia] ?? collect();
+            $pagos = 0;
+            $pendentes = 0;
+            foreach ($linhas as $linha) {
+                if ($linha->status === 'pago') {
+                    $pagos = (int) $linha->qtd;
+                } else {
+                    $pendentes = (int) $linha->qtd;
+                }
+            }
+            $pagamentosPorDia[] = [
+                'dia' => str_pad($dia, 2, '0', STR_PAD_LEFT),
+                'pagos' => $pagos,
+                'pendentes' => $pendentes,
+            ];
+        }
+
+        $receitaPorAno = Mensalidade::query()
+            ->selectRaw("YEAR(data_pagamento) as ano, COALESCE(SUM(valor), 0) as receita")
+            ->where('status', 'pago')
+            ->whereNotNull('data_pagamento')
+            ->groupByRaw('YEAR(data_pagamento)')
+            ->orderBy('ano')
+            ->get()
+            ->map(fn ($item) => ['ano' => (string) $item->ano, 'receita' => (float) $item->receita])
+            ->all();
+
+        $totalPendenteValor = Mensalidade::where('status', '!=', 'pago')->sum('valor');
+        $alunosAtivos = Aluno::where('status', 'ativo')->count();
+        $ticketMedio = $alunosAtivos > 0 ? $totalPendenteValor / $alunosAtivos : 0;
+
+        return response()->json([
+            'ticket_medio' => round($ticketMedio, 2),
+            'receita_por_ano' => $receitaPorAno,
+            'pagamentos_por_dia' => $pagamentosPorDia,
+        ]);
+    }
 }

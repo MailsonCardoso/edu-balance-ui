@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('funcionarios', App\Http\Controllers\FuncionarioController::class);
 
     Route::get('/dashboard/financeiro', [App\Http\Controllers\DashboardController::class, 'financeiro']);
+    Route::get('/dashboard/mensalidades', [App\Http\Controllers\DashboardController::class, 'mensalidades']);
     Route::apiResource('alunos', AlunoController::class);
     Route::get('/alunos/{aluno}/extrato', [AlunoController::class, 'extrato']);
     Route::post('/mensalidades/gerar-proximo-mes', [MensalidadeController::class, 'gerarProximoMes']);

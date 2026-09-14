@@ -22,3 +22,14 @@ export async function fetchDashboardFinanceiro(): Promise<DashboardFinanceiro> {
   const { data } = await api.get("/dashboard/financeiro");
   return data;
 }
+
+export interface DashboardMensalidades {
+  ticket_medio: number;
+  receita_por_ano: { ano: string; receita: number }[];
+  pagamentos_por_dia: { dia: string; pagos: number; pendentes: number }[];
+}
+
+export async function fetchDashboardMensalidades(): Promise<DashboardMensalidades> {
+  const { data } = await api.get("/dashboard/mensalidades");
+  return data;
+}

@@ -18,10 +18,13 @@ import {
 import { PageHeader, StatCard } from "@/components/shared/Primitives";
 import { brl } from "@/lib/format";
 import { fetchAlunos } from "@/lib/api/alunos";
-import { fetchMensalidades } from "@/lib/api/mensalidades";
-import { fetchDashboardFinanceiro, type DashboardFinanceiro } from "@/lib/api/dashboard-financeiro";
+import {
+  fetchDashboardFinanceiro,
+  fetchDashboardMensalidades,
+  type DashboardFinanceiro,
+  type DashboardMensalidades,
+} from "@/lib/api/dashboard-financeiro";
 import { fetchTransactions } from "@/lib/api/transactions";
-import type { Mensalidade } from "@/lib/mock-data";
 import type { Transaction } from "@/lib/api/transactions";
 
 export const Route = createFileRoute("/dashboard")({
@@ -55,56 +58,27 @@ function ChartCard({
 
 const axisStyle = { fontSize: 12, fill: "var(--muted-foreground)" };
 
-function parseDataBr(dateStr: string): Date {
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-    const [d, m, y] = dateStr.split("/");
-    return new Date(+y, +m - 1, +d);
-  }
-  return new Date(dateStr);
-}
-
-function mesAno(d: Date): string {
-  return d.toLocaleDateString("pt-BR", { month: "short", year: "2-digit" }).replace(" de ", "/");
-}
-
-function parseDataNasc(data: string): Date | null {
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(data)) {
-    const [d, m, y] = data.split("/").map(Number);
-    return new Date(y, m - 1, d);
-  }
-  return null;
-}
-
-function idadeNoDia(nasc: Date, ref: Date = new Date()): number {
-  let idade = ref.getFullYear() - nasc.getFullYear();
-  const aindaNaoFez =
-    ref.getMonth() < nasc.getMonth() ||
-    (ref.getMonth() === nasc.getMonth() && ref.getDate() < nasc.getDate());
-  if (aindaNaoFez) idade -= 1;
-  return idade;
-}
-
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
+  const [resumo, setResumo] = useState<DashboardMensalidades | null>(null);
   const [alunos, setAlunos] = useState<Awaited<ReturnType<typeof fetchAlunos>>>([]);
-  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [transacoes, setTransacoes] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const now = new Date();
     Promise.all([
       fetchAlunos(),
-      fetchMensalidades(),
       fetchDashboardFinanceiro(),
+      fetchDashboardMensalidades().catch(() => null),
       fetchTransactions(now.getMonth() + 1, now.getFullYear()).catch(() => ({
         transactions: [],
       })),
     ])
-      .then(([a, m, d, t]) => {
+      .then(([a, d, r, t]) => {
         setAlunos(a);
-        setMensalidades(m);
         setDashboard(d);
+        setResumo(r);
         setTransacoes(t.transactions);
       })
       .catch(() => {})
@@ -115,9 +89,7 @@ function Dashboard() {
     const ativos = alunos.filter((a) => a.status === "ativo");
     const inadimplentes = alunos.filter((a) => a.situacao === "inadimplente" || a.situacao === "em_atraso");
 
-    const ticketMedio = ativos.length > 0
-      ? mensalidades.filter((m) => m.status !== "pago").reduce((s, m) => s + m.valor, 0) / ativos.length
-      : 0;
+    const ticketMedio = resumo?.ticket_medio ?? 0;
 
     const taxaAdimplencia = ativos.length > 0
       ? Math.round(((ativos.length - inadimplentes.length) / ativos.length) * 100)
@@ -129,7 +101,7 @@ function Dashboard() {
       ticketMedio,
       taxaAdimplencia,
     };
-  }, [alunos, mensalidades]);
+  }, [alunos, resumo]);
 
   const fluxo = useMemo(() => {
     const entradas = transacoes
@@ -141,51 +113,9 @@ function Dashboard() {
     return { entradas, saidas, saldo: entradas - saidas };
   }, [transacoes]);
 
-  const chartData = useMemo(() => {
-    const meses: Record<string, number> = {};
-    const anos: Record<string, number> = {};
+  const receitaAnual = useMemo(() => resumo?.receita_por_ano ?? [], [resumo]);
 
-    for (const m of mensalidades) {
-      if (m.status === "pago" && m.dataPagamento) {
-        const d = parseDataBr(m.dataPagamento);
-        const label = mesAno(d);
-        meses[label] = (meses[label] || 0) + m.valor;
-        const anoLabel = String(d.getFullYear());
-        anos[anoLabel] = (anos[anoLabel] || 0) + m.valor;
-      }
-    }
-
-    const receitaMensal = Object.entries(meses)
-      .map(([mes, receita]) => ({ mes, receita }))
-      .sort((a, b) => a.mes.localeCompare(b.mes));
-
-    const receitaAnual = Object.entries(anos)
-      .map(([ano, receita]) => ({ ano, receita }))
-      .sort((a, b) => a.ano.localeCompare(b.ano));
-
-    return { receitaMensal, receitaAnual };
-  }, [mensalidades]);
-
-  const pagamentosDiarios = useMemo(() => {
-    const agora = new Date();
-    const dias: Record<string, { pagos: number; pendentes: number }> = {};
-    const diasNoMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0).getDate();
-
-    for (let i = 1; i <= diasNoMes; i++) {
-      const chave = String(i).padStart(2, "0");
-      dias[chave] = { pagos: 0, pendentes: 0 };
-    }
-
-    for (const m of mensalidades) {
-      const venc = parseDataBr(m.dataVencimento);
-      if (venc.getMonth() !== agora.getMonth() || venc.getFullYear() !== agora.getFullYear()) continue;
-      const chave = String(venc.getDate()).padStart(2, "0");
-      if (m.status === "pago") dias[chave].pagos += 1;
-      else dias[chave].pendentes += 1;
-    }
-
-    return Object.entries(dias).map(([dia, v]) => ({ dia, ...v }));
-  }, [mensalidades]);
+  const pagamentosDiarios = useMemo(() => resumo?.pagamentos_por_dia ?? [], [resumo]);
 
   const chartConsolidado = useMemo(() => {
     return (
@@ -294,7 +224,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <ChartCard title="Receita vs Despesa" subtitle="Últimos 6 meses" index={0}>
           <ResponsiveContainer width="100%" height={256}>
-            <AreaChart data={chartConsolidado.length > 0 ? chartConsolidado : chartData.receitaMensal}>
+            <AreaChart data={chartConsolidado}>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.4} />
@@ -321,7 +251,7 @@ function Dashboard() {
 
         <ChartCard title="Receita anual" subtitle="Por ano" index={1}>
           <ResponsiveContainer width="100%" height={256}>
-            <BarChart data={chartData.receitaAnual}>
+            <BarChart data={receitaAnual}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis dataKey="ano" tick={axisStyle} stroke="var(--border)" />
               <YAxis tick={axisStyle} stroke="var(--border)" tickFormatter={(v) => `${v / 1000}k`} />
