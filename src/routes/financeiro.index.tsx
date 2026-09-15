@@ -477,7 +477,7 @@ function Financeiro() {
     const file = new File([blob], `recibo-${m.id}.pdf`, { type: "application/pdf" });
 
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: "Recibo do pagamento do Associado" });
+      await navigator.share({ files: [file], title: "Recibo de Pagamento do Associado" });
     } else {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -980,7 +980,7 @@ function Financeiro() {
         <AlertDialogContent className="max-w-lg max-h-[90dvh] flex flex-col p-4 sm:p-6">
           <AlertDialogHeader className="shrink-0">
             <AlertDialogTitle className="text-center text-base uppercase tracking-wide">
-              Recibo do pagamento do Associado
+              Recibo de Pagamento do Associado
             </AlertDialogTitle>
           </AlertDialogHeader>
           <div className="flex-1 min-h-0 overflow-y-auto space-y-3 text-sm py-2 pr-1">

@@ -46,7 +46,7 @@ export function ReciboModal({
 
         <div className="pt-4 text-center">
           <p className="text-xs uppercase tracking-wide text-gray-400">
-            Recibo do pagamento do Associado
+            Recibo de Pagamento do Associado
           </p>
           <p className="mt-1 text-lg font-bold text-gray-900">
             ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)
