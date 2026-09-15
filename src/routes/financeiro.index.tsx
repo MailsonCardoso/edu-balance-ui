@@ -11,7 +11,6 @@ import {
   Plus,
   Pencil,
   CalendarClock,
-  Printer,
   RefreshCw,
   Search,
   Trash2,
@@ -54,7 +53,7 @@ import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 import { ReciboVisual } from "@/components/shared/ReciboVisual";
-import { reciboParaPng } from "@/lib/recibo-png";
+import { baixarPngRecibo } from "@/lib/recibo-png";
 import { fetchAlunos } from "@/lib/api/alunos";
 import {
   fetchMensalidade,
@@ -477,27 +476,14 @@ function Financeiro() {
     URL.revokeObjectURL(url);
   };
 
-  const enviarPngWhatsApp = async (m: Mensalidade) => {
+  const baixarPng = async (m: Mensalidade) => {
     if (!reciboRef.current || gerandoImg) return;
     setGerandoImg(true);
     try {
-      const blob = await reciboParaPng(reciboRef.current);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `recibo-${m.id}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      const a2 = alunos.find((x) => x.id === m.alunoId);
-      const phone = a2?.telefoneResponsavel?.replace(/\D/g, "") || a2?.telefone?.replace(/\D/g, "");
-      if (phone) {
-        const msg = encodeURIComponent(
-          `Olá! Segue o recibo de pagamento de ${m.mesReferencia} do(a) ${m.alunoNome || "aluno(a)"}.`,
-        );
-        window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
-      }
-      toast.success("Imagem baixada. É só anexar na conversa do WhatsApp.");
+      await baixarPngRecibo(reciboRef.current, `recibo-${m.id}`);
+      toast.success("Imagem baixada. Pronta para enviar em qualquer app.");
+    } catch {
+      toast.error("Erro ao gerar a imagem do recibo");
     } finally {
       setGerandoImg(false);
     }
@@ -999,15 +985,14 @@ function Financeiro() {
               Fechar
             </Button>
             {reciboMensalidade && (
-              <>
-                <Button variant="outline" onClick={() => enviarPngWhatsApp(reciboMensalidade)} disabled={gerandoImg}>
-                  {gerandoImg ? <Loader2 className="size-4 animate-spin" /> : <ImageDown className="size-4" />}
-                  {gerandoImg ? "Gerando..." : "Baixar p/ WhatsApp"}
-                </Button>
-                <Button onClick={() => baixarPdf(reciboMensalidade)}>
-                  <Printer className="size-4" /> Baixar PDF
-                </Button>
-              </>
+              <Button onClick={() => baixarPng(reciboMensalidade)} disabled={gerandoImg}>
+                {gerandoImg ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <ImageDown className="size-4" />
+                )}
+                {gerandoImg ? "Gerando..." : "Baixar PNG"}
+              </Button>
             )}
           </AlertDialogFooter>
         </AlertDialogContent>
