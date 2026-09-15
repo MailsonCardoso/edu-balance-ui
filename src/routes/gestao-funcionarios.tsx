@@ -487,7 +487,7 @@ function FuncionarioForm({
         role,
         password: password || undefined,
       },
-      false,
+      Boolean(password),
     );
   };
 
