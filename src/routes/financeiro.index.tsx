@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CheckCircle2,
   FileText,
   History,
+  ImageDown,
   Loader2,
   MessageCircle,
   MoreVertical,
@@ -52,6 +53,8 @@ import type { Mensalidade, Aluno, FormaPagamento, OrigemPagamento } from "@/lib/
 import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import { ReciboVisual } from "@/components/shared/ReciboVisual";
+import { reciboParaPng } from "@/lib/recibo-png";
 import { fetchAlunos } from "@/lib/api/alunos";
 import {
   fetchMensalidade,
@@ -121,10 +124,12 @@ function Financeiro() {
   const [pagamentoForma, setPagamentoForma] = useState("");
   const [reciboMensalidade, setReciboMensalidade] = useState<Mensalidade | null>(null);
   const [gerando, setGerando] = useState(false);
+  const [gerandoImg, setGerandoImg] = useState(false);
   const [sincronizando, setSincronizando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
+  const reciboRef = useRef<HTMLDivElement>(null);
 
   const carregar = async () => {
     carregarComplementares();
@@ -472,28 +477,29 @@ function Financeiro() {
     URL.revokeObjectURL(url);
   };
 
-  const enviarPdfWhatsApp = async (m: Mensalidade) => {
-    const blob = await gerarPdfBlob(m);
-    const file = new File([blob], `recibo-${m.id}.pdf`, { type: "application/pdf" });
-
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: "Recibo de Pagamento do Associado" });
-    } else {
+  const enviarPngWhatsApp = async (m: Mensalidade) => {
+    if (!reciboRef.current || gerandoImg) return;
+    setGerandoImg(true);
+    try {
+      const blob = await reciboParaPng(reciboRef.current);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `recibo-${m.id}.pdf`;
+      a.download = `recibo-${m.id}.png`;
       a.click();
       URL.revokeObjectURL(url);
+
       const a2 = alunos.find((x) => x.id === m.alunoId);
       const phone = a2?.telefoneResponsavel?.replace(/\D/g, "") || a2?.telefone?.replace(/\D/g, "");
       if (phone) {
         const msg = encodeURIComponent(
-          `Olá! Segue em anexo o recibo de pagamento de ${m.mesReferencia} do(a) ${m.alunoNome || "aluno(a)"}.`,
+          `Olá! Segue o recibo de pagamento de ${m.mesReferencia} do(a) ${m.alunoNome || "aluno(a)"}.`,
         );
         window.open(`https://wa.me/55${phone}?text=${msg}`, "_blank");
       }
-      toast.info("PDF baixado. Envie o arquivo pelo WhatsApp.");
+      toast.success("Imagem baixada. É só anexar na conversa do WhatsApp.");
+    } finally {
+      setGerandoImg(false);
     }
   };
 
@@ -983,81 +989,10 @@ function Financeiro() {
               Recibo de Pagamento do Associado
             </AlertDialogTitle>
           </AlertDialogHeader>
-          <div className="flex-1 min-h-0 overflow-y-auto space-y-3 text-sm py-2 pr-1">
-            <div className="text-center pb-2">
-              <p className="font-bold text-base">ASSOCIAÇÃO DE PAIS E AMIGOS DO CMCB XII (APA)</p>
-              <p className="text-muted-foreground">CNPJ nº 50.264.838/0001-60</p>
-              <p className="text-muted-foreground">
-                Rua C, Quadra 11, Casa 36, Paraná I, Paço do Lumiar/MA, CEP 65.130-000
-              </p>
-            </div>
-            <p className="text-justify text-muted-foreground border-t border-border pt-4">
-              Declaro, para os devidos fins, que recebi Mensalidade/Contribuição Associativa abaixo
-              discriminada:
-            </p>
-            <div className="space-y-2 bg-muted/30 rounded-lg p-4">
-              <div className="grid grid-cols-[140px_1fr] gap-x-2">
-                <span className="text-muted-foreground">
-                  {reciboMensalidade?.alunoSexo === "feminino" ? "Aluna:" : "Aluno:"}
-                </span>
-                <span className="font-medium">{reciboMensalidade?.alunoNome || "—"}</span>
-                <span className="text-muted-foreground">Responsável:</span>
-                <span className="font-medium">{reciboMensalidade?.alunoResponsavel || "—"}</span>
-                <span className="text-muted-foreground">Mês de Referência:</span>
-                <span className="font-medium">{reciboMensalidade?.mesReferencia}</span>
-                <span className="text-muted-foreground">Valor pago pelo associado:</span>
-                <span className="font-medium">
-                  {reciboMensalidade
-                    ? (() => {
-                        const cobrado =
-                          reciboMensalidade.valorCobrado != null
-                            ? reciboMensalidade.valorCobrado
-                            : reciboMensalidade.valor;
-                        return `${brl(cobrado)} (${numeroExtenso(cobrado)})`;
-                      })()
-                    : "—"}
-                </span>
-                {reciboMensalidade?.valorCobrado != null &&
-                reciboMensalidade.valorCobrado > reciboMensalidade.valor + 0.004 ? (
-                  <>
-                    <span className="text-muted-foreground">
-                      Tarifa do meio de pagamento (Mercado Pago):
-                    </span>
-                    <span className="font-medium">
-                      - {brl(reciboMensalidade.valorCobrado - reciboMensalidade.valor)}
-                    </span>
-                    <span className="text-muted-foreground">
-                      Valor líquido recebido pela associação:
-                    </span>
-                    <span className="font-medium">{brl(reciboMensalidade.valor)}</span>
-                  </>
-                ) : null}
-                <span className="text-muted-foreground">Data do Pagamento:</span>
-                <span className="font-medium">
-                  {reciboMensalidade?.dataPagamento
-                    ? fmtDate(reciboMensalidade.dataPagamento)
-                    : "—"}
-                </span>
-                <span className="text-muted-foreground">Forma de Pagamento:</span>
-                <span className="font-medium capitalize">
-                  {reciboMensalidade ? formaPagamentoExibida(reciboMensalidade) : "—"}
-                </span>
-                <span className="text-muted-foreground">Origem:</span>
-                <span className="font-medium capitalize">
-                  {reciboMensalidade?.origem ? origemPagamentoLabel[reciboMensalidade.origem] : "—"}
-                </span>
-              </div>
-            </div>
-            <p className="text-justify text-muted-foreground">
-              Por ser verdade, firmo o presente recibo para que produza os efeitos legais cabíveis.
-            </p>
-            <p className="text-center font-medium">
-              Paço do Lumiar,{" "}
-              {reciboMensalidade?.dataPagamento
-                ? fmtDateFull(reciboMensalidade.dataPagamento)
-                : "—"}
-              .
-            </p>
+          <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto py-2 pr-1">
+            {reciboMensalidade ? (
+              <ReciboVisual ref={reciboRef} mensalidade={reciboMensalidade} />
+            ) : null}
           </div>
           <AlertDialogFooter className="shrink-0 sm:justify-center gap-2">
             <Button variant="outline" onClick={() => setReciboMensalidade(null)}>
@@ -1065,8 +1000,9 @@ function Financeiro() {
             </Button>
             {reciboMensalidade && (
               <>
-                <Button variant="outline" onClick={() => enviarPdfWhatsApp(reciboMensalidade)}>
-                  <MessageCircle className="size-4" /> Enviar WhatsApp
+                <Button variant="outline" onClick={() => enviarPngWhatsApp(reciboMensalidade)} disabled={gerandoImg}>
+                  {gerandoImg ? <Loader2 className="size-4 animate-spin" /> : <ImageDown className="size-4" />}
+                  {gerandoImg ? "Gerando..." : "Baixar p/ WhatsApp"}
                 </Button>
                 <Button onClick={() => baixarPdf(reciboMensalidade)}>
                   <Printer className="size-4" /> Baixar PDF
