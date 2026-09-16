@@ -89,11 +89,16 @@ class PagamentoService
         $dto = AtualizarStatusDTO::fromMercadoPagoResponse($dadosAtuais);
 
         DB::transaction(function () use ($dto, $dadosAtuais, $payloadWebhook, $paymentId) {
-            $query = PagamentoTransacao::where('payment_id', $paymentId);
-            if (!empty($dadosAtuais['external_reference'])) {
-                $query->orWhere('external_reference', $dadosAtuais['external_reference']);
+            $transacao = PagamentoTransacao::where('payment_id', $paymentId)->first();
+
+            if (!$transacao && !empty($dadosAtuais['external_reference'])) {
+                $transacao = PagamentoTransacao::where('external_reference', $dadosAtuais['external_reference'])
+                    ->where(function ($query) use ($paymentId) {
+                        $query->whereNull('payment_id')->orWhere('payment_id', $paymentId);
+                    })
+                    ->latest('id')
+                    ->first();
             }
-            $transacao = $query->first();
 
             if (!$transacao && !empty($dadosAtuais['external_reference'])) {
                 $transacao = $this->criarTransacaoDeWebhook($dadosAtuais);
@@ -126,10 +131,11 @@ class PagamentoService
                 'payload_response' => $dto->respostaApi,
             ]);
 
+            $mensalidade = $transacao->mensalidade;
             $mensalidadeStatus = MercadoPagoStatus::tryFrom($dto->status)?->mensalidadeStatus();
-            $statusAnteriorMensalidade = $transacao->mensalidade?->status;
+            $statusAnteriorMensalidade = $mensalidade?->status;
 
-            if ($mensalidadeStatus && !$transacao->mensalidade) {
+            if ($mensalidadeStatus && !$mensalidade) {
                 Log::warning('Pagamento: Mensalidade ausente para transacao, ignorando update', [
                     'transacao_id' => $transacao->id,
                     'payment_id' => $paymentId,
@@ -138,6 +144,17 @@ class PagamentoService
             }
 
             if ($mensalidadeStatus && $statusAnteriorMensalidade !== $mensalidadeStatus->value) {
+                if ($this->deveIgnorarRebaixamento($mensalidade, $mensalidadeStatus, $statusAnteriorMensalidade, $transacao)) {
+                    Log::warning('Pagamento: rebaixamento de mensalidade paga ignorado', [
+                        'mensalidade_id' => $mensalidade->id,
+                        'status_anterior' => $statusAnteriorMensalidade,
+                        'novo_status' => $mensalidadeStatus->value,
+                        'transacao_id' => $transacao->id,
+                        'payment_id' => $paymentId,
+                    ]);
+                    return;
+                }
+
                 $dadosAtualizacao = [
                     'status' => $mensalidadeStatus->value,
                 ];
@@ -149,8 +166,8 @@ class PagamentoService
                     $dadosAtualizacao['origem'] = PagamentoOrigem::MercadoPago->value;
 
                     $valorCobrado = (float) ($dadosAtuais['transaction_amount']
-                        ?? $transacao->mensalidade->valor_cobrado
-                        ?? $transacao->mensalidade->valor);
+                        ?? $mensalidade->valor_cobrado
+                        ?? $mensalidade->valor);
                     $dadosAtualizacao['valor_cobrado'] = $valorCobrado;
 
                     if ($formaPagamento === 'pix') {
@@ -160,17 +177,17 @@ class PagamentoService
                     }
                 }
 
-                $transacao->mensalidade->update($dadosAtualizacao);
+                $mensalidade->update($dadosAtualizacao);
 
                 if ($mensalidadeStatus?->value === MensalidadeStatus::Pago->value) {
                     $this->sincronizarMensalidadeNoCaixa(
-                        $transacao->mensalidade->refresh()->loadMissing('aluno'),
+                        $mensalidade->refresh()->loadMissing('aluno'),
                     );
                 }
             }
 
             event(new MensalidadeStatusUpdated(
-                mensalidade: $transacao->mensalidade,
+                mensalidade: $mensalidade,
                 statusAnterior: $statusAnteriorMensalidade,
                 novoStatus: $mensalidadeStatus?->value ?? $dto->status,
                 paymentId: $dto->paymentId,
@@ -187,6 +204,26 @@ class PagamentoService
                 'mensalidade_id' => $transacao->mensalidade_id,
             ]);
         });
+    }
+
+    private function deveIgnorarRebaixamento(
+        Mensalidade $mensalidade,
+        MensalidadeStatus $novoStatus,
+        ?string $statusAnterior,
+        PagamentoTransacao $transacao,
+    ): bool {
+        if ($novoStatus !== MensalidadeStatus::Atrasado) {
+            return false;
+        }
+
+        if ($statusAnterior === MensalidadeStatus::Pago->value || $mensalidade->isPago()) {
+            return true;
+        }
+
+        return PagamentoTransacao::where('mensalidade_id', $mensalidade->id)
+            ->where('status', MercadoPagoStatus::Approved->value)
+            ->whereKeyNot($transacao->getKey())
+            ->exists();
     }
 
     private function criarTransacaoDeWebhook(array $dadosMP): ?PagamentoTransacao
