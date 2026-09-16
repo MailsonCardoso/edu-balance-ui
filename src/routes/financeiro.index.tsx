@@ -156,6 +156,7 @@ function Financeiro() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     alunoId: "",
     mesReferencia: "",
@@ -278,6 +279,7 @@ function Financeiro() {
 
   const abrirForm = (mode: "create" | "edit", mensalidade?: Mensalidade) => {
     setFormMode(mode);
+    setEditingId(mode === "edit" && mensalidade ? mensalidade.id : null);
     if (mode === "edit" && mensalidade) {
       setFormData({
         alunoId: mensalidade.alunoId,
@@ -344,7 +346,11 @@ function Financeiro() {
         });
         toast.success("Mensalidade criada!");
       } else {
-        await updateMensalidade(selectedMensalidade!.id, {
+        if (!editingId) {
+          toast.error("Mensalidade não selecionada — reabra a edição e tente novamente.");
+          return;
+        }
+        await updateMensalidade(editingId, {
           alunoId: formData.alunoId,
           mesReferencia: formData.mesReferencia,
           valor: formData.valor,
@@ -355,6 +361,7 @@ function Financeiro() {
       }
       setFormOpen(false);
       setSelectedMensalidade(null);
+      setEditingId(null);
       carregar();
       carregarLista();
     } catch (e) {
@@ -847,7 +854,13 @@ function Financeiro() {
         }
       />
 
-      <Sheet open={formOpen} onOpenChange={setFormOpen}>
+      <Sheet
+        open={formOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open);
+          if (!open) setEditingId(null);
+        }}
+      >
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <SheetHeader className="pr-8">
             <SheetTitle>
