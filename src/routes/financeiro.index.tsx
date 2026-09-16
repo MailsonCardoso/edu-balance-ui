@@ -51,7 +51,6 @@ import {
 import type { Mensalidade, Aluno, FormaPagamento, OrigemPagamento } from "@/lib/mock-data";
 import { brl, fmtDate, fmtDateFull, maskDate, numeroExtenso } from "@/lib/format";
 import jsPDF from "jspdf";
-import axios from "axios";
 import { toast } from "sonner";
 import { ReciboVisual } from "@/components/shared/ReciboVisual";
 import { baixarPngRecibo } from "@/lib/recibo-png";
@@ -96,51 +95,6 @@ const formaPagamentoExibida = (m: {
   return m.formaPagamento ? formaPagamentoLabel[m.formaPagamento] : "—";
 };
 
-const mesesNomes = [
-  "janeiro",
-  "fevereiro",
-  "março",
-  "abril",
-  "maio",
-  "junho",
-  "julho",
-  "agosto",
-  "setembro",
-  "outubro",
-  "novembro",
-  "dezembro",
-];
-
-function normalizarMes(ref: string): string {
-  const trim = (ref || "").trim();
-  if (/^\d{2}\/\d{4}$/.test(trim)) return trim;
-  const lower = trim.toLowerCase();
-  for (let i = 0; i < mesesNomes.length; i++) {
-    if (lower.startsWith(mesesNomes[i])) {
-      const ano = lower.match(/\d{4}/)?.[0];
-      if (ano) return `${String(i + 1).padStart(2, "0")}/${ano}`;
-    }
-  }
-  return trim;
-}
-
-function mensagemErroApi(err: unknown): string {
-  if (axios.isAxiosError(err)) {
-    const data = err.response?.data as
-      | { message?: string; error?: string; errors?: Record<string, string[]> }
-      | undefined;
-    const primeiroErro = data?.errors
-      ? Object.values(data.errors)
-          .flat()
-          .find((msg) => typeof msg === "string")
-      : undefined;
-    const msg = primeiroErro ?? data?.message ?? data?.error;
-    if (msg) return msg;
-    return `HTTP ${err.response?.status ?? "?"}`;
-  }
-  return err instanceof Error ? err.message : "Falha inesperada";
-}
-
 function Financeiro() {
   const [dashboard, setDashboard] = useState<DashboardFinanceiro | null>(null);
   const [data, setData] = useState<Mensalidade[]>([]);
@@ -156,7 +110,6 @@ function Financeiro() {
 
   const [formOpen, setFormOpen] = useState(false);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     alunoId: "",
     mesReferencia: "",
@@ -279,7 +232,6 @@ function Financeiro() {
 
   const abrirForm = (mode: "create" | "edit", mensalidade?: Mensalidade) => {
     setFormMode(mode);
-    setEditingId(mode === "edit" && mensalidade ? mensalidade.id : null);
     if (mode === "edit" && mensalidade) {
       setFormData({
         alunoId: mensalidade.alunoId,
@@ -325,17 +277,6 @@ function Financeiro() {
       const dataVencimento = toIsoDate(formData.dataVencimento);
       const formaPg = formData.formaPagamento === "nenhuma" ? null : formData.formaPagamento;
       if (formMode === "create") {
-        const duplicada = data.some(
-          (m) =>
-            m.alunoId === formData.alunoId &&
-            normalizarMes(m.mesReferencia) === normalizarMes(formData.mesReferencia),
-        );
-        if (duplicada) {
-          toast.error(
-            "Já existe mensalidade para este aluno no mês informado — use 'Editar' para alterar o valor.",
-          );
-          return;
-        }
         await createMensalidade({
           alunoId: formData.alunoId,
           mesReferencia: formData.mesReferencia,
@@ -346,11 +287,7 @@ function Financeiro() {
         });
         toast.success("Mensalidade criada!");
       } else {
-        if (!editingId) {
-          toast.error("Mensalidade não selecionada — reabra a edição e tente novamente.");
-          return;
-        }
-        await updateMensalidade(editingId, {
+        await updateMensalidade(selectedMensalidade!.id, {
           alunoId: formData.alunoId,
           mesReferencia: formData.mesReferencia,
           valor: formData.valor,
@@ -361,12 +298,10 @@ function Financeiro() {
       }
       setFormOpen(false);
       setSelectedMensalidade(null);
-      setEditingId(null);
       carregar();
       carregarLista();
-    } catch (e) {
-      console.error("Falha ao salvar mensalidade", e);
-      toast.error(`Erro ao salvar mensalidade: ${mensagemErroApi(e)}`);
+    } catch {
+      toast.error("Erro ao salvar mensalidade");
     }
   };
 
@@ -854,13 +789,7 @@ function Financeiro() {
         }
       />
 
-      <Sheet
-        open={formOpen}
-        onOpenChange={(open) => {
-          setFormOpen(open);
-          if (!open) setEditingId(null);
-        }}
-      >
+      <Sheet open={formOpen} onOpenChange={setFormOpen}>
         <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-4 sm:p-6">
           <SheetHeader className="pr-8">
             <SheetTitle>
