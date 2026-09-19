@@ -177,7 +177,7 @@ function AssociadoCadastro() {
             name="nome"
             type="text"
             required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
@@ -188,7 +188,7 @@ function AssociadoCadastro() {
             required
             maxLength={11}
             placeholder="Apenas números"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
             onChange={(e) => { e.target.value = e.target.value.replace(/\D/g, ""); }}
           />
         </div>
@@ -198,7 +198,7 @@ function AssociadoCadastro() {
             name="email"
             type="email"
             required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
@@ -207,7 +207,7 @@ function AssociadoCadastro() {
             name="telefone"
             type="text"
             required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
@@ -215,7 +215,7 @@ function AssociadoCadastro() {
           <input
             name="nome_aluno"
             type="text"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <p className="text-xs text-gray-400">Sua senha de acesso será o CPF informado.</p>
@@ -289,7 +289,7 @@ function AssociadoLogin() {
             required
             onKeyDown={handleKeyDown}
             placeholder="seu@email.com"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <div className="space-y-1.5">
@@ -300,7 +300,7 @@ function AssociadoLogin() {
             required
             onKeyDown={handleKeyDown}
             placeholder="Seu CPF (apenas números)"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm outline-none focus:border-[#D62828] transition-colors"
+            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
           />
         </div>
         <button
