@@ -26,6 +26,7 @@ import { turmas } from "@/lib/mock-data";
 import type { Aluno } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { fetchAlunos, createAluno, updateAluno, deleteAluno } from "@/lib/api/alunos";
+import { cadastrarAssociado } from "@/lib/api/associado";
 
 export const Route = createFileRoute("/alunos/")({
   component: AlunosList,
@@ -78,7 +79,39 @@ function AlunosList() {
       if (sheetMode === "create") {
         const created = await createAluno(aluno);
         setData((d) => [...d, created]);
-        toast.success("Aluno cadastrado com sucesso!");
+
+        const cpfLimpo = (aluno.cpfResponsavel || "").replace(/\D/g, "");
+        if (aluno.responsavel && cpfLimpo) {
+          try {
+            await cadastrarAssociado({
+              nome: aluno.responsavel,
+              cpf: cpfLimpo,
+              email: aluno.email,
+              telefone: aluno.telefoneResponsavel,
+              nome_aluno: aluno.nome,
+              password: cpfLimpo,
+            });
+            toast.success("Aluno e responsável cadastrados com sucesso!");
+          } catch (assocErr: unknown) {
+            const apiErr = assocErr as {
+              response?: { data?: { message?: string; errors?: Record<string, string[]> } };
+            };
+            const assocMsg =
+              apiErr.response?.data?.message ||
+              apiErr.response?.data?.errors?.cpf?.[0] ||
+              apiErr.response?.data?.errors?.email?.[0] ||
+              "erro desconhecido";
+            console.error("Erro ao criar associado:", assocErr);
+            toast.error(
+              `Aluno criado, mas falha ao cadastrar responsável como associado: ${assocMsg}`,
+            );
+          }
+        } else {
+          toast.warning(
+            "Aluno cadastrado, mas responsável não virou associado: informe o CPF do responsável.",
+          );
+        }
+
         setSheetAluno(null);
         setSheetMode("view");
       } else {
