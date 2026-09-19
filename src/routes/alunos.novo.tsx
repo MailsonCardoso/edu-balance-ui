@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { maskCPF, maskDate, maskPhone, formatarCep, buscarCep } from "@/lib/format";
 import { CurrencyInput } from "@/components/shared/CurrencyInput";
 import { createAluno, checkCpfExists } from "@/lib/api/alunos";
+import { cadastrarAssociado } from "@/lib/api/associado";
 
 const schema = z.object({
   nome: z.string().min(3, "Nome muito curto").max(120),
@@ -89,7 +90,18 @@ function NovoAluno() {
   const onSubmit = async (data: FormData) => {
     try {
       await createAluno({ ...data, situacao: "em_dia" });
-      toast.success("Aluno cadastrado com sucesso!");
+
+      const cpfLimpo = data.cpfResponsavel.replace(/\D/g, "");
+      await cadastrarAssociado({
+        nome: data.responsavel,
+        cpf: cpfLimpo,
+        email: data.email,
+        telefone: data.telefoneResponsavel,
+        nome_aluno: data.nome,
+        password: cpfLimpo,
+      });
+
+      toast.success("Aluno e responsável cadastrados com sucesso!");
       navigate({ to: "/alunos" });
     } catch (err: unknown) {
       const apiErr = err as { response?: { data?: { errors?: Record<string, string[]> } } };
