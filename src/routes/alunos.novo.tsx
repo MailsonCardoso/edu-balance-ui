@@ -92,14 +92,25 @@ function NovoAluno() {
       await createAluno({ ...data, situacao: "em_dia" });
 
       const cpfLimpo = data.cpfResponsavel.replace(/\D/g, "");
-      await cadastrarAssociado({
-        nome: data.responsavel,
-        cpf: cpfLimpo,
-        email: data.email,
-        telefone: data.telefoneResponsavel,
-        nome_aluno: data.nome,
-        password: cpfLimpo,
-      });
+      try {
+        await cadastrarAssociado({
+          nome: data.responsavel,
+          cpf: cpfLimpo,
+          email: data.email,
+          telefone: data.telefoneResponsavel,
+          nome_aluno: data.nome,
+          password: cpfLimpo,
+        });
+      } catch (assocErr: unknown) {
+        const apiErr = assocErr as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } };
+        const assocMsg = apiErr.response?.data?.message
+          || apiErr.response?.data?.errors?.cpf?.[0]
+          || apiErr.response?.data?.errors?.email?.[0]
+          || "Erro ao cadastrar responsável como associado";
+        console.error("Erro ao criar associado:", assocErr);
+        toast.error(assocMsg);
+        return;
+      }
 
       toast.success("Aluno e responsável cadastrados com sucesso!");
       navigate({ to: "/alunos" });
