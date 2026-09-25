@@ -1,19 +1,9 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
-import {
-  UserPlus,
-  LogIn,
-  ArrowRight,
-  CheckCircle,
-  Shield,
-  Loader2,
-} from "lucide-react";
+import { UserPlus, LogIn, ArrowRight, CheckCircle, Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import {
-  cadastrarAssociado,
-  loginAssociado,
-} from "@/lib/api/associado";
+import { cadastrarAssociado, loginAssociado } from "@/lib/api/associado";
 
 export const Route = createFileRoute("/_site/associado")({
   component: Associado,
@@ -23,7 +13,9 @@ function erroAmigavel(err: unknown): string {
   const fallback = "Não foi possível concluir a ação. Tente novamente.";
   if (!axios.isAxiosError(err)) return fallback;
 
-  const data = err.response?.data as { message?: string; errors?: Record<string, string[]> } | undefined;
+  const data = err.response?.data as
+    | { message?: string; errors?: Record<string, string[]> }
+    | undefined;
 
   if (err.response?.status === 401) {
     return "E-mail ou senha inválidos. Verifique e tente novamente.";
@@ -86,7 +78,9 @@ function Associado() {
                 <button
                   onClick={() => setAba("login")}
                   className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                    aba === "login" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    aba === "login"
+                      ? "bg-[#D62828] text-white shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Entrar
@@ -94,7 +88,9 @@ function Associado() {
                 <button
                   onClick={() => setAba("cadastro")}
                   className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                    aba === "cadastro" ? "bg-[#D62828] text-white shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    aba === "cadastro"
+                      ? "bg-[#D62828] text-white shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
                   Cadastrar
@@ -107,15 +103,30 @@ function Associado() {
               <p className="text-gray-500 mb-8">Tudo que você vai ter como associado</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { icon: LogIn, title: "Painel do Sócio", desc: "Acesso completo às suas contribuições, benefícios e dados cadastrais." },
-                  { icon: CheckCircle, title: "Pagamentos", desc: "Pague mensalidades com facilidade." },
+                  {
+                    icon: LogIn,
+                    title: "Painel do Sócio",
+                    desc: "Acesso completo às suas contribuições, benefícios e dados cadastrais.",
+                  },
+                  {
+                    icon: CheckCircle,
+                    title: "Pagamentos",
+                    desc: "Pague mensalidades com facilidade.",
+                  },
                   { icon: ArrowRight, title: "Histórico", desc: "Todas as suas contribuições." },
-                  { icon: UserPlus, title: "Dados cadastrais", desc: "Mantenha suas informações atualizadas." },
+                  {
+                    icon: UserPlus,
+                    title: "Dados cadastrais",
+                    desc: "Mantenha suas informações atualizadas.",
+                  },
                   { icon: Shield, title: "Benefícios", desc: "Parceiros e vantagens exclusivas." },
                   { icon: LogIn, title: "Comunidade", desc: "Participe das discussões." },
                   { icon: Shield, title: "Segurança", desc: "Dados protegidos pela LGPD." },
                 ].map((item) => (
-                  <div key={item.title} className="bg-white rounded-xl border border-gray-100 p-5 text-center hover:shadow-md transition-shadow">
+                  <div
+                    key={item.title}
+                    className="bg-white rounded-xl border border-gray-100 p-5 text-center hover:shadow-md transition-shadow"
+                  >
                     <div className="size-10 rounded-full bg-[#D62828]/10 mx-auto grid place-items-center">
                       <item.icon className="size-5 text-[#D62828]" />
                     </div>
@@ -133,10 +144,17 @@ function Associado() {
 }
 
 function AssociadoCadastro() {
+  const cadastroHabilitado = false;
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!cadastroHabilitado) {
+      toast.info("O cadastro está temporariamente desativado.");
+      return;
+    }
+
     setLoading(true);
 
     const form = e.currentTarget;
@@ -189,7 +207,9 @@ function AssociadoCadastro() {
             maxLength={11}
             placeholder="Apenas números"
             className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-            onChange={(e) => { e.target.value = e.target.value.replace(/\D/g, ""); }}
+            onChange={(e) => {
+              e.target.value = e.target.value.replace(/\D/g, "");
+            }}
           />
         </div>
         <div className="space-y-1.5">
@@ -219,13 +239,18 @@ function AssociadoCadastro() {
           />
         </div>
         <p className="text-xs text-gray-400">Sua senha de acesso será o CPF informado.</p>
+        {!cadastroHabilitado && (
+          <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
+            O cadastro está temporariamente desativado.
+          </p>
+        )}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !cadastroHabilitado}
           className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors disabled:opacity-50"
         >
           {loading ? <Loader2 className="size-4 animate-spin" /> : <UserPlus className="size-4" />}
-          {loading ? "Cadastrando..." : "Enviar cadastro"}
+          {loading ? "Cadastrando..." : "Cadastro temporariamente desativado"}
         </button>
       </form>
     </div>
@@ -314,7 +339,9 @@ function AssociadoLogin() {
         </button>
       </div>
       <div className="mt-4 text-center">
-        <a href="#" className="text-sm text-[#D62828] hover:underline">Esqueceu a senha? Recuperar acesso</a>
+        <a href="#" className="text-sm text-[#D62828] hover:underline">
+          Esqueceu a senha? Recuperar acesso
+        </a>
       </div>
       <div className="mt-6 pt-6 border-t border-gray-100">
         <p className="text-xs text-gray-400 leading-relaxed text-center">
