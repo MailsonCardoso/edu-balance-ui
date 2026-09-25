@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { UserPlus, LogIn, ArrowRight, CheckCircle, Shield, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
-import { cadastrarAssociado, loginAssociado } from "@/lib/api/associado";
+import { loginAssociado } from "@/lib/api/associado";
 
 export const Route = createFileRoute("/_site/associado")({
   component: Associado,
@@ -49,7 +49,6 @@ function erroAmigavel(err: unknown): string {
 function Associado() {
   const navigate = useNavigate();
   const token = localStorage.getItem("associado_token");
-  const [aba, setAba] = useState<"cadastro" | "login">("login");
 
   if (token) {
     navigate({ to: "/associado/painel", replace: true });
@@ -74,29 +73,20 @@ function Associado() {
         <div className="container-page">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-start">
             <div>
-              <div className="flex rounded-lg border border-gray-200 p-1 mb-8">
+              <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm text-amber-800">
+                  O cadastro está temporariamente desativado.
+                </p>
                 <button
-                  onClick={() => setAba("login")}
-                  className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                    aba === "login"
-                      ? "bg-[#D62828] text-white shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  type="button"
+                  disabled
+                  className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-amber-200 px-6 py-3 text-sm font-medium text-amber-900 opacity-70"
                 >
-                  Entrar
-                </button>
-                <button
-                  onClick={() => setAba("cadastro")}
-                  className={`flex-1 h-10 rounded-md text-sm font-medium transition-colors ${
-                    aba === "cadastro"
-                      ? "bg-[#D62828] text-white shadow-sm"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  Cadastrar
+                  <UserPlus className="size-4" />
+                  Cadastro temporariamente desativado
                 </button>
               </div>
-              {aba === "login" ? <AssociadoLogin /> : <AssociadoCadastro />}
+              <AssociadoLogin />
             </div>
             <div className="mt-12 lg:mt-0">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#D62828] mb-2">Em breve</h2>
@@ -140,120 +130,6 @@ function Associado() {
         </div>
       </section>
     </>
-  );
-}
-
-function AssociadoCadastro() {
-  const cadastroHabilitado = false;
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!cadastroHabilitado) {
-      toast.info("O cadastro está temporariamente desativado.");
-      return;
-    }
-
-    setLoading(true);
-
-    const form = e.currentTarget;
-    const data = new FormData(form);
-
-    const password = data.get("cpf") as string;
-
-    try {
-      const res = await cadastrarAssociado({
-        nome: data.get("nome") as string,
-        cpf: password,
-        email: data.get("email") as string,
-        telefone: data.get("telefone") as string,
-        nome_aluno: (data.get("nome_aluno") as string) || undefined,
-        password,
-      });
-
-      if (res.success && res.token) {
-        localStorage.setItem("associado_token", res.token);
-        localStorage.setItem("associado_data", JSON.stringify(res.associado));
-        toast.success(res.message);
-        window.location.href = "/associado/painel";
-      }
-    } catch (err) {
-      toast.error(erroAmigavel(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 p-6 sm:p-8">
-      <h2 className="text-lg font-semibold text-[#D62828] mb-6">Cadastrar</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Nome completo</label>
-          <input
-            name="nome"
-            type="text"
-            required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">CPF</label>
-          <input
-            name="cpf"
-            type="text"
-            required
-            maxLength={11}
-            placeholder="Apenas números"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-            onChange={(e) => {
-              e.target.value = e.target.value.replace(/\D/g, "");
-            }}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Email</label>
-          <input
-            name="email"
-            type="email"
-            required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Telefone</label>
-          <input
-            name="telefone"
-            type="text"
-            required
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-sm font-medium text-gray-700">Nome do aluno</label>
-          <input
-            name="nome_aluno"
-            type="text"
-            className="w-full h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#D62828] transition-colors"
-          />
-        </div>
-        <p className="text-xs text-gray-400">Sua senha de acesso será o CPF informado.</p>
-        {!cadastroHabilitado && (
-          <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-            O cadastro está temporariamente desativado.
-          </p>
-        )}
-        <button
-          type="submit"
-          disabled={loading || !cadastroHabilitado}
-          className="inline-flex items-center justify-center gap-2 w-full h-11 px-6 rounded-lg bg-[#D62828] text-white font-medium text-sm hover:bg-[#D62828]/90 transition-colors disabled:opacity-50"
-        >
-          {loading ? <Loader2 className="size-4 animate-spin" /> : <UserPlus className="size-4" />}
-          {loading ? "Cadastrando..." : "Cadastro temporariamente desativado"}
-        </button>
-      </form>
-    </div>
   );
 }
 
