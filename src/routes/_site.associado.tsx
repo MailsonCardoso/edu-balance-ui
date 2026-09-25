@@ -73,19 +73,6 @@ function Associado() {
         <div className="container-page">
           <div className="lg:grid lg:grid-cols-2 lg:gap-12 items-start">
             <div>
-              <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                <p className="text-sm text-amber-800">
-                  O cadastro está temporariamente desativado.
-                </p>
-                <button
-                  type="button"
-                  disabled
-                  className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-amber-200 px-6 py-3 text-sm font-medium text-amber-900 opacity-70"
-                >
-                  <UserPlus className="size-4" />
-                  Cadastro temporariamente desativado
-                </button>
-              </div>
               <AssociadoLogin />
             </div>
             <div className="mt-12 lg:mt-0">
